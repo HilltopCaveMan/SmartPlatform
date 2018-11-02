@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="AppSetting" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="AppSetting" type="GModel.Basic.AppSetting" />
+  </alias>
+  <resultMaps>
+    <resultMap id="AppSettingResult" class="AppSetting">
+      <result property="UserName" column="UserName" type="string" dbType="varchar"/>
+      <result property="settingTime" column="settingTime" type="DateTime" dbType="DateTime"/>
+      <result property="totalSetting" column="totalSetting" type="string" dbType="varchar"/>
+      <result property="onlineSetting" column="onlineSetting" type="string" dbType="varchar"/>
+      <result property="offlineSetting" column="offlineSetting" type="string" dbType="varchar"/>
+      <result property="otherSetting" column="otherSetting" type="string" dbType="varchar"/>
+      <result property="demolitionAlarm" column="demolitionAlarm" type="string" dbType="varchar"/>
+      <result property="overspeedAlarm" column="overspeedAlarm" type="string" dbType="varchar"/>
+      <result property="zoneAlarm" column="zoneAlarm" type="string" dbType="varchar"/>
+      <result property="poweroffAlarm" column="poweroffAlarm" type="string" dbType="varchar"/>
+      <result property="pushSetting" column="pushSetting" type="string" dbType="varchar"/>
+      <result property="stockSetting" column="stockSetting" type="string" dbType="varchar"/>
+      <result property="expiredSetting" column="expiredSetting" type="string" dbType="varchar"/>
+      <result property="warnSetting" column="warnSetting" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectAppSetting" parameterClass="string" resultMap="AppSettingResult">
+      SELECT t.username     as UserName,
+      t.setting_time        as settingTime,
+      t.total_setting       as totalSetting,
+      t.online_setting      as onlineSetting,
+      t.offline_setting     as offlineSetting,
+      t.other_setting       as otherSetting,
+      t.demolition_alarm    as demolitionAlarm,
+      t.overspeed_alarm     as overspeedAlarm,
+      t.zone_alarm          as zoneAlarm,
+      t.power_off_alarm     as poweroffAlarm,
+      t.push_setting        as pushSetting,
+      t.stock_setting       as stockSetting,
+      t.expired_setting     as expiredSetting,
+      t.warn_setting        as warnSetting
+      FROM AppSetting t
+      WHERE t.username=#value#
+    </select>
+
+    <select id="SelectAppSettingPage" parameterClass="AppSetting" resultMap="AppSettingResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT t.username     as UserName,
+      t.setting_time        as settingTime,
+      t.total_setting       as totalSetting,
+      t.online_setting      as onlineSetting,
+      t.offline_setting     as offlineSetting,
+      t.other_setting       as otherSetting,
+      t.demolition_alarm    as demolitionAlarm,
+      t.overspeed_alarm     as overspeedAlarm,
+      t.zone_alarm          as zoneAlarm,
+      t.power_off_alarm     as poweroffAlarm,
+      t.push_setting        as pushSetting,
+      t.stock_setting       as stockSetting,
+      t.expired_setting     as expiredSetting,
+      t.warn_setting        as warnSetting
+      FROM AppSetting t
+      ORDER BY t.setting_time desc
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+    <select id="SelectAppSettingCount" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM AppSetting WHERE 1=1
+    </select>
+
+    <insert id="InsertAppSetting" parameterClass="AppSetting">
+      INSERT INTO AppSetting
+      (username,setting_time,total_setting,online_setting,offline_setting,other_setting,demolition_alarm,overspeed_alarm,zone_alarm,power_off_alarm,push_setting,stock_setting,expired_setting,warn_setting)
+      VALUES(#UserName#,#settingTime#,#totalSetting#,#onlineSetting#,#offlineSetting#,#otherSetting#,#demolitionAlarm#,#overspeedAlarm#,#zoneAlarm#,#poweroffAlarm#,#pushSetting#,#stockSetting#,#expiredSetting#,#warnSetting#)
+    </insert>
+
+    <update id="UpdateAppSetting" parameterClass="AppSetting">
+      UPDATE AppSetting
+      SET username=#UserName#,setting_time=#settingTime#,total_setting=#totalSetting#,online_setting=#onlineSetting#,
+      offline_setting=#offlineSetting#,other_setting=#otherSetting#,
+      demolition_alarm=#demolitionAlarm#,overspeed_alarm=#overspeedAlarm#,zone_alarm=#zoneAlarm#,power_off_alarm=#poweroffAlarm#,
+      push_setting=#pushSetting#,stock_setting=#stockSetting#,expired_setting=#expiredSetting#,warn_setting=#warnSetting# WHERE username=#UserName#
+    </update>
+
+    <delete id="DeleteAppSetting" parameterClass="string">
+      DELETE FROM AppSetting
+      WHERE  username=#UserName#
+    </delete>
+
+  </statements>
+</sqlMap>

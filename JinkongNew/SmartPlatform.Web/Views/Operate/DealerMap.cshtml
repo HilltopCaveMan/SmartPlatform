@@ -1,0 +1,33 @@
+﻿<div style="width:150px;height:300px;position:absolute;top:30px;left:10px;z-index:1000;">
+    <table id="rlb" data-options="rownumbers:true,singleSelect:true,toolbar:''" style="width:150px;height:300px;">
+        <thead>
+            <tr>
+                <th data-options="field:'f1',width:120">经销商</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div id="allmap">
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#rlb').datagrid({
+            data: [
+                { f1: '锡林格勒盟机械有限公司' },
+                { f1: '锡林格勒盟机械有限公司' },
+                { f1: '锡林格勒盟机械有限公司' },
+                { f1: '锡林格勒盟机械有限公司' },
+                { f1: '锡林格勒盟机械有限公司' }
+            ],
+            rownumbers: true,
+            singleSelect: true
+        });
+    })
+
+   
+</script>
+
+
+<iframe src="~/assets/BMapLib/1.html" width="700" height="600" style="margin-left:280px"></iframe>
+

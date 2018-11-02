@@ -1,0 +1,38 @@
+﻿<script type="text/javascript" language="javascript">
+    var result = "@ViewBag.Result";
+    var flag = "@ViewBag.flag";
+    if (result != null && result != "") {
+        if (flag == 1)
+        {
+            window.parent.$("div.panel.window").find('.panel-tool-close').click();
+            window.parent.$.messager.alert('提示', "操作成功！", 'info', function () {
+                window.parent.location.reload();
+            });
+        }
+        else
+        {
+            var ifr = window.parent.document.getElementById('/CarInfo/CarInfoIndex');
+            var win = ifr.window || ifr.contentWindow;
+            win.$('#CarOrgTable').datagrid('reload');
+            window.parent.$(".dialog").dialog('close');
+            window.parent.$.messager.show({
+                title: '提示',
+                msg: "操作成功！",
+                timeout: 2000,
+            });
+        }
+
+    } else {
+        if (flag == 1) {
+            window.parent.$("div.panel.window").find('.panel-tool-close').click();
+        }
+        else {
+            window.parent.$(".dialog").dialog('close');
+        }
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "操作失败！",
+            timeout: 2000,
+        });
+    }
+</script>

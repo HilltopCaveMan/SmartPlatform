@@ -1,0 +1,38 @@
+﻿<script type="text/javascript" language="javascript">
+    var result = "@ViewBag.Result";
+    if (result == "false") {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "请输入车牌号！",
+            timeout: 2000,
+        });
+    }else if (result == "true") {
+        var ifr = window.parent.document.getElementById('/CarInfo/CarInfoIndex');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#CarOrgTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "操作成功！",
+            timeout: 2000,
+        });
+    } else {
+        if (result != "") {
+            window.parent.$(".dialog").dialog('close');
+            window.parent.$.messager.show({
+                title: '提示',
+                msg: result + ",操作失败！",
+                timeout: 2000,
+            });
+        }
+        else {
+            window.parent.$(".dialog").dialog('close');
+            window.parent.$.messager.show({
+                title: '提示',
+                msg: "操作失败！",
+                timeout: 2000,
+            });
+        }
+    }
+</script>

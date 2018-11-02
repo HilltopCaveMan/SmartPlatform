@@ -1,0 +1,114 @@
+﻿@model SmartPlatform.Models.ProductManager.Products
+<div style="padding:10px 60px 20px 60px">
+@using (Ajax.BeginForm("Edit", "Generation", FormMethod.Post, new AjaxOptions()))
+    {
+    @Html.HiddenFor(model => model.DEVICEID)
+        <table cellpadding="5">
+            <tr>
+                <td>车辆编号:</td>
+                <td>
+                    @Html.TextBoxFor(model => model.VINCODE, new { @class = "textbox" })
+                    @Html.ValidationMessageFor(model => model.VINCODE)
+                </td>
+            </tr>
+            <tr>
+                <td>类型:</td>
+                <td>
+                    @Html.TextBoxFor(model => model.VEHICLETYPECODE, new { @class = "textbox" })
+                    @Html.ValidationMessageFor(model => model.VEHICLETYPECODE)
+                </td>
+            </tr>
+            <tr>
+                <td>机型:</td>
+                <td>
+                    @Html.TextBoxFor(model => model.MODELSCODE, new { @class = "textbox" })
+                    @Html.ValidationMessageFor(model => model.MODELSCODE)
+                </td>
+            </tr>
+            <tr>
+                <td>产品代码:</td>
+                <td>
+                   @Html.TextBoxFor(model => model.PRODUCTCODE, new { @class = "textbox" })
+                   @Html.ValidationMessageFor(model => model.PRODUCTCODE)
+                </td>
+            </tr>
+            <tr>
+                <td>终端编号:</td>
+                <td>
+                    @Html.TextBoxFor(model => model.TERMINALNUM, new { @class = "textbox" })
+                    @Html.ValidationMessageFor(model => model.TERMINALNUM)
+                    @Html.HiddenFor(model => model.OlDTERMINALNUM)
+                </td>
+            </tr>
+            <tr>
+                <td>SIM卡号:</td>
+                <td>
+                    @Html.TextBoxFor(model => model.SIMNUM, new { @class = "textbox" })
+                    @Html.ValidationMessageFor(model => model.SIMNUM)
+                </td>
+            </tr>           
+        </table>
+    <div style="text-align:center;padding:5px">
+        @*//<a href="javascript:void(0)" type="submit" class="easyui-linkbutton" onclick="submitForm()">确定</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">取消</a>*@
+        <input class="btn" type="submit" value="确定"  />
+        <input class="btn" type="button" value="取消" onclick="clearForm()" /> 
+    </div>
+      <div>
+            @Html.ValidationSummary(true, "")
+        </div>
+    }
+</div>
+<script type="text/javascript">
+    var MchineClassNameTmp = "";
+    $(function () {
+        //类型
+        $('#VEHICLETYPECODE').combobox({
+            url: '@Url.Action("GetMchineClassList", "Generation")',
+            valueField: 'VEHICLETYPECODER',
+            textField: 'DEVICETYPE',
+            onSelect: function (rec) {
+                //类型远程数据请求路径
+                var url = '@Url.Action("GetMchineTypeList", "Generation")?MchineClassNumber=' + rec.VEHICLETYPECODER;
+                $('#MODELSCODE').combobox("clear");
+                $('#MODELSCODE').combobox('reload', url);
+            }
+        })
+        //机型
+        $('#MODELSCODE').combobox({
+            url: encodeURI('@Url.Action("GetMchineTypeList", "Generation")'),
+            valueField: 'MODELSCODE',
+            textField: 'MODELS',
+            onSelect: function (node) {
+                //类型远程数据请求路径
+                var url = '@Url.Action("GetProductCodeListByModelCode", "Generation")?ModelsCode=' + node.MODELSCODE;
+                $('#PRODUCTCODE').combobox("clear");
+                $('#PRODUCTCODE').combobox('reload', url);
+            }
+        })
+        //产品代码
+        $('#PRODUCTCODE').combobox({
+            url: '@Url.Action("GetProductCodeListByModelCode", "Generation")',
+            valueField: 'PRODUCTCODE',
+            textField: 'PRODUCTCODE',
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) == 0;
+            },
+            onSelect: function (node) {
+            }
+        })
+
+    })
+    function submitFormSucceed() {
+        window.parent.succeed();
+    };
+    function submitFormError() {
+        window.parent.error();
+    };
+
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    };
+    </script>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="CarType" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="CarType" type="GModel.Car.CarType" />
+</alias>
+<resultMaps>
+	<resultMap id="CarTypeResult" class="CarType">
+		<result property="TypeId" column="TypeId" />
+		<result property="TypeName" column="TypeName" />
+		<!--<result property="TypePicture" column="TypePicture" />-->
+		<result property="TypePictype" column="TypePictype" />
+	</resultMap>
+
+  <resultMap id="CarTypeImage" class="Hashtable">
+    <result property="Picture" column="Picture"/>
+    <result property="PicType" column="PicType"/>
+  </resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectCarType" parameterClass="CarType" resultMap="CarTypeResult">
+		SELECT TYPE_ID AS TypeId,TYPE_NAME AS TypeName,TYPE_PICTYPE AS TypePictype
+		FROM CAR_TYPE where 1=1 
+	</select>
+	<select id="SelectCarTypePage" parameterClass="CarType" resultMap="CarTypeResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+			SELECT TYPE_ID AS TypeId,TYPE_NAME AS TypeName,TYPE_PICTYPE AS TypePictype
+			FROM CAR_TYPE where 1=1 
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectCarTypeCount" parameterClass="CarType" resultClass="int">
+		SELECT count(*) 
+		FROM CAR_TYPE where 1=1 
+	</select>
+	<insert id="InsertCarType" parameterClass="CarType">
+		INSERT INTO CAR_TYPE 
+		(TYPE_ID,TYPE_NAME,TYPE_PICTURE,TYPE_PICTYPE) 
+		VALUES(#TypeId#,#TypeName#,#TypePicture#,#TypePictype#)
+	</insert>
+	<update id="UpdateCarType" parameterClass="CarType">
+		UPDATE CAR_TYPE 
+ 		SET TYPE_ID=#TypeId#,TYPE_NAME=#TypeName#,TYPE_PICTURE=#TypePicture#,TYPE_PICTYPE=#TypePictype#
+	</update>
+	<delete id="DeleteCarType" parameterClass="string">
+    DELETE FROM CAR_TYPE
+    WHERE 1=1 and TYPE_ID= #value#
+  </delete>
+  
+  
+  <select id="SelectCarTypeImage" parameterClass="CarType" resultMap="CarTypeImage">
+    SELECT t.type_picture AS Picture,t.type_pictype AS PicType FROM CAR_TYPE t where 1=1 and TYPE_ID=#TypeId#
+  </select>
+</statements>
+</sqlMap>

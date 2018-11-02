@@ -1,0 +1,176 @@
+﻿@model GModel.Basic.UserInfo
+<div class="tabcontant">
+    @using (Ajax.BeginForm("AddTerUserForm", "User", FormMethod.Post, new AjaxOptions()))
+    {
+        <table class="tableForm1" id="endUser">
+            <tr>
+                <td class="field"><i>*</i>登录名</td>
+                <td>
+                    @Html.TextBoxFor(m => m.UserLname, new { @class = "easyui-textbox", @style = "width:180px;" })
+                </td>
+                <td class="field"><i>*</i>用户名称</td>
+                <td>
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "easyui-textbox", @style = "width:180px;" })
+                </td>
+            </tr>
+            <tr>
+                <td class="field"><i>*</i>密码</td>
+                <td>
+                    @Html.PasswordFor(m => m.UserPasswrd, new { @class = "easyui-textbox", @style = "width:180px;" })
+                </td>
+                <td class="field"><i>*</i>确定密码</td>
+                <td>
+                    @Html.PasswordFor(m => m.UserRePasswrd, new { @class = "easyui-textbox", @style = "width:180px;" })
+                </td>
+            </tr>
+            <tr>
+                <td class="field"><i>*</i>设备所属企业</td>
+                <td id="TDDEPT">
+                    <input id="DeptId" class="easyui-combotree" type="text" style="height: 25px; width: 180px; float: left;" panelheight="150" />
+                </td>
+                <td class="field"><i>*</i>终端编号</td>
+                <td>
+                    <input id="DdlTerBind" class="easyui-combotree" type="text" style="height: 25px; width: 180px; float: left;" panelheight="150" />
+                    <input id="userters" name="userters" type="hidden" />
+                </td>
+            </tr>
+        </table>
+        <div class="formfooter" style="margin-left:-10px;">
+            <button class="stdbtn btn_blue" type="submit" onclick="return validate()">确定</button>
+            <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+        </div>
+        <div>@Html.ValidationSummary(true, "")</div>
+    }
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    function validate() {
+        var msg = [];
+        var userlname = $("#UserLname").val();
+        if (userlname == "") {
+            msg.push("登录名不能为空！");
+        }
+        var username = $("#UserName").val();
+        if (username == "") {
+            msg.push("用户名称不能为空！");
+        }
+        var pwd = $('#UserPasswrd').val();
+        if (pwd == "") {
+            msg.push("密码不能为空！");
+        }
+        var repwd = $('#UserRePasswrd').val();
+        if (repwd == "") {
+            msg.push("确定密码不能为空！");
+        }
+        if (pwd != repwd) {
+            msg.push("密码与确定密码不一致！");
+        }
+        var enterid = $('#DeptId').combotree('getValue');
+        if (enterid == "" || enterid == null) {
+            msg.push("设备所属企业不能为空！");
+        }
+        var terno = $('#DdlTerBind').combotree('getText');
+        if (terno == "" || terno == null || terno=="--请选择要管辖的终端--") {
+            msg.push("终端编号不能为空！");
+        }
+        else {
+            $('#userters').val(terno);
+        }
+        if (msg.length > 0) {
+            window.parent.$.messager.alert("提示", msg.join("\r\n"), "info");
+            return false;
+        }
+    }
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    }
+
+    $(function () {
+        $("input, textarea, select").uniform();
+
+        $("#DeptId").combotree({
+            url: '/Dept/GetOrgNode',
+            queryParams: { isTree: "tree" },
+            animate: true,
+            lines: true,
+            editable: true,
+            onSelect: function (node) {
+                BindTer(node.id);
+            },
+            onLoadSuccess: function () {
+                $('#DeptId').combotree('setValue', '@Model.EnterId');
+                BindTer('@Model.EnterId');
+            }
+        });
+
+        BindSearchEvent($("#TDDEPT .textbox-text"), $('#DeptId'));
+
+        /*
+        $("#TDDEPT .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown",
+            function (e) {
+                if (e.keyCode == "13") {
+                    $('#EnterId').combotree('tree').tree("search", $(this).val());
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        $('#EnterId').combotree('tree').tree("collapseAll");
+                    }
+                }
+            }
+        );
+        */
+    });
+
+    function BindTer(DeptId) {
+        //绑定终端
+        $('#DdlTerBind').combotree({
+            url: '/Terminal/GetDeptTerList?DeptId=' + DeptId,
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) > -1;
+            },
+            editable: true,
+            onSelect: function () { },
+            multiple: true,
+            value: '--请选择要管辖的终端--'
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#DdlTerBind'));
+    }
+
+    function submitFormSucceed() {
+        var ifr = window.parent.document.getElementById('/User/TerUserList');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#StaffTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "添加成功！",
+            timeout: 2000,
+        });
+    }
+    function submitFormError(info) {
+        var errormsg = "";
+        if (info != "" && info != null) {
+            errormsg = info + ",添加失败！";
+        }
+        else {
+            errormsg = "添加失败！";
+        }
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: errormsg,
+            timeout: 2000,
+        });
+    }
+</script>
+
+
+<style>
+    #endUser i {
+        color: red;
+    }
+</style>
+

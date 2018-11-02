@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="RawData" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="RawData" type="GModel.InterFace.RawData" />
+</alias>
+<resultMaps>
+	<resultMap id="RawDataResult" class="RawData">
+		<result property="Rawdataid" column="Rawdataid" type="string" dbType="varchar"/>
+		<result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+		<result property="Information" column="Information" type="string" dbType="varchar"/>
+		<result property="InformationTime" column="InformationTime" type="DateTime" dbType="DateTime"/>
+		<result property="Remark" column="Remark" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectRawData" parameterClass="string" resultMap="RawDataResult">
+		SELECT RAWDATAID AS Rawdataid,TER_NO AS TerNo,INFORMATION AS Information,INFORMATION_TIME AS InformationTime,REMARK AS Remark
+		FROM RAW_DATA 
+	</select>
+	<select id="SelectRawDataPage" parameterClass="map" resultMap="RawDataResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+			SELECT RAWDATAID AS Rawdataid,TER_NO AS TerNo,INFORMATION AS Information,INFORMATION_TIME AS InformationTime,REMARK AS Remark
+			FROM RAW_DATA  
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectRawDataCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM RAW_DATA  
+	</select>
+	<insert id="InsertRawData" parameterClass="RawData">
+		INSERT INTO RAW_DATA 
+		(RAWDATAID,TER_NO,INFORMATION,INFORMATION_TIME,REMARK) 
+		VALUES(#Rawdataid#,#TerNo#,#Information#,#InformationTime:DateTime:1/1/0001 12:00:00 AM#,#Remark#)
+	</insert>
+	<update id="UpdateRawData" parameterClass="RawData">
+		UPDATE RAW_DATA 
+ 		SET TER_NO=#TerNo#,INFORMATION=#Information#,INFORMATION_TIME=#InformationTime#,REMARK=#Remark#
+		WHERE RAWDATAID = #Rawdataid#
+	</update>
+	<delete id="DeleteRawData" parameterClass="string">
+		DELETE FROM RAW_DATA 
+		WHERE  $value$ 
+	</delete>
+</statements>
+</sqlMap>

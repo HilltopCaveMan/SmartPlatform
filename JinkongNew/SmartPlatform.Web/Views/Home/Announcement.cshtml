@@ -1,0 +1,130 @@
+﻿@using SmartPlatform.Models
+@model List<SmartPlatform.Models.AnnouncementManager.Announcement>
+
+<div class="tabcontant" style="margin: 0; padding: 0;">
+    <div style="position:fixed;z-index:-1;width:100%;height:100%;">
+        <img src="../assets/images/gonggao.jpg" width="100%" height="100%" />
+    </div>
+
+    @*最新*@
+    <div id="new">
+        <table cellpadding="0" border="0" cellspacing="0">
+            @foreach (var item in ViewBag.list)
+            {
+                <tr>
+                    <td class="name">
+                        <a href="#" id="@item.Id" onclick="rightShow('@item.Id')">
+                            &diams;&nbsp;@item.Name
+                        </a>
+                    </td>
+                    <td class="time">@item.CreateTime</td>
+                </tr>
+            }
+        </table>
+    </div>
+    @*历史*@
+    <div id="history">
+        <table id="Right_Table" cellpadding="0" cellspacing="0" border="0"></table>
+    </div>
+</div>
+<script>
+    function rightShow(id) {
+        $.ajax({
+            url: "/Home/RightAll",
+            type: "post",
+            data: {
+                ID: id
+            },
+            dataType: "Json"
+        }).done(function (data) {
+            $("#Right_Table").empty();
+            for (var i = 0; i < data.length; i++) {
+                var xx = $("<tr><td class='sonname' id='td_Name'>"
+                  + data[i].Name + "</td></tr><tr><td class='sontime' id='td_CreateTime'>"
+                  + data[i].CreateTime + "</td></tr><tr><td class='content' id='td_Content'>&nbsp;&nbsp;"
+                  + data[i].Content + "</td></tr>");
+                $("#Right_Table").append(xx);
+            }
+        })
+    }
+</script>
+<style>
+    #new {
+        width: 430px;
+        height: 280px;
+        margin-left: 85px;
+        margin-top: 160px;
+        float: left;
+    }
+
+    #new table {
+        margin: 0;
+        padding: 0;
+        margin-top: -2px;
+        overflow-y: auto;
+    }
+
+    #new table td {
+        padding-bottom: 5px;
+    }
+
+    #new table td a {
+        font-size: 18px;
+        color: #605959;
+        font-family: '华文中宋';
+        text-decoration: none;
+    }
+
+    #new table td a:hover {
+        color: #0094ff;
+        border-bottom: 1px #0094ff solid;
+    }
+
+    #new table .name {
+        padding-right: 50px;
+    }
+
+    #history {
+        width: 430px;
+        height: 280px;
+        margin-left: 60px;
+        margin-top: 160px;
+        float: left;
+        overflow-y: auto;
+    }
+
+    #history table {
+        margin: 0;
+        padding: 0;
+        width: 410px;
+    }
+
+    #history table td {
+        font-size: 18px;
+        color: #000;
+        font-family: '华文中宋';
+        text-decoration: none;
+        margin-left: 30px;
+    }
+
+    #history table .sonname {
+        text-align: center;
+        padding-left: 50px;
+        padding-right: 30px;
+    }
+
+    #history table .sontime {
+        font-size: 14px;
+        margin-top: 5px;
+        padding-left: 150px;
+        margin-bottom: 5px;
+    }
+
+    #history .content {
+        height: 20px;
+        font-size: 14px;
+        font-family: "黑体";
+        line-height: 30px;
+        overflow-y: auto;
+    }
+</style>

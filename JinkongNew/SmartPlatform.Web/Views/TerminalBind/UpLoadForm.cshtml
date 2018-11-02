@@ -1,0 +1,61 @@
+﻿<script type="text/javascript" language="javascript">
+    var result = "@ViewBag.ReturnVal";
+    if (result == "false") {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "导入失败！",
+            timeout: 2000
+        });
+    }else if (result == "true") {
+        var ifr = window.parent.document.getElementById('/TerminalBind/Index');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#NotAddTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "导入成功！",
+            timeout: 2000
+        });
+    } else {
+        var resultstr = CutStr(result,30);
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: resultstr,
+            timeout: 2000,
+            width: 'auto',
+            height: 'auto'
+        });
+    }
+
+    function CutStr(str,len)
+    {
+        var s = "";
+        var w = "";
+        if (str.trim().length-7 > 291)
+        {
+            str = str.substring(0,291);
+            w = "等,导入有问题!";
+        }
+        var last = parseInt((str.length / len)) * len;
+        for(var i=0;i<str.length ;i++)
+        {
+            var r = i % len;
+            if (i!=0 && i<=last)
+            {
+                if(r==0)
+                {
+                    s += str.substring(i - len, i) + "<br>";
+                } 
+            }
+            else if (i>last)
+            {
+                s += str.substring(i - 1);
+                break;
+            }
+        }
+        return s+w;
+    }
+
+</script>

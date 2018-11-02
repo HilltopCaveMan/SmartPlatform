@@ -1,0 +1,177 @@
+﻿@model GModel.Car.TerminalInfo
+@using (Ajax.BeginForm("EditTerForm", "Terminal", FormMethod.Post, new AjaxOptions()))
+{
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        @Html.HiddenFor(m => m.TerGuid, new { @class = "" })
+        <input id="flag" name="flag" type="hidden" value="@ViewBag.flag"/>
+        <p>
+            <label><i>*</i>终端编号</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.TerNo, new { @class = "textbox" })
+                <b>
+                   
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>所属企业</label>
+            <div class="field">
+                <input name="DeptId" id="TerminalAdd" class="textbox" type="text" style="height:30px;" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>终端类型</label>
+            <div class="field">
+                <input name="TerTypeid" id="TerminalType" class="textbox" type="text" style="height:30px;" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>SIM卡</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.TerSimcard, new { @class = "textbox" })
+                <b>
+                </b>
+            </div>
+        </p>
+    </div>
+    <div class="formfooter" >
+        <button class="stdbtn btn_blue" type="submit" onclick="return validate()">确定</button>
+        <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+    </div>
+}
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    function validate()
+    {
+        var msg = [];
+        var terno = $("#TerNo").val();
+        if (terno == "") {
+            msg.push("终端号不能为空！");
+        }
+        else {
+            var reg = /[\u4e00-\u9fa5]/;
+            if (reg.exec(terno)) {
+                msg.push("终端号不能包含中文！");
+            }
+        }
+        var TerType = $('#TerminalType').combobox('getValue');
+        if (TerType == "" || TerType==null) {
+            msg.push("终端类型不能为空！");
+        }
+        var simcard = $("#TerSimcard").val();
+        if (simcard == "") {
+            msg.push("SIM卡号不能为空！");
+        }
+        else {
+            if (!((simcard.length == 11)
+                || (simcard.length == 13))) {
+                msg.push("SIM卡号长度为11或13位!");
+            }
+        }
+        if (msg.length > 0) {
+            window.parent.$.messager.alert('提示', msg.join("\r\n"), 'info');
+            return false;
+        }
+    }
+
+    function clearForm() {
+        var flag = $('#flag').val();
+        if (flag == 1)
+        {
+            window.parent.$("div.panel:last").find('.panel-tool-close').click();
+        }
+        else
+        {
+            window.parent.$(".dialog").dialog('close');
+        }
+
+    }
+
+    $(function () {
+        $("#TerminalAdd").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            onLoadSuccess: function () {
+                $('#TerminalAdd').combotree('setValue', '@ViewBag.Deptid');
+            }
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerminalAdd'));
+
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown",
+            function (e) {
+                if (e.keyCode == "13") {
+                    $('#TerminalAdd').combotree('tree').tree("search", $(this).val());
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        $('#TerminalAdd').combotree('tree').tree("collapseAll");
+                    }
+                }
+            }
+        );
+        */
+
+        $('#TerminalType').combobox({
+            url: '/TerType/GetTerTypeList',
+            valueField: 'ProId',
+            textField: 'ProName',
+            panelHeight: 100,
+            //queryParams: {isTree:"false"},
+            onLoadSuccess: function () {
+                var data = $('#TerminalType').combobox('getData');
+                if (data.length > 0) {
+                    $('#TerminalType').combobox('select', '@ViewBag.Type');
+                }
+            }
+        });
+    })
+
+    function editFormSucceed() {
+        var flag = $('#flag').val();
+        if (flag == 1) {
+            //var srcurl = window.parent.$("div.panel.window").find('iframe').eq(0).attr('src');
+            //window.parent.$("div.panel.window").filter(function () {
+            //    if ($(this).css("display") == "block") {
+            //        $(this).find('iframe').attr('src', srcurl);
+            //    }
+            //});
+            window.parent.$("div.panel.window").find('.panel-tool-close').click();
+            window.parent.$.messager.alert('提示', "操作成功！", 'info', function () {
+                window.parent.location.reload();
+            });
+        }
+        else {
+            var ifr = window.parent.document.getElementById('/Terminal/TerminalIndex');
+            var win = ifr.window || ifr.contentWindow;
+            win.$('#TerminalTable').datagrid('reload');
+            window.parent.$(".dialog").dialog('close');
+            window.parent.$.messager.show({
+                title: '提示',
+                msg: "修改成功！",
+                timeout: 2000
+            });
+        }
+    }
+
+    function editFormError(msg_content) {
+        var flag = $('#flag').val();
+        if (flag == 1) {
+            window.parent.$("div.panel:last").find('.panel-tool-close').click();
+        }
+        else {
+            window.parent.$(".dialog").dialog('close');
+        }
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改失败！<br /> " + msg_content,
+            timeout: 2000
+        });
+    }
+
+</script>  

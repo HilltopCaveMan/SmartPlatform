@@ -1,0 +1,39 @@
+﻿@model GModel.Basic.QuestionInfo
+<div style="height:90%;overflow:scroll;display:block;margin-bottom:50px;">
+    @Html.HiddenFor(m => m.QuestionId, new { @class = "", })
+    <div class="field">
+        <label>主题：</label>@Html.LabelFor(m => m.QuestionTitle, @Model.QuestionTitle)
+    </div>
+
+    <div class="field">
+        <label>内容：</label>@Html.LabelFor(m => m.QuestionContent, @Model.QuestionContent)
+    </div>
+    <div id="replyinfo">
+    </div>
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" type="button" onclick="clearForm()">关闭</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("input, textarea, select").uniform();
+        $.ajax({
+            url: '/QuestionReply/GetReplyList?questionid=@Model.QuestionId',
+            type: "post",
+            success: function (r) {
+                if (r != null)
+                {
+                    var data = eval(r);
+                    for (var i = 0; i < data.length;i++){
+                        $('#replyinfo').append("<div>" + data[i].ReplyMan + "回复说:" + data[i].ReplyContent + "</div>");
+                    }
+                }
+            }
+        });
+    });
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    };
+</script>

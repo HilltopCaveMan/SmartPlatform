@@ -1,0 +1,393 @@
+﻿@{
+    ViewBag.Title = "DevSendCMD_Wudai";
+}
+@using (Ajax.BeginForm("DevSendCMD_New", "SendCMD", null, new AjaxOptions()))
+{
+    <ul id="slidercontent">
+        <li>
+            <div class="slide_wrap">
+                <input type="hidden" id="terno" name="terno" value="@ViewData["TerNo"]" />
+                <div id="tt" class="easyui-tabs" style="width:800px;">
+                    <div title="定时模式" style="padding:20px;">
+                        <div>
+                            <div style="text-align:center;padding-top:50px;">
+                                <span>回传间隔时间：</span>
+                                <input type="text" name="jgtime" id="jgtime" style="width: 175px;height:35px;" placeholder="请输入1-999" />
+                                <span>(分钟)</span>
+                                <div style="margin-top:10px;">
+                                <span>注：输入0会关闭定时模式</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:20px;text-align:center;">
+                                <a href="#" class="easyui-linkbutton" style="width: 50px;margin-right:15px;" onclick="clearForm()">取消</a>
+                                <a href="#" class="easyui-linkbutton" style="width: 50px; border-color: #16a085; background: #16a085; color: #fff; " onclick="submitTcp('1')">确定</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div title="星期模式" data-options="closable:false" style="overflow:auto;padding:20px;">
+                        <div>
+                            <div>
+                                <div style="width: 200px; margin-top: 3px; text-align: right; float: left;">定时时间：</div>
+                                <div><input class="easyui-timespinner" name="dstime" id="dstime" style="height:30px;"/></div>
+                            </div>
+                            <div>
+                                <div style="width:200px;text-align:right;margin-top:45px;">选择星期：</div>
+                                <ul id="weekstyle">
+                                    <li>
+                                        <span>星期一</span>
+                                        <input type="checkbox" class="weekday" value="1" />
+                                        <span class="weekspan">星期二</span>
+                                        <input type="checkbox" class="weekday" value="2" />
+                                        <span class="weekspan">星期三</span>
+                                        <input type="checkbox" class="weekday" value="3" />
+                                    </li>
+                                    <li>
+                                        <span>星期四</span>
+                                        <input type="checkbox" class="weekday" value="4" />
+                                        <span class="weekspan">星期五</span>
+                                        <input type="checkbox" class="weekday" value="5" />
+                                        <span class="weekspan">星期六</span>
+                                        <input type="checkbox" class="weekday" value="6" />
+                                    </li>
+                                    <li>
+                                        <span>星期日</span>
+                                        <input type="checkbox" class="weekday" value="7" />
+                                    </li>
+                                    <li>
+                                        <span>全选&nbsp;&nbsp;&nbsp;</span>
+                                        <input id="CheckAll" type="checkbox"/>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div style="clear:left;padding-top:20px;padding-left:260px;">
+                                <a href="#" class="easyui-linkbutton" style="width: 50px;margin-right:15px;" onclick="clearForm()">取消</a>
+                                <a href="#" class="easyui-linkbutton" style="width: 50px; border-color: #16a085; background: #16a085; color: #fff; " onclick="submitTcp('2')">确定</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </li>
+        <li>
+            <div class="slide_wrap">
+                <table id="SendCMDListTable"></table>
+            </div>
+        </li>
+    </ul>
+}
+<style type="text/css">
+    span {
+        font-size:14px;
+    }
+    button {
+        height: 25px;
+        margin: 5px;
+        cursor: pointer;
+        border: 0px;
+    }
+    #weekstyle {
+        float: left;
+        width: 280px;
+        border: 1px solid rgb(225,225,225);
+        list-style: none;
+        text-decoration: none;
+        margin-left: 200px;
+        margin-top: -35px;
+    }
+    #weekstyle li {
+        height: 50px;
+        line-height: 50px;
+        padding-left: 25px;
+        border-bottom: 1px solid rgb(225,225,225);
+    }
+    .weekspan{
+        padding-left:5px;
+    }
+</style>
+<script>
+    var TerminalData;
+    function loadSendListTable() {
+        TerminalData = $('#SendCMDListTable').datagrid({
+            url: '@Url.Action("GetSendCMDList", "SendCMD")',
+            height: 380,
+            columns: [[
+                { field: 'TrSetsn', title: '终端编号', width: 120, align: 'center' },
+                {
+                    field: 'TrCmdtype', title: '命令信息', width: 500, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "705":
+                                var straub="设备状态：";
+                                if(row.TrParam2.split('`')[0]=="V")
+                                {
+                                    straub+= "不设置";
+                                }
+                                else if(row.TrParam2.split('`')[0]=="1")
+                                {
+                                    straub+= "测试";
+                                }
+                                else if(row.TrParam2.split('`')[0]=="2")
+                                {
+                                    straub+= "待激活";
+                                }
+                                else if(row.TrParam2.split('`')[0]=="3")
+                                {
+                                    straub += "已激活";
+                                }
+                                straub += " 工作模式：";
+                                if (row.TrParam2.split('`')[1] == "V") {
+                                    straub += "不设置";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "1") {
+                                    straub += "标准模式";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "2") {
+                                    straub += "精准模式";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "3") {
+                                    straub += "追车模式";
+                                }
+                                straub += " 定位次数：";
+                                if (row.TrParam2.split('`')[3] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += parseInt(1440 / parseInt(row.TrParam2.split('`')[3]));
+                                }
+                                straub += " 定时时间：";
+                                if (row.TrParam2.split('`')[4] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += row.TrParam2.split('`')[4]+"点";
+                                }
+                                straub += " 间隔时间：";
+                                if (row.TrParam2.split('`')[5] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += row.TrParam2.split('`')[5] ;
+                                }
+                                if (row.TrParam2.split('`')[9] != null && row.TrParam2.split('`')[9] != "") {
+                                    straub += " 蓝牙设置：";
+                                    if (row.TrParam2.split('`')[9] == "V") {
+                                        straub += "不设置";
+                                    }
+                                    else {
+                                        if (row.TrParam2.split('`')[9] == "1") {
+                                            straub += "开启蓝牙";
+                                        }
+                                        if (row.TrParam2.split('`')[9] == "2") {
+                                            straub += "关闭蓝牙";
+                                        }
+                                    }
+                                }
+                                return straub;
+                            case "715":
+                                return "&lt;" + row.TrParam2.split('<')[1];
+                            case "999":
+                                return row.TrParam2.toString();
+                            default:
+                                return "";
+
+                        }
+                    }
+                },
+                {
+                    field: 'TrState', title: '执行状态', width: 140, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "000":
+                                return "提交成功";
+                            case "001":
+                                return "发送成功";
+                            case "002":
+                                return "执行成功";
+                            case "003":
+                                return "执行失败";
+
+                            case "0":
+                                return "待发送";
+                            case "1":
+                                return "待定";
+                            case "2":
+                                return "已发送，未执行";
+                            case "3":
+                                return "发送成功，命令执行成功";
+                            case "6":
+                                return "命令失效";
+                            case "9":
+                                return "执行失败";
+                            default:
+                                return "";
+                        }
+                    }
+                },
+                 {
+                     field: 'TrOpdate', title: '操作时间', width: 150, align: 'center', formatter: function (value, row) {
+                         switch (value) {
+                             case "0001-01-01 00:00:00":
+                                 return "";
+                             default:
+                                 return value;
+                         }
+                     }
+                 },
+                {
+                    field: 'TrSenddate', title: '发送时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                {
+                    field: 'TrExedate', title: '执行成功时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                }
+            ]],
+            //fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            sortName: 'TrOpdate',
+            sortOrder: 'desc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            queryParams: { "TrSetsn": '@ViewData["TerNo"]' },//查询参数
+            pagination: true
+        });
+    }
+    $(function () {
+        $("input, textarea, select").uniform();
+        jQuery('#slidercontent').bxSlider({
+            prevText: '',
+            nextText: '',
+            buildPager: function (slideIndex) {
+                switch (slideIndex) {
+                    case 0:
+                        return '命令配置';
+                    case 1:
+                        loadSendListTable();
+                        return '已发命令';
+                }
+            }
+        });
+
+        var curr_time = new Date();
+        $('#dstime').timespinner({ editable: false });
+        $('#dstime').timespinner('setValue', curr_time.getHours() + ":" + curr_time.getMinutes());
+    });
+
+    //单选
+    $('#weekstyle').find('input.weekday').each(function (i, o) {
+        $(o).change(function () {
+            var cnt = 0;
+            $('#weekstyle').find('input.weekday').each(function (i, o) {
+                if ($(o).is(':checked') == true)
+                {
+                    cnt++;
+                }
+            });
+            if (cnt == 7) {
+                $.uniform.update($("#CheckAll").attr('checked', true));
+            }
+            else {
+                $.uniform.update($("#CheckAll").attr('checked', false));
+            }
+        });
+    });
+
+    //全选
+    $("#CheckAll").change(function () {
+        if ($("#CheckAll").is(':checked') == true) {
+            $('#weekstyle').find('input.weekday').each(function (i, o) {
+                $.uniform.update($(o).attr('checked', true));
+            });
+        }
+        else {
+            $('#weekstyle').find('input.weekday').each(function (i, o) {
+                $.uniform.update($(o).attr('checked', false));
+            });
+        }
+    });
+
+    //刷新
+    function ReLoad() {
+        $('#SendCMDListTable').datagrid('reload');
+    }
+
+    //取消
+    function clearForm() {
+        window.parent.$("div.panel:last").find('.panel-tool-close').click();
+    };
+
+    //确定
+    function submitTcp(sendtype) {
+        var devid = '@ViewData["TerNo"]';
+        var jgtime = $("#jgtime").val();
+        var dstime = $('#dstime').timespinner('getValue');
+        var weekstr = "";
+        var reg = "^[1-9]\d*|0$";
+        var re = new RegExp(reg);
+        if (sendtype == '1') {
+            if (jgtime == null || jgtime == "" || re.test(jgtime) == false)
+            {
+                window.parent.$.messager.alert('警告', '请输入规范的间隔时间！','info');
+                return;
+            }
+            else if (parseInt(jgtime)>999)
+            {
+                window.parent.$.messager.alert('警告', '请输入小于1000分钟的间隔时间！', 'info');
+                return;
+            }
+        }
+        else {
+            $('#weekstyle').find('input.weekday').each(function (i, o) {
+                if ($(o).is(':checked') == true) {
+                    weekstr += $(o).val();
+                }
+            });
+            if (weekstr == "")
+            {
+                window.parent.$.messager.alert('警告', '请选择星期！', 'info');
+                return;
+            }
+        }
+        $.ajax({
+            url: '@Url.Content("~/SendCMD/DevSendCMD_Wudai")',
+            type: 'POST',
+            data: "{'devid':'" + devid + "','sendtype':'" + sendtype + "','jgtime':'" + jgtime + "','dstime':'"
+                + dstime + "','weekstr':'" + weekstr + "'}",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data.toString() == "true") {
+                    window.parent.$.messager.show({
+                        title: '提示',
+                        msg: "命令发送成功",
+                        timeout: 2000,
+                    });
+                    location.reload();
+                } else {
+                    window.parent.$.messager.show({
+                        title: '提示',
+                        msg: "命令发送失败",
+                        timeout: 2000,
+                    });
+                }
+            },
+            error: function (data) {
+                window.parent.$.messager.alert('提示', '系统错误！', 'error');
+            }
+        });
+    }
+</script>

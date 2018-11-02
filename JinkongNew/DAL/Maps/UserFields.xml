@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="UserFields" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="UserFields" type="GModel.Basic.UserFields" />
+  </alias>
+  <resultMaps>
+    <resultMap id="UserFieldsResult" class="UserFields">
+      <result property="UfId" column="UfId" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+      <result property="UfName" column="UfName" type="string" dbType="varchar"/>
+      <result property="UfDesc" column="UfDesc" type="string" dbType="varchar"/>
+      <result property="InfoType" column="InfoType" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+    <select id="SelectUserFields" parameterClass="UserFields" resultMap="UserFieldsResult">
+      SELECT UF_ID AS UfId,DEPT_ID AS DeptId,UF_NAME AS UfName,UF_DESC AS UfDesc,INFO_TYPE as InfoType
+      FROM USER_FIELDS WHERE UF_ID = #UfId#
+    </select>
+    <select id="SelectUserFieldsPage" parameterClass="UserFields" resultMap="UserFieldsResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT UF_ID AS UfId,DEPT_ID AS DeptId,UF_NAME AS UfName,UF_DESC AS UfDesc,INFO_TYPE as InfoType
+      FROM USER_FIELDS WHERE  DEPT_ID=#DeptId#
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="InfoType">
+          INFO_TYPE=#InfoType#
+        </isNotEmpty>
+      </dynamic>
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    <select id="SelectUserFieldsCount" parameterClass="UserFields" resultClass="int">
+      SELECT count(*)
+      FROM USER_FIELDS WHERE  DEPT_ID = #DeptId#
+    </select>
+    <insert id="InsertUserFields" parameterClass="UserFields">
+      INSERT INTO USER_FIELDS
+      (UF_ID,DEPT_ID,UF_NAME,UF_DESC,INFO_TYPE)
+      VALUES(#UfId#,#DeptId#,#UfName#,#UfDesc#,#InfoType#)
+    </insert>
+    <update id="UpdateUserFields" parameterClass="UserFields">
+      UPDATE USER_FIELDS
+      SET UF_NAME=#UfName#,UF_DESC=#UfDesc#,INFO_TYPE=#InfoType# WHERE UF_ID=#UfId#
+    </update>
+    <delete id="DeleteUserFields" parameterClass="string">
+      DELETE FROM USER_FIELDS
+      WHERE UF_ID = #value#
+    </delete>
+  </statements>
+</sqlMap>

@@ -1,0 +1,156 @@
+﻿<div class="tabcontant">
+    <table id="tableField"></table>
+</div>
+<script type="text/javascript">
+    var FieldTable;
+    var FieldManager = [];
+    var AddFieldVal = '@ViewBag.AddFields';
+    var EditFieldVal = '@ViewBag.EditFields';
+    var DelFieldVal = '@ViewBag.DelFields';
+    if (AddFieldVal == "true") {
+        var AddFieldBtn = {
+            text: '添加',
+            iconCls: 'icon-add',
+            handler: function () { window.parent.$.DialogOpen('/Field/addField', { title: "添加字段", width: 450, height: 250 }); }
+        };
+        FieldManager.push(AddFieldBtn);
+    }
+
+    if (EditFieldVal == "true") {
+        var EditFieldBtn = {
+            text: '修改',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = FieldTable.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    $.messager.alert('警告', '您没有选择', 'error');
+                } else if (rows.length > 1) {
+                    $.messager.alert('错误', '只能选择一条数据进行编辑！', 'error');
+                } else {
+                    var id = rows[0].UfId;
+                    window.parent.$.DialogOpen('/Field/EditFields?UfId=' + id, { title: "修改字段", width: 450, height: 250 });
+                }
+            }
+        };
+        FieldManager.push(EditFieldBtn);
+    }
+
+    if (DelFieldVal == "true") {
+        var DelFieldBtn = {
+            text: '删除',
+            iconCls: 'icon-remove',
+            handler: function () {
+                var rows = FieldTable.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                }
+
+                else {
+                    var id = rows[0].UfId;
+                    window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+                        if (t) {
+                            $.ajax({
+                                url: '/Field/DeleteFields?UfId=' + id,
+                                type: "post",
+                                success: function (r) {
+                                    if (r > 0) {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除成功！",
+                                            timeout: 2000,
+                                        });
+                                        FieldTable.datagrid('reload');
+                                    } else {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除失败！",
+                                            timeout: 2000,
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+        };
+        FieldManager.push(DelFieldBtn);
+    }
+
+    $(function () {
+        //终端用户表格高度
+        $("#tableField").height($(document.body).height()  - 20);
+        loadEndUserTable();
+    });
+    function loadEndUserTable() {
+        FieldTable = $('#tableField').datagrid({
+            url: '@Url.Action("GetFields", "Field")',
+            columns: [[
+                { field: 'UfId', title: '', width: 0, align: 'center', hidden: true },
+                    {
+                        field: 'InfoType', title: '信息类型', width: 30, align: 'center', sortable: true, formatter: function (value, row, index) {
+                            if (value == 1)
+                            {
+                                return "安装信息";
+                            }
+                            else if (value == 2) {
+                                return "信贷信息";
+                            }
+                            else if (value == 3) {
+                                return "车主信息";
+                            }
+                            else { return "";}
+                        }
+                    },
+                    { field: 'UfName', title: '字段名称', width: 80, align: 'center', sortable: true },
+                    { field: 'UfDesc', title: '字段描述', width: 80, align: 'center', sortable: true }
+
+            ]],
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: 'USERNAME',
+            sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            //queryParams: { "LOGINNAME": loginname, "USERNAME": UserName, "DEALERID": DealerID },//查询参数
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            fitColumns: true,
+            pagination: true,
+            singleSelect: true,
+            toolbar: FieldManager
+        });
+    }
+
+
+    function succeed() {
+        $(".dialog").dialog('close');
+        $.messager.alert("提示", "操作成功")
+        FieldTable.datagrid('reload');
+    }
+    function error() {
+        $(".dialog").dialog('close');
+        $.messager.alert("警告", "操作失败")
+    }
+    function exist() {
+        $(".dialog").dialog('close');
+        $.messager.show({
+            title: '提示',
+            msg: '登录名重复',
+            showType: 'fade',
+            timeout: 200,
+            style: {
+                right: '',
+                bottom: ''
+            }
+        });
+        FieldTable.datagrid('reload');
+    }
+
+</script>

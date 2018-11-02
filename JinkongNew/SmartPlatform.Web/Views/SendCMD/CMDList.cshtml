@@ -1,0 +1,186 @@
+﻿<table id="CMDListTable" style="height:460px;"></table>
+<script type="text/javascript" language="javascript">
+    $(function () {
+        loadSendListTable();
+    })
+
+
+    function loadSendListTable() {
+        TerminalData = $('#CMDListTable').datagrid({
+            url: '@Url.Action("CMDListData", "SendCMD")?state=@ViewBag.TerState',
+            columns: [[
+                { field: 'TrSetsn', title: '终端编号', width: 120, align: 'center' },
+                {
+                    field: 'TrCmdtype', title: '命令信息', width: 500, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "101":
+                                return "遥控熄火";
+                            case "102":
+                                return "恢复上电";
+                            case "201":
+                                return "定时呼叫" + " 参数：" + row.TrParam2 + "秒";
+                            case "206":
+                                return "定距呼叫" + " 参数：" + row.TrParam2 + "米";
+                            case "306":
+                                return "限速设置" + " 参数：" + row.TrParam2 + "km/h";
+                            case "307":
+                                return "取消限速";
+                            case "705":
+                                var straub = "地址类型：";
+                                if (row.TrParam2.split('`')[7] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    if (row.TrParam2.split('`')[7].split('&').length > 0) {
+                                        if (row.TrParam2.split('`')[7].split('&')[0] == "I") {
+                                            straub += "IP:" + row.TrParam2.split('`')[7].split('&')[1];
+                                        }
+                                        if (row.TrParam2.split('`')[7].split('&')[0] == "Y") {
+                                            straub += "域名:" + row.TrParam2.split('`')[7].split('&')[1];
+                                        }
+                                    }
+                                    if (row.TrParam2.split('`')[7].split('*').length > 0) {
+                                        if (row.TrParam2.split('`')[7].split('*')[0] == "I") {
+                                            straub += "IP:" + row.TrParam2.split('`')[7].split('*')[1];
+                                        }
+                                        if (row.TrParam2.split('`')[7].split('*')[0] == "Y") {
+                                            straub += "域名:" + row.TrParam2.split('`')[7].split('*')[1];
+                                        }
+                                    }
+                                    straub += " 端口:" + row.TrParam2.split('`')[8];
+                                }
+                                straub += " 设备状态：";
+                                if (row.TrParam2.split('`')[0] == "V") {
+                                    straub += "不设置";
+                                }
+                                else if (row.TrParam2.split('`')[0] == "1") {
+                                    straub += "测试";
+                                }
+                                else if (row.TrParam2.split('`')[0] == "2") {
+                                    straub += "待激活";
+                                }
+                                else if (row.TrParam2.split('`')[0] == "3") {
+                                    straub += "已激活";
+                                }
+                                straub += " 工作模式：";
+                                if (row.TrParam2.split('`')[1] == "V") {
+                                    straub += "不设置";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "1") {
+                                    straub += "标准模式";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "2") {
+                                    straub += "精准模式";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "3") {
+                                    straub += "追车模式";
+                                }
+                                straub += " 工作时间：";
+                                if (row.TrParam2.split('`')[2] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += row.TrParam2.split('`')[2] + "分钟";
+                                }
+                                straub += " 定位次数：";
+                                if (row.TrParam2.split('`')[3] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += 1440 / parseInt(row.TrParam2.split('`')[3]);
+                                }
+                                straub += " 定时时间：";
+                                if (row.TrParam2.split('`')[4] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += row.TrParam2.split('`')[4] + "点";
+                                }
+                                straub += " 间隔时间：";
+                                if (row.TrParam2.split('`')[5] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += row.TrParam2.split('`')[5];
+                                }
+                                if (row.TrParam2.split('`')[9] != null && row.TrParam2.split('`')[9] != "") {
+                                    straub += " 蓝牙设置：";
+                                    if (row.TrParam2.split('`')[9] == "V") {
+                                        straub += "不设置";
+                                    }
+                                    else {
+                                        if (row.TrParam2.split('`')[9] == "1")
+                                        {
+                                            straub += "开启蓝牙";
+                                        }
+                                        if (row.TrParam2.split('`')[9] == "2")
+                                        {
+                                            straub += "关闭蓝牙";
+                                        }
+                                    }
+                                }
+                                return straub;
+                            case "715":
+                                return "&lt;" + row.TrParam2.split('<')[1];
+                            case "999":
+                                return row.TrParam2.toString();
+                            default:
+                                return "";
+                        }
+                    }
+                },
+                {
+                    field: 'TrState', title: '执行状态', width: 140, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "000":
+                                return "提交成功";
+                            case "001":
+                                return "发送成功";
+                            case "002":
+                                return "执行成功";
+                            case "003":
+                                return "执行失败";
+                            default:
+                                return "";
+                        }
+                    }
+                },
+                {
+                    field: '@{if (ViewBag.TerState == "000")
+                              {<text>TrOpdate</text>}else{<text>TrSenddate</text>}}', title:'@{if (ViewBag.TerState == "000")
+                                                                                               {<text>操作时间</text>}else{<text>发送时间</text>}}', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                }
+            ]],
+            //fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            queryParams: { "TerGuid": '@ViewBag.TerGuid' },//查询参数
+            //detailFormatter: function (index, row) {
+            //    return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+            //    $('#ddv-' + index).append(nav);
+            //    $('#dg').datagrid('fixDetailRowHeight', index);
+            //},
+            pagination: true
+            //singleSelect: true,
+            //toolbar: TerManager
+        });
+    }
+
+</script>
+
+
+

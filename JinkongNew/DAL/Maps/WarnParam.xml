@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="WarnParam" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="WarnParam" type="Domain.WarnParam" />
+</alias>
+<resultMaps>
+		<resultMap id="WarnParamResult" class="WarnParam">
+      <result property="OnlineTime" column="OnlineTime" type="double" dbType="Real"/>
+      <result property="Israilwarning" column="Israilwarning" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+    </resultMap>
+</resultMaps>
+<statements>
+	
+<select id="SelectWarnParam" parameterClass="string" resultMap="WarnParamResult">
+SELECT ONLINE_TIME AS OnlineTime,ISRAILWARNING AS Israilwarning,DEPT_ID AS DeptId
+FROM WARN_PARAM WHERE 1=1 $value$ 
+</select>
+<select id="SelectWarnParamCount" parameterClass="string" resultClass="int">
+  SELECT count(*)
+  FROM WARN_PARAM WHERE 1=1 $value$
+</select>
+<insert id="InsertWarnParam" parameterClass="WarnParam">
+	INSERT INTO WARN_PARAM 
+(ONLINE_TIME,ISRAILWARNING,DEPT_ID) 
+	VALUES(#OnlineTime#,#Israilwarning#,#DeptId#)
+</insert>
+<update id="UpdateWarnParam" parameterClass="WarnParam">
+UPDATE WARN_PARAM 
+ SET ONLINE_TIME=#OnlineTime#,ISRAILWARNING=#Israilwarning#,DEPT_ID=#DeptId#
+WHERE DEPT_ID = #DeptId#
+</update>
+<delete id="DeleteWarnParam" parameterClass="string">
+DELETE FROM WARN_PARAM 
+WHERE 1=1 $value$ 
+</delete>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+</statements>
+</sqlMap>

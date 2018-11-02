@@ -1,0 +1,50 @@
+﻿<div id="DivCarList" class="dialog" style="display:none;">
+    <div id="contentwrapper" class="contentwrapper">
+        <div class="tableoptions">
+            <button class="deletebutton radius3" id="DownLoadData" title="table2">导出数据</button> &nbsp;
+        </div><!--tableoptions-->
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">回传时间</th>
+                    <th class="head1">车牌号</th>
+                    <th class="head0">终端编号</th>
+                    <th class="head1">终端状态</th>
+                    <th class="head0">蓝牙绑定</th>
+                    <th class="head1">蓝牙状态</th>
+                    <th class="head0">定位方式</th>
+                    <th class="head1">当前位置</th>
+                    <th class="head0">SIM卡号</th>
+                    <th class="head0">所属组织</th>
+                    <th class="head1">回传次数</th>
+                    <th class="head1">车主电话</th>
+                    <th class="head0">安装位置</th>
+                    <th class="head1">安装时间</th>
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="target"></div>
+
+<div id="WarningType" style="display:none;">
+    <div>断电报警</div>
+    <div>拆除报警</div>
+    <div>区域报警</div>
+    <div>超速报警</div>
+    @*<div>蓝牙报警</div>*@
+</div>

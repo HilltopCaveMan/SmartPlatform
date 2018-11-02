@@ -1,0 +1,226 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" line-height:26px; background: #fafafa;padding:5px;">
+
+        <table style="margin-top:5px;">
+            <tr>
+                <td id="td_ksrq" style="padding-left: 15px;">
+                    开始时间:
+                </td>
+                <td>
+                    <input id="KSRQ" name="KSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                </td>
+
+                <td id="td_jsrq" style="padding-left: 15px;">
+                    结束时间:
+                </td>
+                <td>
+                    <input id="JSRQ" name="JSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    所属企业:
+                </td>
+                <td>
+                    <input id="TerDeptSel" class="easyui-combobox" style="width:200px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    日志类型:
+                </td>
+                <td>
+                    <input id="LogTypeSel" name="LogTypeSel" type="text" class="easyui-combobox" style="width:100px; height:30px;" panelheight="110" />
+                </td>
+
+                <td colspan="4">
+                    &nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="search" onclick="Btn_GetTerList()">查询</a>
+                    @*&nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="upLoad" onclick="Btn_LoadExcel()">导出</a>*@
+                </td>
+
+            </tr>
+        </table>
+    </div>
+    <table id="LoadDataTable"></table>
+</div>
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script type="text/javascript">
+
+    function InitLogTypeSel() {
+        var data = [
+                { "id": "1", "text": "操作日志" },
+                { "id": "2", "text": "异常日志" }
+        ];
+
+        $('#LogTypeSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#LogTypeSel').combobox('setValue', 1);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    $(function () {
+
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 50,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+
+        $("input, textarea, select").uniform();
+
+        //日期段
+        $("#KSRQ").datebox("setValue", "@ViewBag.KSRQ");
+        $("#JSRQ").datebox("setValue", "@ViewBag.JSRQ");
+
+        //用户表格高度
+        $("#LoadDataTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+
+        //日志类型下拉框
+        InitLogTypeSel();
+
+        //所属企业
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" },
+            onLoadSuccess: function () {
+                $('#TerDeptSel').combotree('setValue', '@ViewBag.DeptId');
+            }
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+
+        //InitCarTerTypeSel();
+
+        //设置部门默认值 5bfde218-b359-47ec-889d-3c206a605866
+        //$('#TerDeptSel').combotree('setValue', '@ViewBag.DeptId');
+
+        //加载表格数据
+        InitLoadDataTable();
+
+        //InitUISize();
+
+    });
+
+    var TerManager = [];
+
+    function InitLoadDataTable() {
+
+        var LogTypeNo = $('#LogTypeSel').combotree('getValue');
+
+        if (LogTypeNo == "2") {
+            G_Cols = [[
+                { field: 'GNMC', title: '功能名称', width: 120, align: 'left' },
+                { field: 'GNDZ', title: '功能路径', width: 120, align: 'left' },
+                { field: 'YCMS', title: '异常描述', width: 160, align: 'left' },
+                { field: 'YCSJ', title: '异常时间', width: 110, align: 'center' },
+                { field: 'WLBS', title: '网络标识', width: 100, align: 'center' },
+                { field: 'BZ',   title: '备注', width: 120, align: 'center' }
+            ]];
+        }
+        else {
+            G_Cols = [[
+                { field: 'GNMC', title: '功能名称', width: 120, align: 'left' },
+                { field: 'GNDZ', title: '功能路径', width: 120, align: 'left' },
+                { field: 'CZR',  title: '操作人', width: 100, align: 'center' },
+                { field: 'CZSJ', title: '操作时间', width: 120, align: 'center' },
+                { field: 'LYLX', title: '来源类型', width: 80, align: 'center' },
+                { field: 'WLBS', title: '网络标识', width: 100, align: 'center' },
+                { field: 'BZ',   title: '备注', width: 120, align: 'center' }
+            ]];
+        }
+
+
+        $('#LoadDataTable').datagrid({
+
+            url: '@Url.Action("GetLogList", "Home")',
+
+            columns: G_Cols,
+
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+
+            pageList: [15, 30, 50],
+
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+
+            pagination: true,
+
+            toolbar: TerManager
+        });
+    }
+
+    //提取参数
+    function GetArgs() {
+
+        //日志类型
+        var LogTypeNo = $('#LogTypeSel').combotree('getValue');
+        
+        //时间段
+        var RQ_KS = $("#KSRQ").datebox('getValue');
+        var RQ_JS = $("#JSRQ").datebox('getValue');
+
+        var DeptID = $('#TerDeptSel').combotree('getValue');
+
+        var param = {
+
+            DeptID: DeptID,
+
+            ArgsLogTypeNo: LogTypeNo,
+
+            //时间段
+            ArgsKSRQ: RQ_KS,
+            ArgsJSRQ: RQ_JS
+
+        };
+
+        return param;
+    }
+
+    //加载数据
+    function Btn_GetTerList() {
+        $("#LoadDataTable").datagrid("load", GetArgs());
+        InitLoadDataTable();
+    }
+
+    //导出excel
+    function Btn_LoadExcel() {
+        $.post("GetData_LCTJ_ToExcel",
+            GetArgs(),
+            function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.location.href = e;
+                }
+                else {
+                    alert("导出失败，请重新导出！");
+                }
+            }
+        );
+    }
+    
+    window.onresize = function () {
+        InitUISize();
+    }
+
+</script>
+
+

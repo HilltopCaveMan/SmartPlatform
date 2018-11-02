@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="MenuView" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="MenuView" type="GModel.RoleRight.MenuView" />
+  <typeAlias alias="MenuPower" type="GModel.RoleRight.MenuPower" />
+</alias>
+<resultMaps>
+	<resultMap id="MenuViewResult" class="MenuView">
+		<result property="MenuId" column="MenuId" type="string" dbType="varchar"/>
+		<result property="MenuName" column="MenuName" type="string" dbType="varchar"/>
+		<result property="MenuUrl" column="MenuUrl" type="string" dbType="varchar"/>
+		<result property="MenuParent" column="MenuParent" type="string" dbType="varchar"/>
+		<result property="MenuCreatetime" column="MenuCreatetime" type="DateTime" dbType="DateTime"/>
+		<result property="MenuIcon" column="MenuIcon" type="string" dbType="varchar"/>
+		<result property="MenuType" column="MenuType" type="string" dbType="varchar"/>
+		<result property="Fmenuname" column="Fmenuname" type="string" dbType="varchar"/>
+		<result property="Fmenuparent" column="Fmenuparent" type="string" dbType="varchar"/>
+		<result property="Furl" column="Furl" type="string" dbType="varchar"/>
+	</resultMap>
+  <resultMap id="MenuPowerResult" class="MenuPower">
+    <result property="MenuId" column="MenuId" type="string" dbType="varchar"/>
+    <result property="MenuName" column="MenuName" type="string" dbType="varchar"/>
+    <result property="MenuUrl" column="MenuUrl" type="string" dbType="varchar"/>
+    <result property="MenuParent" column="MenuParent" type="string" dbType="varchar"/>
+    <result property="MenuCreatetime" column="MenuCreatetime" type="DateTime" dbType="DateTime"/>
+    <result property="MenuIcon" column="MenuIcon" type="string" dbType="varchar"/>
+    <result property="MenuType" column="MenuType" type="string" dbType="varchar"/>
+    <result property="Fmenuname" column="Fmenuname" type="string" dbType="varchar"/>
+    <result property="Fmenuparent" column="Fmenuparent" type="string" dbType="varchar"/>
+    <result property="Furl" column="Furl" type="string" dbType="varchar"/>
+    <result property="RmId" column="RmId" type="string" dbType="varchar"/>
+  </resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectMenuView" parameterClass="string" resultMap="MenuViewResult">
+		SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_TYPE AS MenuType,FMENUNAME AS Fmenuname,FMENUPARENT AS Fmenuparent,FURL AS Furl
+		FROM MENU_VIEW 
+	</select>
+	<select id="SelectMenuViewPage" parameterClass="MenuView" resultMap="MenuViewResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_TYPE AS MenuType,FMENUNAME AS Fmenuname,FMENUPARENT AS Fmenuparent,FURL AS Furl
+    FROM MENU_VIEW ORDER BY MENU_SORTORDER ASC
+    <isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectMenuViewCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM MENU_VIEW WHERE 1=1 
+	</select>
+
+  <select id="SelectMenuTreePower" parameterClass="map" resultMap="MenuPowerResult">
+    SELECT MI.MENU_ID         AS MenuId,
+    MI.MENU_NAME       AS MenuName,
+    MI.MENU_URL        AS MenuUrl,
+    MI.MENU_PARENT     AS MenuParent,
+    MI.MENU_CREATETIME AS MenuCreatetime,
+    MI.MENU_ICON       AS MenuIcon,
+    MI.MENU_TYPE       AS MenuType,
+    T.RM_ID            AS RmId,
+    MIF.MENU_NAME      AS Fmenuname,
+    MIF.MENU_PARENT    Fmenuparent,
+    MIF.MENU_URL       Furl
+    FROM MENU_INFO MI
+    JOIN ROLE_MANU RM
+    ON MI.MENU_ID = RM.MENU_ID
+    AND RM.ROLE_ID = #LocalRoleId#
+    LEFT JOIN ROLE_MANU T
+    ON MI.MENU_ID = T.MENU_ID
+    AND T.ROLE_ID = #UserRoleId#
+    JOIN MENU_INFO MIF
+    ON MI.MENU_ID = MIF.MENU_ID
+  </select>
+</statements>
+</sqlMap>

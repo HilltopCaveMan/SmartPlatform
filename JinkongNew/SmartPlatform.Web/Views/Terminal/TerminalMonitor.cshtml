@@ -1,0 +1,509 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Html.Partial("_HeaderPartial2")
+
+@model System.Collections.Generic.IList<GModel.RoleRight.MenuInfo>
+<div class="moitorContent" id="moitorContent">
+    <div id="contentwrapper11" class="contentwrapper withrightpanel">
+        <div class="subcontent chatcontent">
+            <div id="TerChatMessage" class="chatmessage radius2" style="padding:5px;">
+                <div id="TerMapDiv" style="height:100%;width:100%;"></div><!--chatmessageinner-->
+                <div class="full" id="TerMapfullscreen">全屏</div>
+                <div class="Location" id="Location">测距</div>
+                <div class="mappanel-btn"><input id="mointerTer" type="checkbox" name="check1" />追踪当前终端</div>
+                <div class="showPanelBtn allcar" id="AllCar">实时车辆</div>
+                <div class="showPanelBtn caic" id="showPanelBtn">拆卸报警<span class="noft-red">3</span></div>
+                <div class="showPanelBtn yuq" id="showPanelBtn">逾期报警<span class="noft-red">5</span></div>
+                <div class="panelWrap" id="panelTerWrap">
+                    <div style="width:20px;height:200px;margin:-100px 0 0 -10px;color:#999;position:absolute;opacity:0.5;top:50%;left:50%;" id="showOverlayInfo">此处用于展示报警车辆信息</div>
+                    <div id="panel" style="position:absolute;"></div>
+                </div>
+                <a class="intoList down" href="#"></a>
+            </div><!--chatmessage-->
+        </div><!--subcontent-->
+    </div><!--contentwrapper-->
+    <div class="rightpanel" id="rightpanel">
+        <div class="rightpanelinner">
+            <div class="widgetbox uncollapsible">
+                <div class="widgetoptions">
+                    <input type="text" class="easyui-combotree" id="TerDeptSel" panelheight="400" style="width:100%;height:30px" />
+                </div>
+                <div class="widgetcontent userlistwidget nopadding">
+                    <div class="widgetcheck"><input id="ShowTerAll" type="checkbox" name="check2" /> 显示子企业的车辆</div>
+                    <div class="easyui-tabs" id="TerStatu">
+                        <div title="全部">
+                            <div class="box-scroll" id="box-scroll">
+                                <ul id="MonitorTerList" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="在线">
+                            <div class="box-scroll" style="margin-top:10px;">
+                                <ul id="MonitorList1" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="离线">
+                            <div class="box-scroll" style="margin-top:10px;">
+                                <ul id="MonitorList2" class="contactlist"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="more">查看更多车辆&nbsp;↓</a>
+                </div><!--widgetcontent-->
+            </div><!--widgetbox-->
+        </div><!--rightpanelinner-->
+    </div><!--rightpanel-->
+</div>
+<div id="contentwrapper" class="contentwrapper">
+    <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+        <colgroup>
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+            @*<col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />*@
+        </colgroup>
+        <thead>
+            <tr>
+                <th class="head0">更新时间</th>
+                @*<th class="head1">车牌号</th>*@
+                <th class="head1">终端编号</th>
+                <th class="head0">终端状态</th>
+                <th class="head1">定位方式</th>
+                <th class="head0">当前位置</th>
+                @*<th class="head0">SIM卡号</th>
+                    <th class="head0">所属组织</th>*@
+                <th class="head1">回传次数</th>
+                <th class="head0">经度</th>
+                <th class="head1">纬度</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<div id="target"></div>
+@Html.Partial("_FooterPartial")
+
+<script type="text/javascript">
+    var CarTable = null;
+    function LoadDataTable(data) {
+        CarTable = $('#dyntable').dataTable({
+            language: {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "search": "模糊查询"
+            },
+            data: data,
+            columns: [
+                { "data": "Rtime" },
+                { "data": "TerNo" },
+                { "data": "TerStatus" },
+                { "data": "Ifposition" },
+                { "data": "Position" },
+                { "data": "Postbacktimes" },
+                { "data": "GoogleLongitude" },
+                { "data": "GoogleLatitude" }
+            ],
+            "columnDefs": [{
+                targets: [0],
+                orderData: [0, 1]  //如果第一列进行排序，有相同数据则按照第二列顺序排列
+            }, {
+                targets: [1],
+                orderData: [1, 0]  //如果第二列进行排序，有相同数据则按照第一列顺序排列
+            }, {
+                targets: [2],
+                orderData: [2, 0]  //如果第五列进行排序，有相同数据则按照第一列顺序排列
+            }],
+            lengthChange: true,
+            pageLength: 10,
+            scrollCollapse: true,
+            pagingType: "full_numbers",
+            scrollX: true,
+            ordering: true
+        });
+    }
+
+    var MarkerCount = 0;
+    var CKXQ = '@ViewBag.CKXQ';
+    var CKGJ = '@ViewBag.CKGJ';
+    var FSML = '@ViewBag.FSML';
+
+    var MonitorTerMap = {};
+    MonitorTerMap.pics = [];
+    MonitorTerMap.map = null;
+    MonitorTerMap.markerClusterer = null;
+    MonitorTerMap.markers = [];
+    MonitorTerMap.infoWindow = null;
+
+    var data = null;
+    var CarTable;
+    var isPanelShow = false;
+    var innerHeight;
+    var start;
+    var end;
+    var target = $('#target');
+    var pages1 = 1;
+    function initmap() {
+        var latlng = new google.maps.LatLng(39.920532, 103.504355);
+        var options = {
+            'zoom': 4,
+            'center': latlng,
+            'mapTypeId': google.maps.MapTypeId.ROADMAP,
+            'minZoom': 0
+        };
+        MonitorTerMap.map = new google.maps.Map(document.getElementById('TerMapDiv'), options);
+        MonitorTerMap.infoWindow = new google.maps.InfoWindow();
+
+        MonitorTerMap.markers = [];
+        if (MonitorTerMap.markerClusterer) {
+            MonitorTerMap.markerClusterer.clearMarkers();
+        }
+
+        window.setTimeout(MonitorTerMap.time, 0);
+    }
+
+    MonitorTerMap.markerClickFunction = function (pic, latlng) {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            var title = pic.CarNo;
+            var url = pic.CarNo;
+            var fileurl = pic.CarNo;
+            if (pic.Position == null) {
+                pic.Position = "暂无定位位置";
+            }
+            var infoHtml = '<div class="info">'
+                             + '<h3 class="infowindowheader">' + pic.TerNo + '</h3>'
+                             + '<table ><tr><td>终端编号：</td><td>' + pic.TerNo + '</td></tr><tr><td>设备状态：</td><td>' + pic.TerStatus + '</td></tr><tr><td>回传时间：</td><td>' + pic.Rtime + '</td></tr><tr><td>地理位置：</td> <td>' + pic.Position + '</td> </tr></table>'
+                             + '<div class="infowindowfooter">';
+            if (CKXQ == "true") {
+                infoHtml += '<button class="stdbtn btn_lime " type="button" onclick="LookDetail(\'' + pic.CarId + '\',\'' + pic.CarNo + '\')">查看详情</button>';
+            }
+            if (CKGJ == "true") {
+                infoHtml += '<button class="stdbtn btn_default" type="button"  onclick="PlayTrack(\'' + pic.CarId + '\',\'' + pic.CarNo + '\')">查看轨迹</button>';
+            }
+            if (FSML == "true") {
+                infoHtml += '<button class="stdbtn btn_blue" type="button"  onclick="SendCMD(\'' + pic.CarNo + '\',\'' + pic.TerNo + '\',\'' + pic.ProModel + '\')">发送命令</button>';
+            }
+            + '</div>'
+        + '</div>';
+            MonitorTerMap.infoWindow.setContent(infoHtml);
+            MonitorTerMap.infoWindow.setPosition(latlng);
+            MonitorTerMap.infoWindow.open(MonitorTerMap.map);
+        };
+    };
+    MonitorTerMap.markerOutFunction = function () {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            MonitorTerMap.infoWindow.close();
+        }
+    }
+
+    MonitorTerMap.clear = function () {
+        for (var i = 0, marker; marker = MonitorTerMap.markers[i]; i++) {
+            marker.setMap(null);
+        }
+    };
+
+    MonitorTerMap.change = function () {
+        MonitorTerMap.clear();
+        MonitorTerMap.showMarkers();
+    };
+
+    MonitorTerMap.time = function () {
+        var options = {
+            gridSize: 40,
+            minimumClusterSize: 2,
+            maxZoom: 21
+        };
+        MonitorTerMap.markerClusterer = new MarkerClusterer(MonitorTerMap.map, MonitorTerMap.markers, options, MonitorTerMap.infoWindow);
+    };
+
+    function setScroll() {
+        $("#box-scroll").slimScroll({
+            height: '20px',
+            position: 'right',
+            alwaysVisible: true,
+        });
+    }
+    function MapWindow(Latitude, Longitude, RTime, TerNo, Status, Position) {
+        var infoHtml = '<div class="info">'
+                       + '<h3 class="infowindowheader">' + RTime + '</h3>'
+                       + '<table ><tr><td>终端编号：</td><td>' + TerNo + '</td></tr><tr><td>设备状态：</td><td>' + Status + '</td></tr><tr><td>地理位置：</td> <td>' + Position + '</td> </tr></table></div>'
+        MonitorTerMap.infoWindow.setContent(infoHtml);
+        var latLng = new google.maps.LatLng(Latitude, Longitude);
+        MonitorTerMap.infoWindow.setPosition(latLng);
+        MonitorTerMap.infoWindow.open(MonitorTerMap.map);
+        $.scrollTo('.topheader', 300);
+        $(".intoList").removeClass('up');
+        $(".intoList").addClass('down');
+    }
+    $(function () {
+        if (window.innerHeight != undefined) {
+            innerHeight = window.innerHeight;
+        }
+        else {
+            var B = document.body, D = document.documentElement;
+            innerHeight = Math.min(D.clientHeight, B.clientHeight);
+        }
+        $('#moitorContent').height(innerHeight - 111);
+        $('#TerChatMessage').height($('#moitorContent').height() - 30);
+        $('#rightpanel').height(innerHeight - 111);
+        $('#TerStatu .panel-body').height($('#rightpanel').height() - 158);
+        $('#box-scroll').height($('#TerStatu .panel-body').height() - 10);
+        $("input, textarea, select").uniform();
+        initmap();
+        if ($.browser.msie) {
+            $('input:checkbox').click(function () {
+                this.blur();
+                this.focus();
+            });
+        };
+        $("#mointerTer").change(function () {
+            if ($('#mointerTer').attr("checked") == 'checked') {
+            } else {
+            }
+        });
+        $("#TerMapfullscreen").toggle(function () {
+            $("#TerChatMessage").addClass('fulldiv');
+            $('#TerChatMessage').height(window.innerHeight);
+            $('#TerMapfullscreen').text('缩回');
+            document.body.style.overflow = 'hidden';
+            google.maps.event.trigger(MonitorTerMap.map, 'resize');
+        }, function () {
+            $('#TerMapfullscreen').text('全屏')
+            $("#TerChatMessage").removeClass('fulldiv');
+            $('#TerChatMessage').height($('#moitorContent').height() - 30);
+            document.body.style.overflow = 'scroll';
+            google.maps.event.trigger(MonitorTerMap.map, 'resize');
+        })
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            queryParams: { isTree: "false" },
+            animate: true,
+            editable: true,
+            lines: true,
+            onClick: function (node) {
+                if (node.id != "") {
+                    GetListByDept(node.id);
+                }
+            }
+        });
+        $("#showPanelBtn").onclick = showPanel;
+        //sh = window.setInterval('GetNewList()', 10000);
+        LoadPage();
+        //GetNewList();
+        //forList();
+        $(".intoList").toggle(function () {
+            $("html,body").animate({ scrollTop: $('#dyntable').offset().top }, 300, 'swing');
+            $(".intoList").removeClass('down');
+            $(".intoList").addClass('up');
+        }, function () {
+            $("html,body").animate({ scrollTop: $('.topheader').offset().top }, 300, 'swing');
+            $(".intoList").removeClass('up');
+            $(".intoList").addClass('down');
+        });
+        $('#dyntable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                CarTable.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            MapWindow($(this).find("td").eq(7).html(), $(this).find("td").eq(6).html(), $(this).find("td").eq(0).html(), $(this).find("td").eq(2).html(), $(this).find("td").eq(4).html())
+
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#TerDeptSel').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#TerDeptSel').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+    })
+    function PlayTrack(CarId, CarNo) {
+        window.parent.$.DialogOpen('/HistoryTrail/BDTrailNewIndex?CarId=' + CarId, { title: '' + CarNo + '的轨迹', width: '95%', height: '95%' })
+    }
+    function LookDetail(CarId, CarNo) {
+        window.parent.$.DialogOpen('/CarDetail/Index?CarId=' + CarId, { title: '' + CarNo + '的详情', width: 750, height: 450 })
+    }
+    function SendCMD(CarNo, TerNo, ProModel) {
+        if (ProModel == "1.0") { window.parent.$.DialogOpen('/SendCMD/DevSendCMD?str=' + TerNo, { title: CarNo, width: 650, height: 400 }) }
+        else if (ProModel == "2.0") { window.parent.$.DialogOpen('/SendCMD/DevSendCMD_New?str=' + TerNo, { title: CarNo, width: 650, height: 400 }) }
+    }
+
+    $("#ShowTerAll").change(function () {
+        $("#MonitorTerList").html('');
+        $("#ListData").html('');
+        MonitorTerMap.clear();
+        MonitorTerMap.markers = [];
+        var DCode = "";
+        if ($("#ShowTerAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        var DeptId = $('#TerDeptSel').combotree('getValue');
+        if (DeptId != "") {
+            $.post("/CarMonitor/GetTerList", { Businessdivisionid: DeptId, DeptCode: DCode }, function (e) {
+                data = eval(e);
+                MonitorTerMap.init(data);
+                if (e != null && e != "[]") {
+
+                } else if (e != []) {
+                    $("#MonitorTerList").html("<h3>该企业下没有车</h3>");
+                }
+            })
+        } else {
+            window.parent.$.messager.alert('提示', '请选择企业！', 'info');
+        }
+    })
+
+    function GetListByDept(DeptId) {
+        $("#MonitorTerList").html('');
+        $("#ListData").html('');
+
+        MonitorTerMap.clear();
+        MonitorTerMap.markers = [];
+        var DCode = "";
+        if ($("#ShowTerAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        $.post("/CarMonitor/GetTerList", { Businessdivisionid: DeptId, DeptCode: DCode }, function (e) {
+            data = eval(e);
+            MonitorTerMap.init(data);
+            if (e != null && e != "[]") {
+
+            } else if (e == "[]") {
+                $("#MonitorTerList").html("<h3>该企业下没有车</h3>");
+            }
+        })
+    }
+
+    function doSearch(value, name) {
+        $("#MonitorTerList").html('');
+        $("#ListData").html('');
+        MonitorTerMap.clear();
+        MonitorTerMap.markers = [];
+        var CarNo = "";
+        var TerNo = "";
+        if (name == "CarNo") {
+            if (value != "") {
+                CarNo = value;
+            } else {
+                window.parent.$.messager.alert('提示', '请输入车辆编号！', 'info');
+            }
+        } else if (name == "TerNo") {
+            if (value != "") {
+                TerNo = value;
+            } else {
+                window.parent.$.messager.alert('提示', '请输入终端编号！', 'info');
+            }
+        }
+
+
+    }
+
+    //显示结果面板动作
+    function showPanel() {
+        if (isPanelShow == false) {
+            isPanelShow = true;
+            $("showPanelBtn").style.right = "230px";
+            $("panelTerWrap").style.height = "230px";
+        } else {
+            isPanelShow = false;
+            $("showPanelBtn").style.right = "0px";
+            $("panelTerWrap").style.height = "0px";
+        }
+    }
+    window.onresize = function () {
+        $('#moitorContent').height(innerHeight - 111);
+        $('#TerChatMessage').height($('#moitorContent').height() - 30);
+        $('#rightpanel').height(innerHeight - 111);
+        $('#TerStatu .panel-body').height($('#rightpanel').height() - 158);
+        $('#box-scroll').height($('#TerStatu .panel-body').height() - 10);
+    }
+
+    function LoadPage() {
+        var panel = $('#MonitorTerList');
+        $.post("/CarMonitor/GetTerList", { st: pages1, pageSize: 1000 }, function (e) {
+            if (e != null && e != "[]") {
+                var data = eval("(" + e + ")")
+                pages1 = pages1 + 1;
+                var MarkerArr = [];
+                for (var i = 0; i < data.list.length; i++) {
+                    MonitorTerMap.pics.push(data.list[i].realtime_dataObj);
+                    var li = $('<li class="online"></li>');
+                    var a = $('<a href=""></a>')
+                    var div = $('<div class="img-list"></div>');
+                    var img = $('<img />');
+                    $(img).attr({ "src": "../Content/Images/cca1.png", "width": "34", "height": "34" });
+                    $(div).append(img);
+                    $(a).append(div);
+                    var span = $('<span></span>');
+                    $(span).text(data.list[i].realtime_dataObj.TerNo);
+                    $(a).append(span);
+                    $(li).append(a);
+                    $(panel).append(li);
+
+                    var latLng = new google.maps.LatLng(data.list[i].realtime_dataObj.GoogleLatitude, data.list[i].realtime_dataObj.GoogleLongitude);
+                    var marker = new google.maps.Marker({
+                        'position': latLng,
+                        'icon': '../Content/Icon/map-marker-ball-pink.png',
+                        'TerNo': data.list[i].realtime_dataObj.TerNo,
+                        'TerStatus': data.list[i].realtime_dataObj.TerStatus,
+                        'Positioningtime': data.list[i].realtime_dataObj.Positioningtime,
+                        //'Rtime': data.list[i].realtime_dataObj.Rtime,
+                        'PositionlatLng': data.list[i].realtime_dataObj.Position
+                    });
+                    var fn = MonitorTerMap.markerClickFunction(data.list[i].realtime_dataObj, latLng);
+
+                    google.maps.event.addListener(marker, 'click', fn);
+                    $(li).mouseover(fn);
+                    MarkerArr.push(marker);
+                }
+                if (MarkerArr.length > 0) {
+                    MonitorTerMap.markerClusterer.addMarkers(MarkerArr, false);
+                }
+                if (parseInt(pages1) * 1000 >= data.TCount) {
+                    LoadDataTable(MonitorTerMap.pics);
+                } else {
+                    window.setTimeout("LoadPage()", 0);
+                }
+            }
+        })
+    }
+
+</script>

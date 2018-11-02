@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="LogInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="LogInfo" type="GModel.Basic.LogInfo" />
+  </alias>
+  <resultMaps>
+    <resultMap id="LogInfoResult" class="LogInfo">
+      
+      <result property="LOG_ID" column="LOG_ID" type="string" dbType="varchar"/>
+
+      <result property="LOG_TYPE" column="LOG_TYPE" type="string" dbType="varchar"/>
+      
+      <!--功能-->
+      <result property="GNMC" column="GNMC" type="string" dbType="varchar"/>
+      <result property="GNDZ" column="GNDZ" type="string" dbType="varchar"/>
+      
+      <!--异常-->
+      <result property="YCMS" column="YCMS" type="string" dbType="varchar"/>
+      <result property="YCSJ" column="YCSJ" type="DateTime" dbType="DateTime"/>
+      
+      <result property="CZR" column="CZR" type="string" dbType="varchar"/>
+      <result property="CZSJ" column="CZSJ" type="DateTime" dbType="DateTime"/>
+      
+      <result property="LYLX" column="LYLX" type="string" dbType="varchar"/>
+      <result property="WLBS" column="WLBS" type="string" dbType="varchar"/>
+      
+      <result property="BZ" column="BZ" type="string" dbType="varchar"/>
+      
+    </resultMap>
+  </resultMaps>
+  <statements>
+  </statements>
+</sqlMap>

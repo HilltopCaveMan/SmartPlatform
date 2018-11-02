@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="QuestionReply" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="QuestionInfo" type="GModel.Basic.QuestionInfo" />
+    <typeAlias alias="ReplyInfo" type="GModel.Basic.ReplyInfo" />
+  </alias>
+  <resultMaps>
+    <resultMap id="QuestionInfoResult" class="QuestionInfo">
+      <result property="QuestionId" column="QuestionId" type="string" dbType="varchar"/>
+      <result property="QuestionTitle" column="QuestionTitle" type="string" dbType="varchar"/>
+      <result property="QuestionContent" column="QuestionContent" type="string" dbType="varchar"/>
+      <result property="QuestionMan" column="QuestionMan" type="string" dbType="varchar"/>
+      <result property="QuestionTime" column="QuestionTime" type="DateTime" dbType="DateTime"/>
+    </resultMap>
+
+    <resultMap id="ReplyInfoResult" class="ReplyInfo">
+      <result property="ReplyId" column="ReplyId" type="string" dbType="varchar"/>
+      <result property="QuestionId" column="QuestionId" type="string" dbType="varchar"/>
+      <result property="ReplyContent" column="ReplyContent" type="string" dbType="varchar"/>
+      <result property="ReplyMan" column="ReplyMan" type="string" dbType="varchar"/>
+      <result property="ReplyTime" column="ReplyTime" type="DateTime" dbType="DateTime"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+    
+    <select id="SelectQuestionInfo" parameterClass="string" resultMap="QuestionInfoResult">
+      SELECT QUESTIONID AS QuestionId,QUESTIONTITLE AS QuestionTitle,QUESTIONCONTENT AS QuestionContent,QUESTIONMAN AS QuestionMan,QUESTIONTIME AS QuestionTime
+      FROM QUESTIONINFO WHERE QUESTIONID=#QuestionId#
+    </select>
+    
+    <select id="SelectQuestionInfoPage" parameterClass="map" resultMap="QuestionInfoResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT QUESTIONID AS QuestionId,QUESTIONTITLE AS QuestionTitle,QUESTIONCONTENT AS QuestionContent,QUESTIONMAN AS QuestionMan,QUESTIONTIME AS QuestionTime
+      FROM QUESTIONINFO where 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="QuestionTitle">
+          QUESTIONTITLE like '%'||#QuestionTitle#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="QuestionMan">
+          QUESTIONMAN=#QuestionMan#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="st">
+          QUESTIONTIME &gt;= to_date(#st#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ed">
+          QUESTIONTIME &lt;= to_date(#ed#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+      </dynamic>
+      Order by QUESTIONTIME desc
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    
+    <select id="SelectQuestionCount" parameterClass="map" resultClass="int">
+      SELECT count(*)
+      FROM QUESTIONINFO where 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="QuestionTitle">
+          QUESTIONTITLE like '%'||#QuestionTitle#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="QuestionMan">
+          QUESTIONMAN=#QuestionMan#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="st">
+          QUESTIONTIME &gt;= to_date(#st#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ed">
+          QUESTIONTIME &lt;= to_date(#ed#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+      </dynamic>
+    </select>
+
+    <select id="GetReplyInfoByQuestionId" parameterClass="string" resultMap="ReplyInfoResult">
+      SELECT REPLYID AS ReplyId,QUESTIONID AS QuestionId,REPLYCONTENT AS ReplyContent,REPLYMAN AS ReplyMan,REPLYTIME AS ReplyTime
+      FROM REPLYINFO WHERE QUESTIONID=#value# Order by REPLYTIME asc
+    </select>
+    <select id="GetReplyCountByQuestionId" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM REPLYINFO WHERE QUESTIONID=#value#
+    </select>
+
+    <insert id="InsertReplyInfo" parameterClass="ReplyInfo">
+      INSERT INTO REPLYINFO
+      (REPLYID,QUESTIONID,REPLYCONTENT,REPLYMAN,REPLYTIME)
+      VALUES(#ReplyId#,#QuestionId#,#ReplyContent#,#ReplyMan#,#ReplyTime#)
+    </insert>
+    
+    <insert id="InsertQuestionInfo" parameterClass="QuestionInfo">
+      INSERT INTO QUESTIONINFO
+      (QUESTIONID,QUESTIONTITLE,QUESTIONCONTENT,QUESTIONMAN,QUESTIONTIME)
+      VALUES(#QuestionId#,#QuestionTitle#,#QuestionContent#,#QuestionMan#,#QuestionTime#)
+    </insert>
+    
+    <update id="UpdateQuestionInfo" parameterClass="QuestionInfo">
+      UPDATE QUESTIONINFO
+      SET QUESTIONTITLE=#QuestionTitle#,QUESTIONCONTENT=#QuestionContent# WHERE QUESTIONID=#QuestionId#
+    </update>
+    
+    <delete id="DeleteQuestionInfo" parameterClass="string">
+      begin
+      DELETE FROM REPLYINFO
+      WHERE QUESTIONID=#value#;
+      DELETE FROM QUESTIONINFO
+      WHERE QUESTIONID=#value#;
+      end;
+    </delete>
+    
+  </statements>
+</sqlMap>

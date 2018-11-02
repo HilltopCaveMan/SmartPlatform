@@ -1,0 +1,105 @@
+﻿<div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+    <table>
+        <tr>
+            <td style="padding-left: 15px;">
+                <ul class="photosharing_menu">
+                    <li>开始日期&nbsp;<input class="easyui-datebox" id="begindate" style="width:120px;height:25px;"></li>
+                    <li>开始时间&nbsp;<input class="easyui-timespinner" id="begintime" style="width:120px;height:25px"></li>
+                </ul>
+            </td>
+            <td>
+                <ul class="photosharing_menu">
+                    <li>结束日期&nbsp;<input class="easyui-datebox" id="enddate" style="width:120px;height:25px;"></li>
+                    <li>结束时间&nbsp;<input class="easyui-timespinner" id="endtime" style="width:120px;height:25px;"></li>
+                </ul>
+            </td>
+            <td colspan="2">
+                <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetMilageData()">查询</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<table id="MilageData" style="height:265px;"></table>
+
+<script type="text/javascript" language="javascript">
+    var curr_time = new Date();
+    $(function () {
+        $('#begindate').datebox('calendar').calendar({
+            validator: function (date) {
+                var now = new Date();
+                var d1 = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
+                return d1 > date;
+            }
+        });
+        $('#enddate').datebox('calendar').calendar({
+            validator: function (date) {
+                var now = new Date();
+                var d1 = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
+                return d1 > date;
+            }
+        });
+        $("#begindate").datebox({value:myformatter(curr_time)});
+        $("#enddate").datebox({value: myformatter(curr_time) });
+        $("#begintime").timespinner({ showSeconds: true });
+        $("#endtime").timespinner({ showSeconds: true });
+        $("#begintime").timespinner("setValue", "00:00:00");
+        var curtime = curr_time.getHours() + ":" + curr_time.getMinutes() + ":" + curr_time.getSeconds();
+        $("#endtime").timespinner("setValue","23:59:59");//curtime
+        loadMilageDataTable();
+    });
+    function myformatter(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        return y + '-' + m + '-' + d;
+    }
+    //点击查询
+    function GetMilageData() {
+        var tnstr = '@ViewBag.TerNo';
+        var distr = '@ViewBag.DeptId';
+        var bt = $("#begindate").datebox("getValue") + " " + $("#begintime").timespinner("getValue");
+        var et = $("#enddate").datebox("getValue") + " " + $("#endtime").timespinner("getValue");
+        if (bt == "" && et == "") {
+            window.parent.$.messager.alert('警告', '请选择日期', 'error');
+        }
+        else {
+            $.ajax({
+                url: "/HistoryTrail/GetMilageByEnddate",
+                data: { TerNo: tnstr, ed: et },
+                type: "POST",
+                success: function (data) {
+                    if (data == "false")
+                    {
+                        window.parent.$.messager.alert('警告','您选择的结束日期中没有里程','error');
+                    }
+                    else
+                    {
+                        var param = { TerNo: tnstr, DeptId: distr, st: bt, ed: et };
+                        $("#MilageData").datagrid("load", param);
+                    }
+                }
+            });
+        }
+      
+    }
+
+    function loadMilageDataTable() {
+          $('#MilageData').datagrid({
+            url: '@Url.Action("GetTerMilageData", "HistoryTrail")',
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 180, align: 'center' },
+                { field: 'CarNo', title: '车牌号码', width: 180, align: 'center' },
+                { field: 'Milage', title: '行驶里程(km)', width: 150, align: 'center' }
+            ]],
+            striped: true, //是否显示斑马线效果
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            pageList: [15, 30, 45],
+            queryParams: { "TerNo": '@ViewBag.TerNo', "DeptId": '@ViewBag.DeptId', "st": myformatter(curr_time) + " " + $("#begintime").timespinner("getValue"), "ed": myformatter(curr_time) + " " + $("#endtime").timespinner("getValue")},//查询参数
+            pagination: true
+        });
+    }
+
+</script>

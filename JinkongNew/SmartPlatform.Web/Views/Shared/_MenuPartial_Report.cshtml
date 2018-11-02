@@ -1,0 +1,96 @@
+﻿<div id="main-nav-bg"></div>
+<div class="vernav2 iconmenu" style=" margin-top: 3px;">
+    <ul id="Menu"></ul>
+    <a class="togglemenu" style="display:none;"></a><br /><br />
+</div><!--leftmenu-->
+
+<script type="text/javascript">
+    $.ajax({
+        type: 'post',
+        url: '/CarReport/GetReportMenuTree',
+        success: function (data) {
+            if (data == null) {
+                window.location.href = "/Account/Login";
+            }
+            else {
+                var _menus = data;
+                addNav(_menus);
+                InitLeftMenu();
+                jQuery('.vernav2 > ul li a').each(function () {
+                    var url = jQuery(this).attr('href');
+                    jQuery(this).click(function () {
+                        if (jQuery(url).length > 0) {
+                            if (jQuery(url).is(':visible')) {
+                                if (!jQuery(this).parents('div').hasClass('menucoll2'))
+                                    jQuery(url).slideUp();
+                            } else {
+                                jQuery('.vernav2 ul ul').each(function () {
+                                    jQuery(this).slideUp();
+                                });
+                                if (!jQuery(this).parents('div').hasClass('menucoll2'))
+                                    jQuery(url).slideDown();
+                            }
+                            return false;
+                        }
+                    });
+                });
+            }
+        }
+    });
+
+    function addNav(_menus) {
+        var MenuList = "";
+        if (_menus.length > 0) {
+            var MenuParent = "";
+            $.each(_menus, function (i, sm) {
+                MenuParent += ' <li class="">'
+                + '<a class="dropdown-collapse" href="#' + sm.id + '" class="' + sm.icon + '" onclick="addTab(\'' + sm.text + '\',\'' + sm.url + '\')">' + sm.text + '</a>'
+                + '<span class="arrow" style="display:none;"></span>';
+                if (sm.children!=null && sm.children.length > 0) {
+                    var MenuChlidren = "";
+                    MenuChlidren += ' <ul class="TwoMenu" id="' + sm.id + '">';
+                    $.each(sm.children, function (j, o) {
+                        MenuChlidren += '<li class="">'
+                        + '<a ref="' + o.id + '" href="#"  rel="' + o.url + '" >' + o.text + '</a>'
+                        + '</li>';
+                    });
+                    
+                    MenuChlidren += '</ul>';
+                    MenuParent += MenuChlidren;
+                }
+                MenuParent += '</li>'
+            });
+            MenuList += MenuParent;
+        }
+        $("#Menu").append(MenuList);
+    }
+
+    // 初始化左侧
+    function InitLeftMenu() {
+        $('.TwoMenu li a').live('click', function () {
+            var tabTitle = $(this).text();
+            var url = $(this).attr("rel");
+            var menuid = $(this).attr("ref");
+            addTab(tabTitle, url);
+        });
+    };
+
+    function addTab(subtitle, url) {
+        if (!$('#tabs').tabs('exists', subtitle)) {
+            $('#tabs').tabs('add', {
+                title: subtitle,
+                content: createFrame(url),
+                closable: true
+            });
+        }
+        else {
+            $('#tabs').tabs('select', subtitle);
+        }
+    };
+
+    function createFrame(url) {
+        var s = '<iframe scrolling="auto" frameborder="0" id="' + url + '"  src="' + url + '" style="width:100%;height:100%;"></iframe>';
+        return s;
+    }
+
+</script>

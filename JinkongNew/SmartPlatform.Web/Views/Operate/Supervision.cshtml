@@ -1,0 +1,219 @@
+﻿
+<div class="tabcontant">
+    <div id="audit_polluteManager_list_searchPanel"
+         style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+         class="easyui-panel" iconcls="icon-search" title="监管管理"
+         collapsible="true" minimizable="false" maximizable="false"
+         closable="false">
+        <form id="audit_polluteManager_list_searchForm" method="post">
+            <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        GPS编号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:100px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        经销商：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:100px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        机型：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        销售状态：
+                    </td>
+                    <td>
+                        <select name="operatestatus" class="easyui-combobox" style="width:150px;height:20px;"
+                                id="audit_polluteManager_list_searchInput_operatestatus">
+                            <option value="">--请选择--</option>
+                            <option value="01">在库</option>
+                            <option value="02">样机</option>
+                            <option value="03">销售</option>
+                            <option value="03">待测机</option>
+                            <option value="03">退役</option>
+                        </select>
+                    </td>
+                    <td style="padding-left:30px;" rowspan="2"  align="center">
+                        <a class="easyui-linkbutton" icon="icon-search"
+                           href="javascript:audit_polluteManager_list_searchForm_submit();">查询</a> &nbsp;&nbsp;
+                    </td>
+                </tr>
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        SIM卡号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:100px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        车辆编号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:100px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        添加车辆时间：
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" style="width:110px">
+                        至: <input class="easyui-datebox" style="width:110px">
+                    </td>
+                    <td style="padding-left: 15px;">
+                        销售时间：
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" style="width:110px">
+                        至: <input class="easyui-datebox" style="width:110px">
+                    </td>
+                </tr>
+                
+            </table>
+        </form>
+    </div>
+    <table id="supervisionTable" data-options="rownumbers:true,singleSelect:true,toolbar:toolbar" class="easyui-datagrid" style="height:auto"></table>
+</div>
+
+<div id="dd"></div>
+
+<div id="SetPage" style="display:none">
+
+    <table>
+        <tr margin-left="40">
+            <td>车牌号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:100px;height:20px;" value="3F70001AZ-G" /></td>
+        </tr>
+        <tr>
+            <td>GPS编号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:100px;height:20px;" value="FR60" /></td>
+        </tr>
+        <tr>
+            <td>SIM卡号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:100px;height:20px;" value="12345678901" /></td>
+        </tr>
+        <tr>
+            <td>经销商：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:100px;height:20px;" value="廊坊市机械有限公司" /></td>
+        </tr>
+        <tr>
+            <td>销售状态：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:100px;height:20px;" value="销售" /></td>
+        </tr>
+        <tr>
+            <td>驾驶员名称：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:100px;height:20px;" value="吴明远" /></td>
+        </tr>
+        <tr>
+            <td>驾驶员手机号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:100px;height:20px;" value="13700011111" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                <a class="easyui-linkbutton" icon="icon-cut"
+                   href="#">确认修改</a> &nbsp;&nbsp;
+            </td>
+        </tr>
+    </table>
+
+
+</div>
+
+
+<script type="text/javascript">
+    var toolbar = [
+    {
+        text: '导出Excel表',
+        iconCls: 'icon-save',
+        handler: function () { alert('cut') }
+    }];
+
+    function OpenSetPage() {
+        $('#SetPage').dialog({
+            title: '修改监管管理参数',
+            width: 300,
+            height: 300,
+            closed: true,
+            cache: false,
+            modal: true,
+        });
+
+        $('#SetPage').css('display', 'block')
+        $('#SetPage').dialog('open')
+
+    }
+
+
+    function Off() {
+
+        alert("注销成功！");
+
+    }
+
+
+
+
+    $(function () {
+     var dg=  $('#supervisionTable').datagrid({
+            data: [
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' },
+                { f0: 'W303164344', f1: 'FTC003RFCDZ004311', f2: '14768615914', f3: '销售', f4: '北京雷沃博多工程机械有限公司', f5: '刘禹瑞', f6: '2013-01-25 03:12:26.0', f7: '2013-03-30 11:55:13.47', f8: '廊坊市三河市', f9: '4-11-21 14:50:15.227', f10: '     　　　', f11: '<a href="#" onclick="OpenSetPage()">修改</a>　　<a href="#" onclick="Off()">注销</a>' }
+
+                
+            ],
+            columns: [[
+                //{ field: 'ck', checkbox: true },
+                { field: 'f0', title: 'GPS编号', width: 100, align: 'center', sortable: true },
+                { field: 'f1', title: '车辆编号', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: 'SIM卡号', width: 100, align: 'center', sortable: true },
+                { field: 'f3', title: '销售状态', width: 100, align: 'center', sortable: true },
+                { field: 'f4', title: '经销商', width: 60, align: 'center' },
+                { field: 'f5', title: '用户', width: 80, align: 'center' },
+                { field: 'f6', title: '添加车辆时间', width: 100, align: 'center' },
+                { field: 'f7', title: '首次销售', width: 80, align: 'center' },
+                { field: 'f8', title: '最新位置', width: 80, align: 'center' },
+                { field: 'f9', title: '最新数据时间', width: 80, align: 'center' },
+                { field: 'f10', title: 'GPS结束时间', width: 80, align: 'center' },
+                { field: 'f11', title: '操作', width: 80, align: 'center' },
+            ]],
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true
+        });
+
+
+     dg.datagrid('enableFilter', []);
+
+
+
+    });
+
+
+
+</script>

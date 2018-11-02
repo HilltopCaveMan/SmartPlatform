@@ -1,0 +1,132 @@
+﻿/*.main_box {
+    position: absolute; top:50%; right:10%; margin-top:-160px; margin-left: -300px; padding: 30px; width:400px; height:300px;
+	background:url(../Content/images/1.png);
+    border-radius: 10px;
+}*/
+.nrsApp{
+    line-height:50px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+    background: linear-gradient(to bottom, #BDC3C7 0%, #BDC3C7 100%);
+    background-color:#e2e2e2;
+    background-repeat: repeat-x;
+}
+.nrsApp-android {
+    border-right: 1px solid #fff;
+}
+    #appdowload-wraper a {
+    display: inline-block;
+    font-size: 14px;
+    line-height: 21px;
+    padding: 0 15px;
+    vertical-align: baseline;
+}
+
+    .nrsApp .ico {
+    cursor: pointer;
+    margin-right: 8px;
+    margin-top: -2px;
+}
+    .ico-android {
+    background-position: 0 0;
+    display: inline-block;
+    height: 21px;
+    vertical-align: middle;
+    width: 17px;
+    background-image: url("../Content/images/bg_v3.png");
+}
+    .ico-ios {
+    background-position: -20px 0;
+    display: inline-block;
+    height: 18px;
+    vertical-align: middle;
+    width: 15px;
+    background-image: url("../Content/images/bg_v3.png");
+}
+    #appdowload-wraper{
+  -webkit-border-top-left-radius: 10px;
+  -moz-border-top-left-radius: 10px;
+  -ms-border-top-left-radius: 10px;
+  -o-border-top-left-radius: 10px;
+  border-top-left-radius: 10px;
+  -webkit-border-top-right-radius: 10px;
+  -moz-border-top-right-radius: 10px;
+  -ms-border-top-right-radius: 10px;
+  -o-border-top-right-radius: 10px;
+  border-top-right-radius: 10px;
+  position: absolute;
+  top: 50%;
+  right: 10%;
+  margin-top: -165px;
+  width: 370px;
+  height:300px;
+  display:none;
+  background-color:#ECF0F1;
+  text-align: center;
+    }
+    #login-wraper {
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+  border-radius: 10px;
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  position: absolute;
+  opacity:0.9;
+  top: 50%;
+  right: 10%;
+  display: block;
+  margin-top: -165px;
+  width: 370px;
+  height:320px;
+  background: white;
+  text-align: center;
+}
+
+
+/* line 97, ../sass/typica-login.scss */
+.login-form legend {
+  /*margin-top: 5px;
+  
+  padding-bottom: 25px;*/
+  margin-bottom: 30px;
+}
+/* line 102, ../sass/typica-login.scss */
+.login-form .body {
+  border-bottom: 1px solid #eeeeee;
+}
+/* line 106, ../sass/typica-login.scss */
+.login-form .footer {
+  margin-top: 20px;
+}
+/* line 108, ../sass/typica-login.scss */
+.login-form .footer .checkbox.inline {
+  display: inline;
+}
+/* line 110, ../sass/typica-login.scss */
+.login-form .footer .checkbox.inline input[type="checkbox"] {
+  float: none;
+  margin-top: -4px;
+}
+/* line 115, ../sass/typica-login.scss */
+.login-form .footer .btn {
+  padding: 7px 25px;
+}
+
+#carousel-example-generic img{
+    max-height:100%;
+    min-width:1000px;
+}
+#carousel-example-generic .carousel-control{
+    width:10%;
+}
+ .login-form h1{
+      font-size:25px;
+	  font-weight:300;
+	  margin-bottom:10px;
+	  border-bottom:1px solid #e5e5e5;
+	  color:#333333 !important;
+	  font-family:inherit !important;
+   }

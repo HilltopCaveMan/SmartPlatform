@@ -1,0 +1,337 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table style="margin-bottom:5px;">
+            <tr>
+                <td style="padding-left: 15px;">
+                    终端类型：
+                </td>
+                <td>
+                    <input id="TerTypeSel" type="text" class="easyui-combobox" style="width:140px; height:30px;" panelheight="110" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input id="AllDataDeptSel" class="easyui-combobox" style="width:150px; height:30px;" />
+                </td>
+                <td>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="checkbox" id="AllDataDept" name="check2"> <label for="ChildrenDept">查询子企业 </label>
+                </td>
+                <td style="padding-left: 15px;">
+                    状态类型：
+                </td>
+                <td>
+                    <input id="StateTypeSel" name="StateTypeSel" type="text" class="easyui-combobox" style="width:100px; height:30px;" panelheight="110" />
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    对象类型：
+                </td>
+                <td>
+                    <input id="ObjTypeSel" name="ObjTypeSel" type="text" class="easyui-combobox" style="width:140px; height:30px;" panelheight="60" />
+                </td>
+                <td style="padding-left: 15px;">
+                    &nbsp;&nbsp;&nbsp;关键字：
+                </td>
+                <td>
+                    <input id="SearchKey" name="SearchKey" type="text" style="width:140px; height:20px;" />
+                </td>
+                <td colspan="2">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetTerListData()">查询</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="ExportData()">数据导出</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="AllData"></table>
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script src="~/assets/javascripts/echarts.js"></script>
+<script type="text/javascript">
+    var AllData;
+    $(function () {
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 80,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+
+        //终端类型下拉框
+        $('#TerTypeSel').combobox({
+            url: '/TerType/GetTerTypeList?TypeMode=true',
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) == 0;
+            },
+            valueField: 'ProId',
+            textField: 'ProName'
+        });
+
+        //绑定对象类型
+        InitCarTerTypeSel();
+
+        //绑定状态类型
+        InitStateTypeSel();
+
+        $("input, textarea, select").uniform();
+        //终端用户表格高度
+        $("#AllData").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+        loadAllData();
+
+        $("#AllDataDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" }
+            @*onLoadSuccess: function () {
+                $('#parentid').combotree('setValue', '@ViewBag.FatherID');
+            }*@
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#AllDataDeptSel'));
+
+        /*
+        $(".textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown",
+            function (e) {
+                if (e.keyCode == "13") {
+                    $('#AllDataDeptSel').combotree('tree').tree("search", $(this).val());
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        $('#AllDataDeptSel').combotree('tree').tree("collapseAll");
+                    }
+                }
+            }
+        );
+        */
+
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                GetTerListData();
+            }
+        });
+
+        //加载图表
+        InitPieChart();
+    });
+
+    //绑定对象类型
+    function InitCarTerTypeSel() {
+        var data = [
+            { "id": "1", "text": "终端编号" },
+            { "id": "2", "text": "车牌号" }
+        ];
+
+        $('#ObjTypeSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#ObjTypeSel').combobox('setValue', 1);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //绑定状态类型
+    function InitStateTypeSel() {
+        var data = [
+            { "id": "0", "text": "全部" },
+            { "id": "1", "text": "在线设备" },
+            { "id": "2", "text": "离线设备" },
+            { "id": "3", "text": "失联设备" },
+            { "id": "4", "text": "到期设备" },
+            { "id": "5", "text": "库存设备" },
+            { "id": "6", "text": "休眠设备" },
+            { "id": "7", "text": "其他设备" }
+        ];
+
+        $('#StateTypeSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#StateTypeSel').combobox('setValue', 0);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //加载图表
+    function InitPieChart() {
+        var now = new Date();
+        var month = now.getMonth() + 1;
+        if (month < 10) {
+            month = '0' + month;
+        }
+        var FormatNow = now.getFullYear() + '-' + month;
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '设备状态统计',
+                subtext: '日期:' + FormatNow
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{b} : {c} ({d}%)"
+            },
+            legend: {
+                right:20,
+                bottom: 0,
+                orient: 'vertical',
+                selectedMode: false,
+                data: [{ name: '在线' },
+                       { name: '离线' },
+                       { name: '失联' },
+                       { name: '到期' },
+                       { name: '库存' },
+                       { name: '休眠' },
+                       { name: '其他' }]
+            },
+            series: [{
+                type: 'pie',
+                radius: '85%',
+                label: {
+                    normal: {
+                        show: false
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: false
+                    }
+                },
+                data: null
+            }]
+        };
+
+        //加载数据
+        $.ajax({
+            url: "/CarReport/GetTerCharData",
+            data:GetArgs(),
+            success: function (data) {
+                if (eval(data)[0].value == "0" && eval(data)[1].value == "0" && eval(data)[2].value == "0" && eval(data)[3].value == "0" && eval(data)[4].value == "0" && eval(data)[5].value == "0" && eval(data)[6].value == "0") {
+                    var brr = [];
+                    option.legend.data = [{ name: '无数据' }];
+                    option.series[0].radius = ['85%'];
+                    brr.push({ id: 'ccbj', value: '0', name: '无数据', itemStyle: { normal: { color: 'green', borderColor: 'black', borderWidth: 1 } } });
+                    option.series[0].data = brr;
+                }
+                else {
+                    option.series[0].data = eval(data);
+                }
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            }
+        });
+        myChart.on('click', GetDataList);
+
+        function GetDataList(param)
+        {
+            $('#StateTypeSel').combobox('setValue', param.data.id);
+            $("#AllData").datagrid("load", GetArgs());
+        }
+    }
+
+    //加载数据
+    function loadAllData() {
+        AllData = $('#AllData').datagrid({
+            url: '@Url.Action("GetTjbbTerData","CarReport")',
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center' },
+                { field: 'CarNo', title: '车牌号', width: 120, align: 'center' },
+                {
+                    field: 'Rtime', title: '回传时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'Postbacktimes', title: '回传条数', width: 100, align: 'center' },
+                { field: 'Position', title: '回传位置', width: 300, align: 'center' },
+                {
+                    field: 'Ter_Innettime', title: '入网时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'TerSimcard', title: 'SIM卡号', width: 110, align: 'center' },
+                { field: 'StateName', title: '终端状态', width: 110, align: 'center' },
+                { field: 'ProName', title: '终端类型', width: 110, align: 'center' }
+            ]],
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            sortName: 'Rtime',
+            sortOrder: 'desc',//desc,asc
+            pageList: [10, 50, 100, 150],
+            queryParams: {},//查询参数
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true,
+            //singleSelect: true,
+            toolbar: '<div id="main" style="height:200px;"></div>'
+        });
+    }
+
+    //为表格增加参数重载数据
+    function GetTerListData() {
+        InitPieChart();
+        $("#AllData").datagrid("load", GetArgs());
+    }
+
+    //导出
+    function ExportData() {
+        $.post("/CarReport/GetReportTerData", GetArgs(), function (e) {
+            if (e.indexOf("Files") > 0) {
+                window.location.href = e;
+            } else {
+                window.parent.$.messager.alert('警告', '导出失败，请重新导出！', 'info');
+            }
+        })
+    }
+
+    //得到条件参数
+    function GetArgs()
+    {
+        var DeptId = $('#AllDataDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#AllDataDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var ObjType = $('#ObjTypeSel').combobox('getValue');
+        var ObjValue = $('#SearchKey').val();
+        var ProId = $('#TerTypeSel').combobox('getValue');
+        var StateId = $('#StateTypeSel').combobox('getValue');
+        var param = { ObjType: ObjType, ObjValue: ObjValue, ProId: ProId, StateId: StateId, DeptId: DeptId, ChildrenSel: Children };
+        return param;
+    }
+</script>
+
+

@@ -1,0 +1,211 @@
+﻿<div class="tabcontant">
+    <table>
+        <tr>
+            <td>
+                <table id="StaffTable" style="width:900px;height:500px;"></table>
+                <div id="tb" style="padding:5px;height:auto">
+                    <div style="margin-bottom:5px">
+                        @if (ViewBag.AddUser == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="AddTerUser()" iconcls="icon-add" plain="true">添加</a>
+                        }
+                        @if (ViewBag.EditUser == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="EditUser()" iconcls="icon-edit" plain="true">修改</a>
+                        }
+                        @if (ViewBag.DelUser == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="DelUser()" iconcls="icon-remove" plain="true">删除</a>
+                        }
+
+                        @if (ViewBag.PwdReste == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="ResetUser()" iconcls="icon-remove" plain="true">密码初始化</a>
+                        }
+                    </div>
+                    <div>
+                        登录名: <input id="txtLUserSel" class="easyui-textbox" style="width:120px; height:25px;" />&nbsp;&nbsp;
+                        用户名:<input id="txtUserSel" class="easyui-textbox" style="width:120px; height:25px;" />&nbsp;&nbsp;
+                        <a href="#" onclick="btnUserSel()" class="easyui-linkbutton" iconcls="icon-search">查找</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="~/assets/javascripts/jquery.easyuitree.js"></script>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    var NodeId;
+    var QrgTable;
+    var UserDeptId = '@ViewBag.Deptid';
+    var UserDeptName = '@ViewBag.Deptname';
+
+    $(function () {
+        $("input, textarea, select").uniform();
+        //*******************************
+        //2015-04-10 Cwen.H
+        //模糊查询市场部列表
+        //*******************************
+        $('#bussname').searchbox({
+            width: 210,
+            searcher: function (value, name) {
+                $("#Departments").tree("search", value);
+            },
+            prompt: '请输入......'
+        });
+
+        //所属企业
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" }
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+
+        $('#StaffTable').height($(document.body).height() - 25);
+        $('#StaffTable').width($(document.body).width() - 25); 
+        LoadPersonalList();
+    });
+
+    //////////加载部门树//////////
+    function LoadDepartmentTree() {
+        $('#Departments').tree({
+            url: "/Dept/GetOrgNode",
+            animate: true,
+            lines: true,
+            onContextMenu: function (e, node) {
+                e.preventDefault();
+                // 选中节点
+                $('#Departments').tree('select', node.target);
+                // 实例右键菜单
+                $('#RightMenu').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            },
+            onLoadSuccess: function (node, data) {
+                $("#Departments li:eq(0)").find("div:eq(0)").addClass("tree-node-selected");   //设置第一个节点高亮
+                var n = $("#Departments").tree("getSelected");
+                if (n) {
+                    LoadPersonalList(n.id);
+                }
+
+            },
+            onClick: function (node) {
+                NodeId = node.id;
+                LoadPersonalList(node.id);
+            }
+        });
+    };
+
+    function AddTerUser() {
+        window.parent.$.DialogOpen('/User/AddTerUser?Businessdivisionid=' + UserDeptId + '&Businessdivisionname=' + UserDeptName, { title: "添加设备用户", width: 700, height: 300 });
+    }
+
+    function EditUser() {
+        var row = QrgTable.datagrid('getSelected');
+        if (row == null) {
+            window.parent.$.messager.alert('警告', '您没有选择要编辑的用户！', 'error');
+        }
+        else {
+            var id = row.UserId;
+            window.parent.$.DialogOpen('/User/EditTerUser?UserId=' + id, { title: "修改用户信息", width: 700, height: 300 });
+        }
+    }
+
+    function DelUser() {
+        var row = $('#StaffTable').datagrid('getSelected');
+        if (row == null) {
+            window.parent.$.messager.alert('警告', '您没有选择要删除的用户', 'error');
+        } else {
+            window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '/User/DelUser?UserId=' + row.UserId,
+                        type: "post",
+                        success: function (r) {
+                            if (r == "true") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '删除成功！',
+                                    timeout: 2000
+                                });
+                                $('#StaffTable').datagrid('reload');
+                            } else {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '删除失败！',
+                                    timeout: 2000
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    }
+
+    function ResetUser() {
+        var row = $('#StaffTable').datagrid('getSelected');
+        if (row == null) {
+            window.parent.$.messager.alert('警告', '您没有选择要重置密码的用户', 'error');
+        } else {
+            window.parent.$.messager.confirm('确定', '您确定要将' + row.UserLname + '用户重置密码吗?', function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '/User/ResetUser?UserId=' + row.UserId,
+                        type: "post",
+                        success: function (r) {
+                            if (r == "true") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '重置成功！',
+                                    timeout: 2000
+                                });
+                                $('#StaffTable').datagrid('reload');
+                            } else {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '重置失败！',
+                                    timeout: 2000
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        }
+
+    }
+
+    function btnUserSel() {
+        var param = { UserLname: $("#txtLUserSel").val(), UserName: $("#txtUserSel").val() };
+        $("#StaffTable").datagrid("load", param);
+    }
+
+
+    function LoadPersonalList(Nid) {
+        QrgTable = $('#StaffTable').datagrid({
+            url: "/User/GetTerUserListByCode",
+            columns: [[
+                { field: 'UserId', title: '用户ID', hidden: true },
+                { field: 'UserLname', title: '登录名', width: 50, align: 'center', sortable: true },
+                { field: 'UserName', title: '用户姓名', width: 50, align: 'center' },
+                { field: 'RoleName', title: '管辖设备', width: 200, align: 'center' }
+            ]],
+            singleSelect: true,
+            fitColumns: true,
+            striped: true,
+            pagination: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            pageList: [15, 30, 45],
+            queryParams: {Businessdivisionid: Nid },
+            toolbar: "#tb"
+        })
+    };
+</script>

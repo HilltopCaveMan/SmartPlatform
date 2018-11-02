@@ -1,0 +1,174 @@
+﻿
+<link href="~/Content/style.default_511.css" rel="stylesheet" />
+<link href="~/assets/themes/bootstrap/easyui.css" rel="stylesheet" type="text/css" />
+<link href="~/assets/themes/icon.css" rel="stylesheet" type="text/css" />
+<link href="~/assets/themes/color.css" rel="stylesheet" type="text/css" />
+<link href="~/assets/themes/demo.css" rel="stylesheet" type="text/css" />
+
+<link href="~/Content/uniform.tp.css" rel="stylesheet" />
+<link href="~/assets/themes/step.css" rel="stylesheet" />
+
+<script type="text/javascript" src="~/assets/javascripts/jquery-1.8.0.js"></script>
+<script src="~/Scripts/jquery.uniform.min.js"></script>
+<script type="text/javascript" src="~/assets/javascripts/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="~/assets/javascripts/datagrid-detailview.js"></script>
+
+<script src="~/Scripts/jquery.validate.min.js" type="text/javascript"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js" type="text/javascript"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js" type="text/javascript"></script>
+
+<script type="text/javascript" src="~/assets/javascripts/Dialog.js"></script>
+
+<script type="text/javascript" src="~/assets/javascripts/easyui-lang-zh_CN.js"></script>
+
+<script src="~/assets/javascripts/uploadPreview.min.js"></script>
+
+<script type="text/javascript" src="~/assets/javascripts/wizard.js"></script>
+<script src="~/Scripts/jquery.slimscroll.min.js"></script>
+<script src="~/Scripts/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/general.js"></script>
+<script src="~/Scripts/jquery.bxSlider.min.js"></script>
+<script src="~/Scripts/loading-overlay.min.js"></script>
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<div id="DivCarList" class="dialog">
+    <div id="contentwrapper" class="contentwrapper">
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">回传时间</th>
+                    <th class="head1">车牌号</th>
+                    <th class="head0">终端编号</th>
+                    <th class="head1">终端状态</th>
+                    <th class="head0">定位方式</th>
+                    <th class="head1">当前位置</th>
+                    <th class="head0">SIM卡号</th>
+                    <th class="head0">所属组织</th>
+                    <th class="head1">回传次数</th>
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+    G_ShowCarOrTerList();
+
+    function G_ShowCarOrTerList() {
+        var options = {
+            title: '车辆终端列表--超里程统计' ,
+            width: '90%',
+            height: '85%'
+        };
+
+        $("#DivCarList").css("display", "block");
+        var dlg = $("#DivCarList").dialog($.extend({
+            modal: true,
+            resizable: true,
+            close: true
+        }, options));
+
+        //刷新列表
+        CarTable = $('#dyntable').DataTable();
+        CarTable.destroy();
+        if (CarTable != null) {
+            //CarTable.destroy();
+        }
+
+        LoadDataTable(MonitorMap.markers);
+    }
+
+    function LoadDataTable(data) {
+
+        CarTable = $('#dyntable').dataTable({
+            language: {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                //"info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ) 共_TOTAL_条",
+                "info": "第 _PAGE_ 页 ( 共 _PAGES_ 页 ) 共_TOTAL_条",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "search": "模糊查询"
+            },
+            initComplete: function () {
+
+                //$("#mytool").append('<button id="datainit" type="button" class="btn btn-primary btn-sm">导出数据</button>&nbsp');
+
+                //绑定车辆列表下载 Excel
+                BindLoadDataTableToExcel();
+            },
+            data: data,
+            columns: [
+                { "data": "Rtime" },
+                { "data": "CarNo" },
+                { "data": "TerNo" },
+                { "data": "TerStatus" },
+                { "data": "Ifposition" },
+                { "data": "Position" },
+                { "data": "TerSimcard" },
+                { "data": "Businessdivisionname" },
+                { "data": "Postbacktimes" }
+            ],
+            "columnDefs": [{
+                targets: [0],
+                orderData: [0, 1]  //如果第一列进行排序，有相同数据则按照第二列顺序排列
+            }, {
+                targets: [1],
+                orderData: [1, 0]  //如果第二列进行排序，有相同数据则按照第一列顺序排列
+            }, {
+                targets: [4],
+                orderData: [4, 0]  //如果第五列进行排序，有相同数据则按照第一列顺序排列
+            }],
+
+            lengthChange: true,
+            pageLength: 10,
+            scrollCollapse: true,
+            pagingType: "full_numbers",
+            scrollX: true,
+            ordering: true
+        });
+    }
+
+    function BindLoadDataTableToExcel() {
+
+        var btn = new Array();
+
+        btn.push("<span class='tableoptions' style='border-width:0px;'>&nbsp;&nbsp;");
+        btn.push(" <button class='deletebutton radius3' id='DownLoadData' title='导出Excel数据文件'>导出数据</button> &nbsp;");
+        btn.push("</span>");
+
+        $("#dyntable_length").append(btn.join(""));
+
+        $("#DownLoadData").click(function (e) {
+            var DeptId = $('#DeptSel').combotree('getValue');
+            if ($("#ChkShowChild").is(':checked') == true) {
+                DCode = "true";
+            }
+            else {
+                DCode = "false";
+            }
+            $.post("../CarMonitor/DownLoadExcel", { Businessdivisionid: DeptId, DeptCode: DCode, SelType: "Dept" }, function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.location.href = e;
+                } else {
+                    window.parent.$.messager.alert('提示', '导出失败，请重新导出！', 'info');
+                }
+            })
+        })
+    }
+</script>

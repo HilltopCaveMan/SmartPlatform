@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="FieldValues" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="FieldValues" type="GModel.Car.FieldValues" />
+</alias>
+<resultMaps>
+	<resultMap id="FieldValuesResult" class="FieldValues">
+		<result property="CarId" column="CarId" type="string" dbType="varchar"/>
+		<result property="UfId" column="UfId" type="string" dbType="varchar"/>
+		<result property="FieldValue" column="FieldValue" type="string" dbType="varchar"/>
+		<result property="FieldId" column="FieldId" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectFieldValues" parameterClass="FieldValues" resultMap="FieldValuesResult">
+    SELECT CAR_ID AS CarId,UF_ID AS UfId,FIELD_VALUE AS FieldValue
+    FROM FIELD_VALUES WHERE  FIELD_ID = #FieldId#
+  </select>
+	<select id="SelectFieldValuesPage" parameterClass="map" resultMap="FieldValuesResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+			SELECT CAR_ID AS CarId,UF_ID AS UfId,FIELD_VALUE AS FieldValue,FIELD_ID AS FieldId
+			FROM FIELD_VALUES 
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectFieldValuesCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM FIELD_VALUES  
+	</select>
+	<insert id="InsertFieldValues" parameterClass="FieldValues">
+		INSERT INTO FIELD_VALUES 
+		(CAR_ID,UF_ID,FIELD_VALUE,FIELD_ID) 
+		VALUES(#CarId#,#UfId#,#FieldValue#,#FieldId#)
+	</insert>
+	<update id="UpdateFieldValues" parameterClass="FieldValues">
+		UPDATE FIELD_VALUES 
+ 		SET CAR_ID=#CarId#,UF_ID=#UfId#,FIELD_VALUE=#FieldValue# WHERE  FIELD_ID=#FieldId#
+	</update>
+	<delete id="DeleteFieldValues" parameterClass="string">
+    DELETE FROM FIELD_VALUES
+    WHERE CAR_ID = #value#
+  </delete>
+</statements>
+</sqlMap>

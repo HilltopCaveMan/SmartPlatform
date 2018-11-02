@@ -1,0 +1,590 @@
+﻿<div class="tabcontant">
+    <table>
+        <tr>
+            @*<td>
+                <div id="Organization" style="padding:10px;">
+                    <input id="bussname" />
+                    <ul id="Departments" style="margin-top:10px"></ul>
+                    <div id="RightMenu" class="easyui-menu" style="width:120px;">
+                        @if (ViewBag.AddDept == "true")
+                        {
+                            <div onclick="append()" data-options="iconCls:'icon-add'">添加</div>
+                        }
+                        @if (ViewBag.DelDept == "true")
+                        {
+                            <div onclick="removeit()" data-options="iconCls:'icon-remove'">删除</div>
+                        }
+                        @if (ViewBag.EditDept == "true")
+                        {
+                            <div onclick="expand()" data-options="iconCls:'icon-edit'">重命名</div>
+                        } 
+                    </div>
+                </div>
+            </td>*@
+            <td>
+                <table id="StaffTable" style="width:900px;height:500px;"></table>
+                <div id="tb" style="padding:5px;height:auto">
+                    <div style="margin-bottom:5px">
+                        @if (ViewBag.AddUser == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="AddUser()" iconcls="icon-add" plain="true">添加</a>
+                        }
+                        @if (ViewBag.EditUser == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="EditUser()" iconcls="icon-edit" plain="true">修改</a>
+                        }
+                        @if (ViewBag.DelUser == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="DelUser()" iconcls="icon-remove" plain="true">删除</a>
+                        }
+                        
+                        @if (ViewBag.PwdReste == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="ResetUser()" iconcls="icon-remove" plain="true">密码初始化</a>
+                        }
+                    </div>
+                    <div>
+                        登录名: <input id="txtLUserSel" class="easyui-textbox" style="width:120px; height:25px;" />&nbsp;&nbsp;
+                        用户名:<input id="txtUserSel" class="easyui-textbox" style="width:120px; height:25px;" />&nbsp;&nbsp;
+                        @*经销商:<input class="easyui-textbox" style="width:100px; height:25px;" />&nbsp;&nbsp;*@
+                        所属企业:<input id="TerDeptSel" class="easyui-combobox" style="width:200px; height:25px;" />&nbsp;&nbsp;
+                        <input type="checkbox" id="ChildrenDept" name="check2"> <label for="ChildrenDept">查询子企业 </label>&nbsp;&nbsp;
+                        <a href="#" onclick="btnUserSel()" class="easyui-linkbutton" iconcls="icon-search">查找</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="~/assets/javascripts/jquery.easyuitree.js"></script>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+/*
+* 1）扩展jquery easyui tree的节点检索方法。使用方法如下：
+* $("#treeId").tree("search", searchText);
+* 其中，treeId为easyui tree的根UL元素的ID，searchText为检索的文本。
+* 如果searchText为空或""，将恢复展示所有节点为正常状态
+*/
+    (function ($) {
+        $.extend($.fn.tree.methods, {
+            /**
+             * 扩展easyui tree的搜索方法
+             * tree easyui tree的根DOM节点(UL节点)的jQuery对象
+             * searchText 检索的文本
+             * this-context easyui tree的tree对象
+             */
+            search: function (jqTree, searchText) {
+                //easyui tree的tree对象。可以通过tree.methodName(jqTree)方式调用easyui tree的方法
+                var tree = this;
+
+                //获取所有的树节点
+                var nodeList = getAllNodes(jqTree, tree);
+
+                //如果没有搜索条件，则展示所有树节点
+                searchText = $.trim(searchText);
+                if (searchText == "") {
+                    for (var i = 0; i < nodeList.length; i++) {
+                        $(".tree-node-targeted", nodeList[i].target).removeClass("tree-node-targeted");
+                        $(nodeList[i].target).show();
+                    }
+                    //展开已选择的节点（如果之前选择了）
+                    var selectedNode = tree.getSelected(jqTree);
+                    if (selectedNode) {
+                        tree.expandTo(jqTree, selectedNode.target);
+                    }
+                    return;
+                }
+
+                //搜索匹配的节点并高亮显示
+                var matchedNodeList = [];
+                if (nodeList && nodeList.length > 0) {
+                    var node = null;
+                    for (var i = 0; i < nodeList.length; i++) {
+                        node = nodeList[i];
+                        if (isMatch(searchText, node.text)) {
+                            matchedNodeList.push(node);
+                        }
+                    }
+
+                    //隐藏所有节点
+                    for (var i = 0; i < nodeList.length; i++) {
+                        $(".tree-node-targeted", nodeList[i].target).removeClass("tree-node-targeted");
+                        $(nodeList[i].target).hide();
+                    }
+
+                    //折叠所有节点
+                    tree.collapseAll(jqTree);
+
+                    //展示所有匹配的节点以及父节点
+                    for (var i = 0; i < matchedNodeList.length; i++) {
+                        showMatchedNode(jqTree, tree, matchedNodeList[i]);
+                    }
+                }
+            },
+
+            /**
+             * 展示节点的子节点（子节点有可能在搜索的过程中被隐藏了）
+             *  node easyui tree节点
+             */
+            showChildren: function (jqTree, node) {
+                //easyui tree的tree对象。可以通过tree.methodName(jqTree)方式调用easyui tree的方法
+                var tree = this;
+
+                //展示子节点
+                if (!tree.isLeaf(jqTree, node.target)) {
+                    var children = tree.getChildren(jqTree, node.target);
+                    if (children && children.length > 0) {
+                        for (var i = 0; i < children.length; i++) {
+                            if ($(children[i].target).is(":hidden")) {
+                                $(children[i].target).show();
+                            }
+                        }
+                    }
+                }
+            },
+
+            /**
+             * 将滚动条滚动到指定的节点位置，使该节点可见（如果有滚动条才滚动，没有滚动条就不滚动）
+             *  param {
+             *    treeContainer: easyui tree的容器（即存在滚动条的树容器）。如果为null，则取easyui tree的根UL节点的父节点。
+             *    targetNode:  将要滚动到的easyui tree节点。如果targetNode为空，则默认滚动到当前已选中的节点，如果没有选中的节点，则不滚动
+             * }
+             */
+            scrollTo: function (jqTree, param) {
+                //easyui tree的tree对象。可以通过tree.methodName(jqTree)方式调用easyui tree的方法
+                var tree = this;
+
+                //如果node为空，则获取当前选中的node
+                var targetNode = param && param.targetNode ? param.targetNode : tree.getSelected(jqTree);
+
+                if (targetNode != null) {
+                    //判断节点是否在可视区域
+                    var root = tree.getRoot(jqTree);
+                    var $targetNode = $(targetNode.target);
+                    var container = param && param.treeContainer ? param.treeContainer : jqTree.parent();
+                    var containerH = container.height();
+                    var nodeOffsetHeight = $targetNode.offset().top - container.offset().top;
+                    if (nodeOffsetHeight > (containerH - 30)) {
+                        var scrollHeight = container.scrollTop() + nodeOffsetHeight - containerH + 30;
+                        container.scrollTop(scrollHeight);
+                    }
+                }
+            }
+        });
+
+        /**
+         * 展示搜索匹配的节点
+         */
+        function showMatchedNode(jqTree, tree, node) {
+            //展示所有父节点
+            $(node.target).show();
+            $(".tree-title", node.target).addClass("tree-node-targeted");
+            var pNode = node;
+            while ((pNode = tree.getParent(jqTree, pNode.target))) {
+                $(pNode.target).show();
+            }
+            //展开到该节点
+            tree.expandTo(jqTree, node.target);
+            //如果是非叶子节点，需折叠该节点的所有子节点
+            if (!tree.isLeaf(jqTree, node.target)) {
+                tree.collapse(jqTree, node.target);
+            }
+        }
+
+        /**
+         * 判断searchText是否与targetText匹配
+         *  searchText 检索的文本
+         *  targetText 目标文本
+         * 检索的文本与目标文本匹配；否则为false.
+         */
+        function isMatch(searchText, targetText) {
+            return $.trim(targetText) != "" && targetText.indexOf(searchText) != -1;
+        }
+
+        /**
+         * 获取easyui tree的所有node节点
+         */
+        function getAllNodes(jqTree, tree) {
+            var allNodeList = jqTree.data("allNodeList");
+            if (!allNodeList) {
+                var roots = tree.getRoots(jqTree);
+                allNodeList = getChildNodeList(jqTree, tree, roots);
+                jqTree.data("allNodeList", allNodeList);
+            }
+            return allNodeList;
+        }
+
+        /**
+         * 定义获取easyui tree的子节点的递归算法
+         */
+        function getChildNodeList(jqTree, tree, nodes) {
+            var childNodeList = [];
+            if (nodes && nodes.length > 0) {
+                var node = null;
+                for (var i = 0; i < nodes.length; i++) {
+                    node = nodes[i];
+                    childNodeList.push(node);
+                    if (!tree.isLeaf(jqTree, node.target)) {
+                        var children = tree.getChildren(jqTree, node.target);
+                        childNodeList = childNodeList.concat(getChildNodeList(jqTree, tree, children));
+                    }
+                }
+            }
+            return childNodeList;
+        }
+    })(jQuery);
+    var NodeId;
+    var treedepartment = null;
+    var QrgTable;
+
+    var DeptManager = [];
+    var AddDeptVal = '@ViewBag.AddDept';
+    var EditDeptVal = '@ViewBag.EditDept';
+    var DelDeptVal = '@ViewBag.DelDept';
+    var UserDeptId = '@ViewBag.Deptid';
+    var UserDeptName = '@ViewBag.Deptname';
+
+    if (AddDeptVal == "true") {
+        var AddDeptBtn = {
+            iconCls: 'icon-add',
+            text: '添加',
+            handler: function () {
+                var node = $('#Departments').tree('getSelected');
+                if (node.id == "" && node.id == null) {
+                    window.parent.$.DialogOpen('/Dept/ANode', { title: "添加企业", width: 450, height: 250 });
+                } else {
+                    window.parent.$.DialogOpen('/Dept/ANode?FatherNodeId=' + node.id, { title: "添加企业", width: 450, height: 250 });
+                }
+            }
+        };
+        DeptManager.push(AddDeptBtn);
+    }
+
+    if (EditDeptVal == "true") {
+        var EditDeptBtn = {
+            iconCls: 'icon-edit',
+            text: '修改',
+            handler: function () {
+                var id = $("#Departments").tree('getSelected').id;
+                var text = $("#Departments").tree('getSelected').text;
+                if (id == "" && id == null) {
+                    window.parent.$.messager.alert('警告', '您没有选择需要修改的', 'error');
+                } else {
+                    window.parent.$.DialogOpen('/Dept/ENode?DeptId=' + id, { title: "修改企业", width: 450, height: 250 });
+                }
+            }
+        };
+        DeptManager.push(EditDeptBtn);
+    }
+
+    if (DelDeptVal == "true") {
+        var DelDeptBtn = {
+            iconCls: 'icon-remove',
+            handler: function () {
+                var id = $("#Departments").tree('getSelected').id;
+                if (id == "" || id == null) {
+                    window.parent.$.messager.alert('警告', '您没有选择需要删除的企业', 'error');
+                } else {
+                    $.post("/Dept/GetDeptByFatherId", { DeptId: id }, function (e) {
+                        if (e > 0) {
+                            window.parent.$.messager.confirm('确定', '该企业下面有子企业，确定要删除吗', function (t) {
+                                if (t) {
+                                    DelDeptFun(id, "true");
+                                }
+                            });
+                        } else {
+                            window.parent.$.messager.confirm('确定', '您确定要删除该企业吗', function (t) {
+                                if (t) {
+                                    DelDeptFun(id, "false");
+                                }
+                            });
+                        }
+                    });
+                }
+                
+            }
+        }
+        DeptManager.push(DelDeptBtn);
+    }
+
+    function DelDeptFun(id, DelType) {
+        $.ajax({
+            url: '/Dept/DelEnter?Businessdivisionid=' + id + '&ExistChildren=' + DelType,
+            type: "post",
+            success: function (r) {
+                if (r > 0) {
+                    window.parent.$.messager.show({
+                        title: '提示',
+                        msg: "删除成功！",
+                        timeout: 3000
+                    });
+                    LoadDepartmentTree();
+                } else if (r == 0) {
+                    window.parent.$.messager.show({
+                        title: '提示',
+                        msg: "此企业不存在！",
+                        timeout: 3000
+                    });
+                    LoadDepartmentTree();
+                } else if (r == -1) {
+                    window.parent.$.messager.show({
+                        title: '提示',
+                        msg: "此企业下存在车和终端，请转移后再删除！",
+                        timeout: 3000
+                    });
+                } else if (r == -2) {
+                    window.parent.$.messager.show({
+                        title: '提示',
+                        msg: "此企业下存在车，请转移后再删除！",
+                        timeout: 3000
+                    });
+                } else if (r == -3) {
+                    window.parent.$.messager.show({
+                        title: '提示',
+                        msg: "此企业下存在终端，请转移后再删除！",
+                        timeout: 3000
+                    });
+                }
+            }
+        });
+    }
+
+    $(function () {
+        $("input, textarea, select").uniform();
+        //*******************************
+        //2015-04-10 Cwen.H
+        //模糊查询市场部列表
+        //*******************************
+        $('#bussname').searchbox({
+            width: 210,
+            searcher: function (value, name) {
+                $("#Departments").tree("search", value);
+            },
+            prompt: '请输入......'
+        });
+
+        //所属企业
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" }
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#TerDeptSel').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#TerDeptSel').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+
+        ////////组织机构的操作///////
+        //$('#Organization').panel({
+        //    title: "组织机构",
+        //    width: 250,
+        //    height: $(document.body).height() - 25,
+        //    tools: DeptManager
+        //});
+        $('#StaffTable').height($(document.body).height() - 25);
+        $('#StaffTable').width($(document.body).width() - 25); // - $('#Organization').width()
+        //LoadDepartmentTree();
+        LoadPersonalList();
+    });
+
+    //////////加载部门树//////////
+    function LoadDepartmentTree() {
+        $('#Departments').tree({
+            url: "/Dept/GetOrgNode",
+            animate: true,
+            lines: true,
+            onContextMenu: function (e, node) {
+                e.preventDefault();
+                // 选中节点
+                $('#Departments').tree('select', node.target);
+                // 实例右键菜单
+                $('#RightMenu').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            },
+            onLoadSuccess: function (node, data) {
+                $("#Departments li:eq(0)").find("div:eq(0)").addClass("tree-node-selected");   //设置第一个节点高亮
+                var n = $("#Departments").tree("getSelected");
+                if (n) {
+                    // $("#scb").tree("select", n.target);    //相当于默认点击了一下第一个节点，执行onSelect方法
+                    LoadPersonalList(n.id);
+                }
+
+            },
+            onClick: function (node) {
+                NodeId = node.id;
+                LoadPersonalList(node.id);
+            }
+        });
+    };
+
+    ///Tree方法
+    //////部门树添加///////s
+    function append() {
+        var node = $('#Departments').tree('getSelected');
+
+        $.DialogOpen('/Dept/ANode?FatherNodeId=' + node.id, { title: "添加组织机构", width: 450, height: 240 });
+    };
+    /////部门树修改//////
+    function expand() {
+        var node = $('#Departments').tree('getSelected');
+
+        window.parent.$.DialogOpen('/Dept/ENode?DeptId=' + node.id, { title: "修改组织机构", width: 500, height: 240 });
+    };
+    //////部门树删除/////
+    function removeit() {
+        var id = $("#Departments").tree('getSelected').id;
+        if (id == "" || id == null) {
+            window.parent.$.messager.alert('警告', '您没有选择需要删除的企业', 'error');
+        } else {
+            $.post("/Dept/GetDeptByFatherId", { DeptId: id }, function (e) {
+                if (e > 0) {
+                    window.parent.$.messager.confirm('确定', '该企业下面有子企业，确定要删除吗', function (t) {
+                        if (t) {
+                            DelDeptFun(id, "true");
+                        }
+                    });
+                } else {
+                    window.parent.$.messager.confirm('确定', '您确定要删除该企业吗', function (t) {
+                        if (t) {
+                            DelDeptFun(id, "false");
+                        }
+                    });
+                }
+            });
+        }
+    };
+
+    function AddUser() {
+        window.parent.$.DialogOpen('/User/AddUser?Businessdivisionid=' + UserDeptId + '&Businessdivisionname=' + UserDeptName, { title: "添加企业用户", width: 700, height: 300 });
+    }
+
+    function AddTerUser() {
+        window.parent.$.DialogOpen('/User/AddTerUser?Businessdivisionid=' + UserDeptId + '&Businessdivisionname=' + UserDeptName, { title: "添加设备用户", width: 700, height: 300 });
+    }
+
+    function EditUser() {
+        var row = QrgTable.datagrid('getSelected');
+        if (row == null) {
+            window.parent.$.messager.alert('警告', '您没有选择要编辑的用户！', 'error');
+        }
+        else {
+            var id = row.UserId;
+            window.parent.$.DialogOpen('/User/EditUser?UserId=' + id, { title: "修改用户信息", width: 700, height: 300 });
+        }
+    }
+
+    function DelUser() {
+        var row = $('#StaffTable').datagrid('getSelected');
+        if (row == null) {
+            window.parent.$.messager.alert('警告', '您没有选择要删除的用户', 'error');
+        } else {
+            window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '/User/DelUser?UserId=' + row.UserId,
+                        type: "post",
+                        success: function (r) {
+                            if (r == "true") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '删除成功！',
+                                    timeout: 2000
+                                });
+                                $('#StaffTable').datagrid('reload');
+                            } else {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '删除失败！',
+                                    timeout: 2000
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    }
+
+    function ResetUser() {
+        var row = $('#StaffTable').datagrid('getSelected');
+        if (row == null) {
+            window.parent.$.messager.alert('警告', '您没有选择要重置密码的用户', 'error');
+        } else {
+            window.parent.$.messager.confirm('确定', '您确定要将' + row.UserLname + '用户重置密码吗?', function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '/User/ResetUser?UserId=' + row.UserId,
+                        type: "post",
+                        success: function (r) {
+                            if (r == "true") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '重置成功！',
+                                    timeout: 2000
+                                });
+                                $('#StaffTable').datagrid('reload');
+                            } else {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: '重置失败！',
+                                    timeout: 2000
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        }
+
+    }
+
+    function btnUserSel() {
+        var DeptID = $('#TerDeptSel').combotree('getValue');
+        var Children = "";
+
+        if ($("#ChildrenDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        //var param = { CarNo: $("#CarNoSel").val(), TypeId: $("#CarTypeSel").combobox('getValue'), Businessdivisionid: DeptID };
+        var param = { UserLname: $("#txtLUserSel").val(), UserName: $("#txtUserSel").val(), Businessdivisionid: DeptID,ChildrenSel:Children };
+        $("#StaffTable").datagrid("load", param);
+    }
+
+
+    function LoadPersonalList(Nid) {
+        QrgTable = $('#StaffTable').datagrid({
+            url: "/User/GetygListByzzjgId",
+            columns: [[
+                { field: 'UserId', title: '用户ID', hidden: true },
+                { field: 'UserLname', title: '登录名', width: 100, align: 'center', sortable: true },
+                { field: 'UserName', title: '用户姓名', width: 100, align: 'center' },
+                { field: 'UserPhone', title: '移动电话', width: 100, align: 'center' },
+                { field: 'UserEmail', title: '邮箱', width: 100, align: 'center' },
+                { field: 'Businessdivisionname', title: '所属企业', width: 100, align: 'center' }
+            ]],
+            singleSelect: true,
+            fitColumns: true,
+            striped: true,
+            pagination: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            pageList: [15, 30, 45],
+            queryParams: {Businessdivisionid: Nid },
+            toolbar: "#tb"
+        })
+    };
+</script>

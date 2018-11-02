@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="RealtimeView" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="RealtimeView" type="GModel.Location.RealtimeView" />
+</alias>
+<resultMaps>
+	<resultMap id="RealtimeViewResult" class="RealtimeView">
+		<result property="Latitude" column="Latitude" type="double" dbType="Real"/>
+		<result property="Longitude" column="Longitude" type="double" dbType="Real"/>
+		<result property="GoogleLatitude" column="GoogleLatitude" type="double" dbType="Real"/>
+		<result property="GoogleLongitude" column="GoogleLongitude" type="double" dbType="Real"/>
+		<result property="Rtime" column="Rtime" type="DateTime" dbType="DateTime"/>
+		<result property="Position" column="Position" type="string" dbType="varchar"/>
+		<result property="TerStatus" column="TerStatus" type="string" dbType="varchar"/>
+		<result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+		<result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+		<result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+		<result property="CarNo" column="CarNo" type="string" dbType="varchar"/>
+		<result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+		<result property="Id" column="Id" type="string" dbType="varchar"/>
+		<result property="TerGuid" column="TerGuid" type="string" dbType="varchar"/>
+		<result property="CarId" column="CarId" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectRealtimeView" parameterClass="string" resultMap="RealtimeViewResult">
+		SELECT LATITUDE AS Latitude,LONGITUDE AS Longitude,GOOGLE_LATITUDE AS GoogleLatitude,GOOGLE_LONGITUDE AS GoogleLongitude,RTIME AS Rtime,POSITION AS Position,TER_STATUS AS TerStatus,BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,CAR_NO AS CarNo,TER_NO AS TerNo,ID AS Id,TER_GUID AS TerGuid,CAR_ID AS CarId
+		FROM REALTIME_VIEW  
+	</select>
+	<select id="SelectRealtimeViewPage" parameterClass="map" resultMap="RealtimeViewResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT LATITUDE AS Latitude,LONGITUDE AS Longitude,GOOGLE_LATITUDE AS GoogleLatitude,GOOGLE_LONGITUDE AS GoogleLongitude,RTIME AS Rtime,POSITION AS Position,TER_STATUS AS TerStatus,BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,CAR_NO AS CarNo,TER_NO AS TerNo,ID AS Id,TER_GUID AS TerGuid,CAR_ID AS CarId
+    FROM REALTIME_VIEW where 1=1
+    <dynamic prepend="AND">
+      <isNotEmpty prepend="AND" property="Businessdivisionid">
+        BUSINESSDIVISIONID = #Businessdivisionid#
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="Businessdivisioncode">
+        BUSINESSDIVISIONCODE like  '$Businessdivisioncode$%'
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="CarNo">
+        CAR_NO like  #CarNo#||'%'
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="TerNo">
+        TER_NO like  #TerNo#||'%'
+      </isNotEmpty>
+    </dynamic>
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectRealtimeViewCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM REALTIME_VIEW  
+	</select>
+</statements>
+</sqlMap>

@@ -1,0 +1,24 @@
+﻿
+<div id="div_Monitor" class="easyui-panel" style="width:100%;height:600px;">
+    <div class="easyui-layout" style="width:100%;height:100%;">
+        <div data-options="region:'north'" style="height:40%">
+        </div>
+        <div data-options="region:'west',split:false" style="width:47%;">
+            <table id="BindTerInfoTable"></table>
+            <div id="BindTerInfoTb" style="padding:5px; height:auto">
+                终端编码：<input id="BindTerNoSel" class="easyui-textbox" style="width:100px; height:25px;" />&nbsp;&nbsp;
+                所属企业：<input id="BindDeptSel" class="easyui-combotree" style="width:150px; height:25px;" />&nbsp;&nbsp;
+                <a href="#" onclick="BindGetTerInfo()" class="easyui-linkbutton" iconcls="icon-search">查找</a>
+            </div>
+
+        </div>
+        <div data-options="region:'east',split:false" style="width:48%;">
+            <table id="BindTerSelTable"></table>
+
+        </div>
+        <div style="vertical-align:middle; text-align:center" data-options="region:'center',iconCls:'icon-ok'">
+            <a id="SaleReturnDevice" class="easyui-linkbutton" onclick="BindTerCar()" iconcls="icon-back"></a>
+            <a id="SaleReturnDevice" class="easyui-linkbutton" onclick="BindCancelTerCar()" iconcls="icon-left"></a>
+        </div>
+    </div>
+</div>

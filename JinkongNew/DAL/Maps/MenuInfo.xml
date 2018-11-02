@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="MenuInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="MenuInfo" type="GModel.RoleRight.MenuInfo" />
+</alias>
+<resultMaps>
+	<resultMap id="MenuInfoResult" class="MenuInfo">
+		<result property="MenuId" column="MenuId" type="string" dbType="varchar"/>
+		<result property="MenuName" column="MenuName" type="string" dbType="varchar"/>
+		<result property="MenuUrl" column="MenuUrl" type="string" dbType="varchar"/>
+		<result property="MenuParent" column="MenuParent" type="string" dbType="varchar"/>
+		<result property="MenuCreatetime" column="MenuCreatetime" type="DateTime" dbType="DateTime"/>
+		<result property="MenuIcon" column="MenuIcon" type="string" dbType="varchar"/>
+		<result property="MenuSortorder" column="MenuSortorder" type="string" dbType="varchar"/>
+		<result property="MenuType" column="MenuType" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectMenuInfo" parameterClass="MenuInfo" resultMap="MenuInfoResult">
+    SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_SORTORDER AS MenuSortorder,MENU_TYPE AS MenuType
+    FROM MENU_INFO WHERE MENU_ID= #MenuId# 
+  </select>
+	<select id="SelectMenuInfoPage" parameterClass="string" resultMap="MenuInfoResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+			SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_SORTORDER AS MenuSortorder,MENU_TYPE AS MenuType
+			FROM MENU_INFO 
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectMenuInfoCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM MENU_INFO   
+	</select>
+	<insert id="InsertMenuInfo" parameterClass="MenuInfo">
+    INSERT INTO MENU_INFO
+    (MENU_ID,MENU_NAME,MENU_URL,MENU_PARENT,MENU_CREATETIME,MENU_ICON,MENU_SORTORDER,MENU_TYPE)
+    VALUES(#MenuId#,#MenuName#,#MenuUrl#,#MenuParent#,sysdate,#MenuIcon#,#MenuSortorder#,#MenuType#)
+  </insert>
+	<update id="UpdateMenuInfo" parameterClass="MenuInfo">
+    UPDATE MENU_INFO
+    SET MENU_NAME=#MenuName#,MENU_URL=#MenuUrl#,MENU_PARENT=#MenuParent#,MENU_CREATETIME=#MenuCreatetime#,MENU_ICON=#MenuIcon#,MENU_SORTORDER=#MenuSortorder#,MENU_TYPE=#MenuType# WHERE MENU_ID=#MenuId#
+  </update>
+	<delete id="DeleteMenuInfo" parameterClass="string">
+    DELETE FROM MENU_INFO
+    WHERE  MENU_ID=#MenuId#
+  </delete>
+      <!--查询车辆监控页面的查看轨迹、查看详情和发送命令权限-->
+  <select id="GetMenuByRoleId" parameterClass="string" resultMap="MenuInfoResult">
+    <!--SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_SORTORDER AS MenuSortorder,MENU_TYPE AS MenuType
+    FROM MENU_INFO MI WHERE MI.MENU_PARENT IN (SELECT MENU_ID FROM MENU_INFO M WHERE M.MENU_NAME = #MenuName#) OR MI.MENU_NAME = #SingleName#-->
+
+    SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_SORTORDER AS MenuSortorder,MENU_TYPE AS MenuType
+    FROM MENU_INFO MI WHERE MI.MENU_ID IN(SELECT MENU_ID FROM ROLE_MANU RM WHERE RM.ROLE_ID=#value#)
+  </select>
+
+  <!--根据角色ID和菜单类型查询-->
+  <select id="SelectMenuInfoByRoleId" parameterClass="map" resultMap="MenuInfoResult">
+    SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_SORTORDER AS MenuSortorder,MENU_TYPE AS MenuType
+    FROM MENU_INFO WHERE MENU_TYPE = #MenuType# AND MENU_ID IN (SELECT RI.MENU_ID  FROM ROLE_MANU RI  WHERE RI.ROLE_ID = #RoleId#) ORDER BY MENU_SORTORDER ASC
+  </select>
+
+  <!--根据角色ID、菜单类型和父ID查询-->
+  <select id="SelectMenuChildByRoleId" parameterClass="map" resultMap="MenuInfoResult">
+    SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_SORTORDER AS MenuSortorder,MENU_TYPE AS MenuType
+    FROM MENU_INFO WHERE MENU_PARENT =#MenuParent# AND MENU_TYPE = #MenuType# AND MENU_ID IN (SELECT RI.MENU_ID  FROM ROLE_MANU RI  WHERE RI.ROLE_ID = #RoleId#)  ORDER BY MENUSORTORDER ASC
+  </select>
+  
+  
+
+</statements>
+</sqlMap>

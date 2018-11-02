@@ -1,0 +1,134 @@
+﻿
+@model GModel.Basic.VersionInfo
+
+@using (Ajax.BeginForm("Edit", "VersionInfo", new AjaxOptions()))
+{
+    
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        <p>
+            <label><i>*</i>版本名称</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.VerName, new { @class = "textbox" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.VerName)
+                </b>
+            </div>
+            <input name="VerId" id="VerId" value="@ViewBag.VerId" type="hidden">
+            <input name="PublishDate" id="PublishDate" value="@ViewBag.PublishDate" type="hidden">
+        </p>
+        <p>
+            <label><i>*</i>版本号:</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.VerNumber, new { @class = "textbox" })
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>APP类型:</label>
+            <div class="field">
+                <input name="AppType" id="AppType" class="easyui-combobox" type="text" style="height:30px" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>发布人:</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.Publisher, new { @class = "textbox" })
+                <b>
+                </b>
+            </div>
+        </p>
+        <p id="AddMenuUrl">
+            <label>下载地址</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.AppUrl, new { @class = "textbox" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.AppUrl)
+                </b>
+            </div>
+        </p>
+        <p id="AddMenuIcon">
+            <label>描述</label>
+            <div class="field">
+                @Html.TextAreaFor(m => m.Description,new { @class = "textbox", style="height:55px;width:234px" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.Description)
+                </b>
+            </div>
+        </p>
+    </div>
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" type="submit" onclick="return validate()">确定</button>
+        <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#AppType').combobox({
+            textField: "text",
+            valueField: "id",
+            data: [
+             { id: "Android", text: "Android" },
+             { id: "ISO", text: "ISO" }],
+            editable: false
+        });
+
+        $('#AppType').combobox('setValue', '@ViewBag.AppType');
+    })
+
+    function validate() {
+
+        var msg = [];
+
+        var verName = $("#VerName").val();
+        if (verName == "") {
+            msg.push("版本名称不能为空！");
+        }
+
+        var verNumber = $('#VerNumber').val();
+        if (verNumber == "") {
+            msg.push("版本号不能为空！");
+        }
+
+        var verFBR = $('#Publisher').val();
+        if (verFBR == "") {
+            msg.push("发布人不能为空！");
+        }
+
+        if (msg.length > 0) {
+            window.parent.$.messager.alert('提示', msg.join("\r\n"), 'info');
+            return false;
+        }
+    }
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    }
+
+    function editFormSucceed() {
+        var ifr = window.parent.document.getElementById('/VersionInfo/Index');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#VerInfoTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改成功！",
+            timeout: 2000
+        });
+    }
+
+    function editFormError(msg_content) {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改失败！<br /> " + msg_content,
+            timeout: 2000
+        });
+    }
+
+</script>  

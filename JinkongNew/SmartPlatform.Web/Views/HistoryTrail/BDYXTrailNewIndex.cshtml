@@ -1,0 +1,482 @@
+﻿@*历史轨迹百度地图*@
+<div class="photosharing_head">
+    <ul class="photosharing_menu">
+        <li>开始时间&nbsp;<input class="easyui-datebox" id="HisDate" style="width:100px;height:30px"></li>
+        <li><input class="easyui-timespinner" id="begintime" style="width:100px;height:30px"></li>
+        <li>&nbsp;&nbsp;&nbsp;结束时间&nbsp;<input class="easyui-datebox" id="EndDate" style="width:100px;height:30px"></li>
+        <li><input class="easyui-timespinner" id="endtime" style="width:100px;height:30px;"></li>
+        @*<li class="marginleft10">
+                播放速度
+                <select id="overviewselect" name="select">
+                    <option value="10">快</option>
+                    <option value="50">较快</option>
+                    <option value="100" selected>正常</option>
+                    <option value="500">较慢</option>
+                    <option value="1000">慢</option>
+                </select>
+            </li>*@
+        <li class="marginleft10 trashbtn"><a class="trash" id="onloadData">加载轨迹</a></li>
+        <li class="marginleft10 trashbtn"><a class="trash" id="play">开始动画</a></li>
+        @*<li class="marginleft10 trashbtn"><a class="trash" id="stop">停止动画</a></li>*@
+    </ul>
+    <div id="MapContainer">
+        <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+        <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+    </div>
+    <span class="clearall"></span>
+    <div class="Location" style="border: 1px solid #999; top:60px; right:600px; z-index: 1;"><input type="checkbox" name="check1" id="Location" />测距</div>
+</div><!--photosharing_head-->
+<div id="mapdiv" style="position:relative;">
+    <div id="baidumap-TrailNew" style="height:100%;float:left;width:100%;">
+    </div>
+    <div style="height:100%;float:left;width:30%;position:absolute;top:0;right:0;background:#fff;">
+        <div class="tableoptions">
+            <button class="deletebutton radius3" id="DownLoadData">导出数据</button>
+        </div>
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">更新时间</th>
+                    <th class="head1">当前位置</th>
+                    @*//<th class="head1">车牌号</th>*@
+                    @*<th class="head0">终端编号</th>*@
+                    <th class="head1">报警状态</th>
+                    <th class="head0">定位方式</th>
+                    @*<th class="head1">谷歌纬度</th>
+                    <th class="head0">谷歌经度</th>
+                    <th class="head0">百度纬度</th>
+                    <th class="head0">百度经度</th>*@
+
+                    @*//<th class="head0">SIM卡号</th>
+                    //<th class="head0">所属组织</th>
+                    //<th class="head1">回传次数</th>*@
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+    @*<div class="full" id="fullscreen"><a href="#" title="全屏显示" class="fullicon" id="turnFULL"></a></div>*@
+    <div style="clear:both;"></div>
+</div>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=3xyzXPzwlGKFZWULrsKdioWb"></script>
+<link href="~/assets/BMapLib/DrawingManager_min.css" rel="stylesheet" />
+<link href="~/assets/BMapLib/SearchInfoWindow_min.css" rel="stylesheet" />
+<script src="~/assets/BMapLib/SearchInfoWindow_min.js"></script>
+<script src="~/assets/BMapLib/DrawingManager.js"></script>
+<script src="~/assets/javascripts/DrawingManager_min.js"></script>
+<script src="~/assets/javascripts/DistanceTool_min.js"></script>
+<script src="~/assets/javascripts/TextIconOverlay_min.js"></script>
+<script src="~/assets/javascripts/MarkerClusterer_min.js"></script>
+<script type="text/javascript" language="javascript">
+    var data = null;
+    var curr_time = new Date();
+    var sh;
+    var count = 0;
+    var PLAYSTATU = "stop";
+    var BeginTime;
+    var EndTime;
+    var Spend;
+    var CarTable, tableHeight;
+    var number = 0;
+    var BmarkerClusterer = null;
+    var map = new BMap.Map("baidumap-TrailNew");
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 10);
+    map.addControl(new BMap.NavigationControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));
+    map.addControl(new BMap.MapTypeControl({ anchor: BMAP_ANCHOR_TOP_LEFT }));
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    var myDis = new BMapLib.DistanceTool(map);
+    map.clearOverlays();
+    var opts = {
+        enableMessage: false//设置不允许信息窗发送短息
+    };
+    var points = new Array();   //坐标数组
+    var datar = [];
+    var pic; //对象
+    var marker;//标注
+    var myIcon;//图片
+    var infoHtml;//内容
+    function BdMarkers(data) {
+        datar = data;
+        if (data.length > 0) {
+            var num = 0;
+            for (var i = (data.length - 1) ; i >= 0; i--) {
+                if (data[i].BaiduLongitude != 0 && data[i].BaiduLatitude != 0) {
+                    if (num == 0)
+                    {
+                        var startpt = new BMap.Point(data[i].BaiduLongitude, data[i].BaiduLatitude);
+                        map.setCenter(startpt);
+                        num++;
+                    }
+                    var pt = new BMap.Point(data[i].BaiduLongitude, data[i].BaiduLatitude);
+                    points.push(pt);
+                    var status = "";
+                    switch (data[i].ReplydataName) {
+                        case "":
+                            status = "正常";
+                            break;
+                        default:
+                            status = data[i].ReplydataName;
+                            break;
+                    }
+                    infoHtml = '<div class="info">'
+                                + '<h3 class="infowindowheader">' + data[i].Rtime + '</h3>'
+                                + '<table ><tr><td>终端编号：</td><td>' + data[i].TerNo + '</td></tr><tr><td>报警状态：</td><td>' + status + '</td></tr><tr><td>地理位置：</td><td>' + data[i].Position + '</td></tr></table></div>'
+                    if (i == (data.length - 1)) {
+                        myIcon = new BMap.Icon("../Content/Icon/start.png", new BMap.Size(32, 70));
+                        marker = new BMap.Marker(pt, { icon: myIcon });
+                        map.addOverlay(marker);
+                        addClickHandler(infoHtml, marker);
+                    } else if (i == 0) {
+                        myIcon = new BMap.Icon("../Content/Icon/Finish.png", new BMap.Size(32, 70));
+                        marker = new BMap.Marker(pt, { icon: myIcon });
+                        map.addOverlay(marker);
+                        addClickHandler(infoHtml, marker);
+                    } else {
+                        myIcon = new BMap.Icon("../assets/images/Cirle.png", new BMap.Size(15, 10));
+                        marker = new BMap.Marker(pt, { icon: myIcon }, { offset: new BMap.Size(20, 50) });
+                        map.addOverlay(marker);
+                        addClickHandler(infoHtml, marker);
+                    }
+                }
+            }
+            if (points != undefined) {
+                Polyline = new BMap.Polyline(points, {
+                    strokeColor: "#000", strokeWeight: 3, strokeOpacity: 0.8
+                });
+                map.addOverlay(Polyline);
+            }
+        }
+    }
+
+    ////百度地图 标记点击事件
+    function addClickHandler(sContent, marker) {
+        marker.addEventListener("click", function (e) {
+            openInfo(sContent, e)
+        });
+    };
+    //信息窗口
+    function openInfo(sContent, e) {
+        var p = e.target;
+        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+        map.setCenter(point);
+        var infoWindow = new BMap.InfoWindow(sContent, opts);  // 创建信息窗口对象
+        map.openInfoWindow(infoWindow, point); //开启信息窗口
+    };
+
+    var markerPoint = null; //动画标注坐标
+    var animateMarker = null; //动画标注
+    var animatemyIcon = new BMap.Icon("../Content/Icon/9.png", new BMap.Size(32, 70)); //动画标注图标
+    var mark = null; //标注
+    var n = datar.length - 1;
+
+    function animate(long, lati) {
+        if (mark != null) {
+            map.removeOverlay(mark);
+        }
+        markerPoint = new BMap.Point(long, lati);
+        animateMarker = new BMap.Marker(markerPoint, { icon: animatemyIcon });
+        map.addOverlay(animateMarker);
+        map.panTo(markerPoint);
+        mark = animateMarker;
+    }
+
+    function fun() {
+        if (datar[n].BaiduLongitude != 0 && datar[n].BaiduLatitude != 0) {
+            animate(datar[n].BaiduLongitude, datar[n].BaiduLatitude);
+        }
+        n--;
+        window.setTimeout("fun()", 1000);
+    }
+
+    $(function () {
+        $('#mapdiv').height(window.innerHeight - 54);
+        tableHeight = $('#mapdiv').height() - 155;
+        $("#begintime").timespinner({ showSeconds: true });
+        $("#endtime").timespinner({ showSeconds: true });
+        $("#begintime").timespinner("setValue", "00:00:00");
+        $("#endtime").timespinner("setValue", "23:59:59");
+        $("#HisDate").datebox("setValue", myformatter(curr_time));
+        $("#EndDate").datebox("setValue", myformatter(curr_time));
+        var StartDate = $("#HisDate").datebox("getValue") + " " + $("#begintime").timespinner("getValue");
+        var EndDate = $("#EndDate").datebox("getValue") + " " + $("#endtime").timespinner("getValue");
+        jQuery("input, textarea, select").uniform();
+        $.post("/HistoryTrail/GetYXTrailList", { CarId: "@ViewBag.CarId", TerNo: "@ViewBag.TerNo", st: StartDate, ed: EndDate }, function (e) {
+            if (e != null && e != "") {
+                data = eval(e);
+                BdMarkers(data);
+                LoadDataTable(data);
+            }
+        });
+        jQuery("#play").click(function () {
+            //if (number == "0") {
+            //    count = 0;
+            //    PLAYSTATU = "stop";
+            //    $('#stop').text('停止动画');
+            //    BeginTime = jQuery('#begintime').datetimebox('getValue');
+            //    EndTime = jQuery('#endtime').datetimebox('getValue');
+            //    Spend = jQuery('#overviewselect').val();
+            //    var CarId;
+            //    window.clearInterval(sh);
+            //    sh = window.setInterval('animateCircle()', Spend);
+            //} else if (number == "1") {
+                count = 0;
+                //PLAYSTATU = "stop";
+                //$('#stop').text('停止动画');
+                //BeginTime = jQuery('#begintime').datetimebox('getValue');
+                //EndTime = jQuery('#endtime').datetimebox('getValue');
+                //Spend = jQuery('#overviewselect').val();
+                var CarId;
+                //window.clearInterval(sh);
+                n = data.length - 1;
+                if (n >= 0) {
+                    window.setTimeout("fun()", 1000);
+                }
+            //}
+        });
+        //jQuery("#stop").click(function () {
+        //    if (PLAYSTATU == "stop") {
+        //        window.clearInterval(sh);
+        //        PLAYSTATU = "contiue";
+        //        $('#stop').text('继续动画');
+        //        window.clearInterval("fun()");
+        //    } else if (PLAYSTATU == "contiue" && count > 0) {
+        //        PLAYSTATU = "stop";
+        //        $('#stop').text('停止动画');
+        //        //sh = window.setInterval('animateCircle()', Spend);
+        //    }
+        //});
+        //jQuery("#overviewselect").change(function () {
+        //    if (PLAYSTATU == "stop" && count > 0) {
+        //        Spend = jQuery('#overview;select').val();
+        //        var CarId;
+        //        window.clearInterval(sh);
+        //        //sh = window.setInterval('animateCircle()', Spend);
+        //    }
+        //});
+
+        $("#onloadData").click(function () {
+            map.clearOverlays();
+            if ($("#HisDate").datebox("getValue") == "" || $("#EndDate").datebox("getValue") == "" || $("#begintime").timespinner("getValue") == "" || $("#endtime").timespinner("getValue") == "") {
+                window.parent.$.messager.alert('提示', "请填写日期和时间段！",'info');
+                return;
+            }
+            var StartDate = $("#HisDate").datebox("getValue") + " " + $("#begintime").timespinner("getValue");
+            var EndDate = $("#EndDate").datebox("getValue") + " " + $("#endtime").timespinner("getValue");
+            var tianshu = (new Date(EndDate).getTime() - new Date(StartDate).getTime()) / (24 * 60 * 60 * 1000);
+            if (tianshu > 7 || tianshu < 0) {
+                window.parent.$.messager.alert('提示', "结束日期应不小于开始日期且天数最多为7天！", 'info');
+                return;
+            }
+            $.post("/HistoryTrail/GetYXTrailList", { CarId: "@ViewBag.CarId", TerNo: "@ViewBag.TerNo", st: StartDate, ed: EndDate }, function (e) {
+                if (e != null && e != "") {
+                    data = eval(e);
+                    CarTable = $('#dyntable').DataTable();
+                    CarTable.destroy();
+                    LoadDataTable(data);
+                    BdMarkers(data);
+                }
+                if(e=="[]"){
+                    window.parent.$.messager.alert('提示', "当前条件下，无轨迹记录！", 'info');
+                }
+            });
+        })
+        $('#dyntable tbody').on('click', 'tr', function () {
+            var tbdata = CarTable.fnGetData(this);
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                CarTable.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            MapWindow(
+                //$(this).find("td").eq(0).html(),
+                //$(this).find("td").eq(2).html(),
+                //$(this).find("td").eq(3).html(),
+                //$(this).find("td").eq(1).html(),
+                //$(this).find("td").eq(7).html(),
+                //$(this).find("td").eq(8).html()
+                tbdata.Rtime,
+                tbdata.TerNo,
+                tbdata.ReplydataName,
+                tbdata.Position,
+                tbdata.BaiduLatitude,
+                tbdata.BaiduLongitude
+            );
+        });
+        //导出数据
+        $("#DownLoadData").click(function (e) {
+            if ($("#HisDate").datebox("getValue") == "" || $("#EndDate").datebox("getValue") == "" || $("#begintime").timespinner("getValue") == "" || $("#endtime").timespinner("getValue") == "") 
+            {
+                window.parent.$.messager.alert('提示', "请填写日期和时间段！",'info');
+                return;
+            }
+            var StartDate = $("#HisDate").datebox("getValue") + " " + $("#begintime").timespinner("getValue");
+            var EndDate = $("#EndDate").datebox("getValue") + " " + $("#endtime").timespinner("getValue");
+            var tianshu = (new Date(EndDate).getTime() - new Date(StartDate).getTime()) / (24 * 60 * 60 * 1000);
+            if (tianshu > 7 || tianshu < 0) {
+                window.parent.$.messager.alert('提示', "结束日期应不小于开始日期且天数最多为7天！", 'info');
+                return;
+            }
+            $.post("/HistoryTrail/YXDownLoadExcel", { CarId: "@ViewBag.CarId", TerNo: "@ViewBag.TerNo", st:StartDate, ed:EndDate }, function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.location.href = e;
+                } else {
+                    window.parent.$.messager.alert('提示', "导出失败，请重新导出！",'info');
+                }
+            })
+        });
+        //选中测距
+        $("#Location").change(function () {
+            if ($('#Location').attr("checked") == 'checked') {
+                myDis.open();  //开启鼠标测距
+            } else {
+                myDis.close();
+            }
+        });
+    })
+
+    function MapWindow(Rtime, TerNo, Status, Position, BaiduLatitude, BaiduLongitude) {
+        var infoHtml = '<div class="info">'
+                     + '<h3 class="infowindowheader">' + Rtime + '</h3>'
+                     + '<table ><tr><td>终端编号：</td><td>' + TerNo + '</td></tr><tr><td>报警状态：</td><td>';
+        switch (Status) {
+            case "":
+                infoHtml += "正常";
+                break;
+            default:
+                infoHtml += Status;
+                break;
+        }
+        infoHtml += '</td></tr><tr><td>地理位置：</td> <td>' + Position + '</td> </tr></table></div>'
+        var point = new BMap.Point(BaiduLongitude, BaiduLatitude);
+        var infoWindow = new BMap.InfoWindow(infoHtml, point);  // 创建信息窗口对象
+        map.panTo(point);
+        map.openInfoWindow(infoWindow, point); //开启信息窗口
+    }
+
+
+    //调用百度地图
+    function BaiDuMap() {
+        $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+        $("#BaiDuMap").css({ "background": "#0094ff", "color": "#ffffff" });
+    }
+    //调用谷歌地图
+    function GoogleMap() {
+        var terno = '@ViewBag.TerNo'
+        location.href = '/HistoryTrail/YXTrailNewIndex?TerNo=' + terno;
+        $("#GoogleMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#BaiDuMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+    function LoadDataTable(data) {
+        CarTable = $('#dyntable').dataTable({
+            language: {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "search": "模糊查询",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页 ",
+                    "sNext": "下一页 ",
+                    "sLast": "末页 "
+                }
+            },
+            "dom":
+                    "<'row'<'span12'l>r>" +
+                    "t" +
+                    "<'row'<'span6'i><'span6'p>>",
+            data: data,
+            columns: [
+        { "data": "Rtime" },
+        { "data": "Position" },
+        //{ "data": "TerNo" },
+        {
+            "data": "ReplydataName", "render": function (data, type, full, meta) {
+                switch (data) {
+                    case "":
+                        return "正常";
+                        break;
+                    default:
+                        return data;
+                        break;
+
+                }
+            }
+        },
+        { "data": "Ifposition" },
+        //{ "data": "GoogleLatitude" },
+        //{ "data": "GoogleLongitude" },
+        //{ "data": "BaiduLatitude" },
+        //{ "data": "BaiduLongitude" }
+            ],
+            "columnDefs": [{
+
+                targets: [0],
+                orderData: [0, 1]  //如果第一列进行排序，有相同数据则按照第二列顺序排列
+            }, {
+                targets: [1],
+                orderData: [1, 0]  //如果第二列进行排序，有相同数据则按照第一列顺序排列
+            }, {
+                targets: [2],
+                orderData: [2, 0]  //如果第五列进行排序，有相同数据则按照第一列顺序排列
+            }],
+            lengthChange: true,
+            pageLength: 10,
+            // scrollCollapse: true,
+            pagingType: "full_numbers",
+            scrollX: true,
+            scrollY: tableHeight,
+            ordering: true,
+            "order": [[0,'desc'], [2,'asc']]
+        });
+    }
+
+    function myformatter(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        return y + '/' + m + '/' + d;
+    }
+</script>
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 20px;
+        right: 520px;
+        border: 1px solid #999;
+    }
+
+    #MapContainer div {
+        width: 75px;
+        float: left;
+        text-align: center;
+    }
+
+    #BaiDuMap {
+        cursor: pointer;
+        color: #fff;
+        background: #0094ff;
+    }
+
+    #GoogleMap {
+        cursor: pointer;
+        background: #ffffff;
+        color: #797070;
+    }
+</style>

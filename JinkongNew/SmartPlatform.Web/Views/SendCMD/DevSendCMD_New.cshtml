@@ -1,0 +1,634 @@
+﻿@{
+    ViewBag.Title = "DevSendCMD_New";
+}
+@using (Ajax.BeginForm("DevSendCMD_New", "SendCMD", null, new AjaxOptions()))
+{
+    <ul id="slidercontent">
+        <li>
+            <div class="slide_wrap">
+                <input type="hidden" id="veList" name="veList" value="@ViewData["Ter_ID"]" />
+                <table id="isShow" style="display:none;" cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                    <colgroup>
+                        <col class="con0" width="25%" />
+                        <col class="con1" width="25%" />
+                        <col class="con0" width="25%" />
+                        <col class="con1" width="25%" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">地址类型</th>
+                            <th class="head1">地址</th>
+                            @*<th class="head0">激活状态</th>*@
+                            <th class="head1">累计工时</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select id="AddressType" name="AddressType" onchange="addsTypeChange(this.options[this.options.selectedIndex].value)">
+                                    <option value="00" onselect="true">不设置</option>
+                                    <option value="01">IP</option>
+                                    <option value="02">域名</option>
+                                </select>
+                            </td>
+                            <td width="200">
+                                <input type="text" name="ips" id="ips" value="0.0.0.0" style="width: 150px;display:none" />
+                                <input style="display: none; width: 120px" type="text" name="DomainName" id="DomainName" value="0" />
+                                <input type="text" name="ports" id="ports" value="0000" style="width: 60px" />
+                            </td>
+                            @*<td>
+                                <select id="Activation" name="Activation">
+                                    <option value="00">不设置</option>
+                                    <option value="01">测试</option>
+                                    <option value="02">待激活</option>
+                                    <option value="03">已激活</option>
+                                </select>
+                            </td>*@
+                            <td style="">
+                                <input style="width: 60px" type="text" name="Workhours" id="Workhours" value="00" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr>
+                <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                    <colgroup>
+                        <col class="con0" width="20%" />
+                        <col class="con1" width="20%" />
+                        <col class="con0" width="20%" />
+                        <col class="con1" width="20%" />
+                        <col class="con0" width="20%" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">设备状态</th>
+                            <th class="head0">工作模式</th>
+                            <th class="head1">定时时间</th>
+                            <th class="head0">定位次数(0:不设置)</th>
+                            @*<th class="head1">工作时间(分钟)</th>*@
+                            <th class="head0">间隔时间（追车模式：秒）</th> @*其他模式：分钟；*@
+                            <th>蓝牙设置</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select id="sbzt" name="sbzt">
+                                    <option value="00">不设置</option>
+                                    @if(ViewBag.IsAdmin==true)
+                                    {
+                                    <option value="01">测试</option>
+                                    <option value="02">待激活</option>
+                                    }
+                                    <option value="03">已激活</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="gzmss" name="gzmss" onchange="selectChange(this.options[this.options.selectedIndex].value)">
+                                    <option value="00">不设置</option>
+                                    <option value="01">标准模式</option>
+                                    <option value="02">精准模式</option>
+                                    <option value="03">追车模式</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="dssjs" name="dssjs">
+                                    @*定位时间*@
+                                    <option value="0">不设置</option>
+                                    <option value="8">8:00</option>
+                                    <option value="9">9:00</option>
+                                    <option value="10">10:00</option>
+                                    <option value="11">11:00</option>
+                                    <option value="12">12:00</option>
+                                    <option value="13">13:00</option>
+                                    <option value="14">14:00</option>
+                                    <option value="15">15:00</option>
+                                    <option value="16">16:00</option>
+                                    <option value="17">17:00</option>
+                                    <option value="18">18:00</option>
+                                    <option value="19">19:00</option>
+                                    <option value="20">20:00</option>
+                                    <option value="21">21:00</option>
+                                    <option value="22">22:00</option>
+                                    <option value="23">23:00</option>
+                                    <option value="24">00:00</option>
+                                    <option value="1">1:00</option>
+                                    <option value="2">2:00</option>
+                                    <option value="3">3:00</option>
+                                    <option value="4">4:00</option>
+                                    <option value="5">5:00</option>
+                                    <option value="6">6:00</option>
+                                    <option value="7">7:00</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="dwcs" id="dwcs" style="width: 60px" value="0" />
+                            </td>
+                            @*<td>
+                                <input type="text" name="gzsjs" id="gzsjs" style="width: 60px" value="2" disabled="disabled" />
+                            </td>*@
+                            <td>
+                                <input type="text" name="xmsjs" id="xmsjs" style="width: 60px" value="0" disabled="disabled" />
+                                <input type="text" name="zhuiche_xmsjs" id="zhuiche_xmsjs" style="width: 60px;display:none" value="0" />
+                            </td>
+                            <td>
+                                <select id="lysz" name="lysz">
+                                    <option value="0">不设置</option>
+                                    <option value="1">开启蓝牙</option>
+                                    <option value="2">关闭蓝牙</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="height:50px;text-align:center;padding:5px;">
+                    @*<input type="button" value="已激活" class="" onclick="jihuo();" />*@
+                    <input type="button" value="设置" class="" onclick="submitTcp('1');" />
+                    @*<input type="button" value="刷新状态" class="" onclick="ReLoad();" />*@
+                </div>
+                <div class="notibar announcement">
+                    <p>
+                        1、设备出厂时，默认上传位置信息的频率为 1次/天。<br clear="all">
+                        2、在下次信息回传前，向设备发送多条命令信息，只有最后一条命令有效。<br clear="all">
+                        3、为延长设备的使用寿命：标准模式、精准模式设置次数不得超过 24次/天（1次/小时）；追车模式下数据发送间隔最小60秒最大3600秒;0为不设置。<br clear="all">
+                    </p>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="slide_wrap">
+                <table id="SendCMDListTable"></table>
+            </div>
+        </li>
+    </ul>
+}
+<script>
+    var aa = "@ViewBag.IsAdmin";
+    var TerminalData;
+    if (aa == false || aa == "false" || aa == "False") {
+        var myTable = document.getElementById('isShow');
+        myTable.style.display = "none";
+    }
+    else {
+        var myTable = document.getElementById('isShow');
+        myTable.style.display = "block";
+    }
+
+    function loadSendListTable() {
+        TerminalData = $('#SendCMDListTable').datagrid({
+            url: '@Url.Action("GetSendCMDList", "SendCMD")',
+            height: 380,
+            columns: [[
+                { field: 'TrSetsn', title: '终端编号', width: 80, align: 'center' },
+                {
+                    field: 'TrCmdtype', title: '命令信息', width: 560, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "705":
+                                var straub="设备状态：";
+                                if(row.TrParam2.split('`')[0]=="V")
+                                {
+                                    straub+= "不设置";
+                                }
+                                else if(row.TrParam2.split('`')[0]=="1")
+                                {
+                                    straub+= "测试";
+                                }
+                                else if(row.TrParam2.split('`')[0]=="2")
+                                {
+                                    straub+= "待激活";
+                                }
+                                else if(row.TrParam2.split('`')[0]=="3")
+                                {
+                                    straub += "已激活";
+                                }
+                                straub += " 工作模式：";
+                                if (row.TrParam2.split('`')[1] == "V") {
+                                    straub += "不设置";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "1") {
+                                    straub += "标准模式";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "2") {
+                                    straub += "精准模式";
+                                }
+                                else if (row.TrParam2.split('`')[1] == "3") {
+                                    straub += "追车模式";
+                                }
+                                //straub += " 工作时间：";
+                                //if (row.TrParam2.split('`')[2] == "V") {
+                                //    straub += "不设置";
+                                //}
+                                //else{
+                                //    straub += row.TrParam2.split('`')[2]+"分钟";
+                                //}
+                                straub += " 定位次数：";
+                                if (row.TrParam2.split('`')[3] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += parseInt(1440 / parseInt(row.TrParam2.split('`')[3]));
+                                }
+                                straub += " 定时时间：";
+                                if (row.TrParam2.split('`')[4] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += row.TrParam2.split('`')[4]+"点";
+                                }
+                                straub += " 间隔时间：";
+                                if (row.TrParam2.split('`')[5] == "V") {
+                                    straub += "不设置";
+                                }
+                                else {
+                                    straub += row.TrParam2.split('`')[5] ;
+                                }
+                                if (row.TrParam2.split('`')[9] != null && row.TrParam2.split('`')[9] != "") {
+                                    straub += " 蓝牙设置：";
+                                    if (row.TrParam2.split('`')[9] == "V") {
+                                        straub += "不设置";
+                                    }
+                                    else {
+                                        if (row.TrParam2.split('`')[9] == "1") {
+                                            straub += "开启蓝牙";
+                                        }
+                                        if (row.TrParam2.split('`')[9] == "2") {
+                                            straub += "关闭蓝牙";
+                                        }
+                                    }
+                                }
+                                return straub;
+                            case "999":
+                                return row.TrParam2.toString();
+                            default:
+                                return "";
+
+                        }
+                    }
+                },
+                {
+                    field: 'TrState', title: '执行状态', width: 140, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "000":
+                                return "提交成功";
+                            case "001":
+                                return "发送成功";
+                            case "002":
+                                return "执行成功";
+                            case "003":
+                                return "执行失败";
+
+                            case "0":
+                                return "待发送";
+                            case "1":
+                                return "待定";
+                            case "2":
+                                return "已发送，未执行";
+                            case "3":
+                                return "发送成功，命令执行成功";
+                            case "6":
+                                return "命令失效";
+                            case "9":
+                                return "执行失败";
+                            default:
+                                return "";
+                        }
+                    }
+                },
+                 {
+                     field: 'TrOpdate', title: '操作时间', width: 150, align: 'center', formatter: function (value, row) {
+                         switch (value) {
+                             case "0001-01-01 00:00:00":
+                                 return "";
+                             default:
+                                 return value;
+                         }
+                     }
+                 },
+                {
+                    field: 'TrSenddate', title: '发送时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                {
+                    field: 'TrExedate', title: '执行成功时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                }
+            ]],
+            //fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            sortName: 'TrOpdate',
+            sortOrder: 'desc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            queryParams: { "TrSetsn": '@ViewData["Ter_ID"]' },//查询参数
+            //detailFormatter: function (index, row) {
+            //    return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+            //    $('#ddv-' + index).append(nav);
+            //    $('#dg').datagrid('fixDetailRowHeight', index);
+            //},
+            pagination: true
+            //singleSelect: true,
+            //toolbar: TerManager
+        });
+    }
+    $(function () {
+        $("input, textarea, select").uniform();
+        jQuery('#slidercontent').bxSlider({
+            prevText: '',
+            nextText: '',
+            buildPager: function (slideIndex) {
+                switch (slideIndex) {
+                    case 0:
+                        return '命令配置';
+                    case 1:
+                        loadSendListTable();
+                        return '已发命令';
+                }
+            }
+        });
+
+        //不是L开头的设备号变灰
+        var devid = $("#veList").val();
+        if (devid.substring(0,1).toString() != "L") {
+            $("#lysz").attr("disabled",true);
+        }
+        else {
+            $("#lysz").attr("disabled",false);
+        }
+
+        $("#dwcs").change(function () {
+            ss = $("#dwcs").val().toString();
+            if (ss == "0") {
+                $("#xmsjs").attr("value", "0");
+            }
+            else if (isNaN(ss) == true) {
+                window.parent.$.messager.alert('提示', '回传次数范围为1-24次！', 'error');
+                return false;
+            }
+            else if ($("#gzmss").val() == "03") {
+                //if (parseInt($("#dwcs").val()) <= 144 && parseInt($("#dwcs").val()) > 0) {
+                //    var vTime = 24 * 60;
+                //    $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                //} else {
+                //    window.parent.$.messager.alert('提示', '回传次数范围为1-24次！', 'error');
+                //    return;
+                //}
+                $("#dwcs").attr("value", "0");
+                $("#dwcs").attr("disabled", "disabled");
+                $("#xmsjs").attr("disabled", "");
+            }
+            else {
+                if (parseInt($("#dwcs").val()) <= 24 && parseInt($("#dwcs").val()) > 0) {
+                    //var vTime = 24 * 60;
+                    //$("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                } else {
+                    window.parent.$.messager.alert('提示', '回传次数范围为1-24次！', 'error');
+                    return;
+                }
+            }
+        });
+        $("#yxTime").hide();
+        $("#online").click(
+            function () {
+                if ($("#online").attr("checked")) {
+                    $("#yxTime").show();
+                } else {
+                    $("#yxTime").hide();
+                }
+            }
+        );
+    });
+
+    //刷新
+    function ReLoad() {
+        $('#SendCMDListTable').datagrid('reload');
+    }
+
+    @*function jihuo() {
+        var devid = $("#veList").val();
+        window.parent.$.messager.confirm('确定', '你确定激活吗？', function (t) {
+            if (t) {
+                $.ajax({
+                    url: '@Url.Content("~/SendCMD/DevSendCMD_New")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: "{'devid':'" + devid + "','ips':'0.0.0.0','ports':'0000','gzmss':'00'"
+                        + ",'gzsjs':'2','dssjs':'0','xmsjs':'0','scsjs':'','dwcs':'0'"
+                        + ",'CmandType':'1','addressType':'00','DomainName':'0'"
+                        + ",'Activation':'03','Workhours':'00'}",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        if (data.toString() != "") {
+                            window.parent.$.messager.alert('提示', '命令发送成功', 'info');
+                            // grid.loadData();
+                            //send(data, sens);
+                        }
+                    },
+                    error: function (data) {
+
+                    }
+                });
+            }
+
+        });
+    }*@
+
+    function submitTcp(sens) {
+        var devid = $("#veList").val();
+        var addressType = $('#AddressType option:selected').val();//是否设置地址
+
+        var DomainName = $("#DomainName").val();
+        var DNcheck = /^([\w-]+\.)+([\w]+)$/;
+        //var DNcheck = /^(2[0-5]{2}|1?[0-9]{1,2}).(2[0-5]{2}|1?[0-9]{1,2}).(2[0-5]{2}|1?[0-9]{1,2}).(2[0-5]{2}|1?[0-9]{1,2})$/;
+        if (addressType != "02" && DomainName == "0") {
+            DomainName = DomainName;
+        }
+        else {
+            if (!DNcheck.test(DomainName)) {
+                window.parent.$.messager.alert('提示', '域名格式不正确！', 'error');
+                return false;
+            }
+        }
+        //var Activation = $('#Activation option:selected').val();
+        //var Ipcheck = /^(2[0-5]{2}|1?[0-9]{1,2}).(2[0-5]{2}|1?[0-9]{1,2}).(2[0-5]{2}|1?[0-9]{1,2}).(2[0-5]{2}|1?[0-9]{1,2})/g;
+
+        var ips = $("#ips").val();
+        var re = /(\d+)\.(\d+)\.(\d+)\.(\d+)/g; //匹配IP地址的正则表达式
+
+        if (addressType != "01" && ips == "0.0.0.0") {
+            ips = ips;
+        }
+        else {
+            if ((re.test(ips) == true)) {
+                if (RegExp.$1 <= 255 && RegExp.$1 >= 0
+                    && RegExp.$2 <= 255 && RegExp.$2 >= 0
+                    && RegExp.$3 <= 255 && RegExp.$3 >= 0
+                    && RegExp.$4 <= 255 && RegExp.$4 >= 0) {
+                }
+                else {
+                    window.parent.$.messager.alert('提示', 'IP格式不正确！', 'error');
+                    return false;
+                }
+            }
+            else {
+                window.parent.$.messager.alert('提示', 'IP格式不正确！', 'error');
+                return false;
+            }
+        }
+        //else if (Ipcheck.test(ips)==false) {
+        //    $.ligerDialog.alert('IP格式不正确', '设置无效', 'warn');
+        //    return false;
+        //}
+        var ports = $("#ports").val();
+        if (ports == "0000" || 1024 <= ports && ports <= 65535) {
+            ports = ports;
+        }
+        else {
+            window.parent.$.messager.alert('提示', '请设置端口号段为1024 - 65535！', 'error');
+            return false;
+        }
+        var Activation = $("#sbzt").val();
+        var gzmss = $("#gzmss").val();
+        var gzsjs = "V";//$("#gzsjs").val();
+        var dssjs = $("#dssjs").val() * 60;
+        var xmsjs = $("#xmsjs").val();
+        if (gzmss == "03") {
+            xmsjs = $("#zhuiche_xmsjs").val();
+            var num = /^(\s)*(-?[0-9]+|[0-9]*)?(\s)*$/;
+            if (num.test(xmsjs)) {
+                if (((60 <= parseInt(xmsjs) && parseInt(xmsjs) <= 3600))) {
+                }
+                else {
+                    window.parent.$.messager.alert('提示', '追车模式下数据发送间隔最小60秒最大3600秒', 'error');
+                    return false;
+                }
+            }
+            else {
+                window.parent.$.messager.alert('提示', '间隔时间应只填写数字', 'error');
+                return false;
+            }
+        }
+
+        var scsjs = $("#scsjs").val();
+        var dwcs = $("#dwcs").val();
+        var Workhours = $("#Workhours").val();
+        var LanyaState = $("#lysz option:selected").val();
+        var str = "确定发送命令吗？";
+
+        if (parseInt($("#dwcs").val()) <= 24 && parseInt($("#dwcs").val()) >= 0) {
+            window.parent.$.messager.confirm('确定', str, function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '@Url.Content("~/SendCMD/DevSendCMD_New")',
+                        type: 'POST',
+                        //dataType: 'json',
+                        data: "{'devid':'" + devid + "','ips':'" + ips + "','ports':'" + ports + "','gzmss':'"
+                            + gzmss + "','gzsjs':'" + gzsjs + "','dssjs':'" + dssjs + "','xmsjs':'"
+                            + xmsjs + "','scsjs':'" + scsjs + "','dwcs':'"
+                            + dwcs + "','CmandType':'" + sens + "','addressType':'" + addressType
+                            + "','DomainName':'" + DomainName + "','Activation':'" + Activation
+                            + "','Workhours':'" + Workhours
+                            + "','LanyaState':'"+LanyaState+"'}",
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+                            if (data.toString() == "true") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "命令发送成功",
+                                    timeout: 2000,
+                                });
+                                location.reload();
+                            } else {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "命令发送失败",
+                                    timeout: 2000,
+                                });
+                            }
+                        },
+                        error: function (data) {
+                            window.parent.$.messager.alert('提示', '系统错误！', 'error');
+                        }
+                    });
+                }
+            });
+
+        } else {
+            window.parent.$.messager.alert('提示', '回传次数范围为1-24次', 'error');
+            return;
+        }
+    }
+    //$("#ips").val('202.85.209.80');
+    //$("#DomainName").val('202.85.209.80');
+    //$("#ports").val('9001');
+    //选址改变
+    function addsTypeChange(typeval) {
+        switch (typeval) {
+            case "00"://不设置
+                document.getElementById('ips').style.display = 'none';
+                document.getElementById('DomainName').style.display = 'none';
+                $("#ips").val('0.0.0.0');
+                $("#DomainName").val('0');
+                $("#ports").val('0000');
+                break;
+            case "01"://IP
+                document.getElementById('ips').style.display = '';
+                document.getElementById('DomainName').style.display = 'none';
+                $("#ips").val('123.57.217.93');
+                $("#ports").val('9007');
+                break;
+            case "02"://域名
+                document.getElementById('ips').style.display = 'none';
+                document.getElementById('DomainName').style.display = '';
+                $("#DomainName").val('www.umlgps.com');
+                $("#ports").val('9007');
+                break;
+            default:
+        }
+    }
+    function selectChange(index) {
+        switch (index) {
+            case "00":
+                document.getElementById('xmsjs').style.display = '';
+                document.getElementById('zhuiche_xmsjs').style.display = 'none';
+                document.getElementById('dwcs').disabled = "";
+                break;
+            case "01":
+                document.getElementById('dssjs').disabled = "";
+                document.getElementById('dwcs').disabled = "";
+                document.getElementById('xmsjs').style.display = '';
+                document.getElementById('zhuiche_xmsjs').style.display = 'none';
+                break;
+            case "02":
+                document.getElementById('dssjs').disabled = "";
+                document.getElementById('dwcs').disabled = "";
+                document.getElementById('xmsjs').style.display = '';
+                document.getElementById('zhuiche_xmsjs').style.display = 'none';
+                break;
+            case "03":
+                $("#dwcs").val("0");
+                document.getElementById('dwcs').disabled = "disabled";
+                document.getElementById('xmsjs').style.display = 'none';
+                document.getElementById('zhuiche_xmsjs').style.display = '';
+                break;
+            default:
+                //$("#gzsjs").attr("value", '2');
+        }
+    }
+</script>

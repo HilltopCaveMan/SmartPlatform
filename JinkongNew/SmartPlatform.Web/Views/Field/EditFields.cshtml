@@ -1,0 +1,102 @@
+﻿@model GModel.Basic.UserFields
+    @using (Ajax.BeginForm("EditForm", "Field", FormMethod.Post, new AjaxOptions()))
+    {
+        @Html.HiddenFor(m => m.UfId, new { @class = "" })
+        <div class="stdform" style="padding:20px 70px 10px 60px">
+            <p>
+                <label>信息类型</label>
+                <div class="field">
+                    @Html.DropDownListFor(m => m.InfoType, new List<SelectListItem>
+                        {
+                            new SelectListItem {Text ="请选择类型",Value ="0"},
+                            new SelectListItem {Text ="安装信息",Value ="1"},
+                            new SelectListItem {Text ="信贷信息",Value ="2"},
+                            new SelectListItem {Text ="车主信息",Value ="3"}
+                        }, new { id = "InfoType", name = "InfoType" })
+                    <b>
+                        @Html.ValidationMessageFor(model => model.InfoType)
+                    </b>
+                </div>
+            </p>
+            <p>
+                <label><i>*</i>字段名称</label>
+                <div class="field">
+                    @Html.TextBoxFor(m => m.UfName, new { @class = "textbox" })
+                    <b>
+                        @Html.ValidationMessageFor(model => model.UfName)
+                    </b>
+                </div>
+            </p>
+            <p>
+                <label>字段描述</label>
+                <div class="field">
+                    @Html.TextBoxFor(m => m.UfDesc, new { @class = "textbox" })
+                    <b>
+                        @Html.ValidationMessageFor(model => model.UfDesc)
+                    </b>
+                </div>
+            </p>
+        </div>
+        <div class="formfooter">
+            <button class="stdbtn btn_blue" type="submit" onclick="return validate()">确定</button>
+            <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+        </div>
+    }
+
+<script type="text/javascript">
+
+    function validate() {
+        var ufname = $("#UfName").val();
+        if (ufname == "") {
+            alert("字段名称不能为空！");
+            return false;
+        }
+    }
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close')
+    }
+
+    $(function () {
+        $("input, textarea, select").uniform();
+    })
+
+    function editFormSucceed() {
+        var ifr = window.parent.document.getElementById('/Field/FieldsIndex');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#tableField').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.alert('提示', '修改成功！');
+
+        //setTimeout(function () {
+        //    window.parent.$.messager.close();
+        //}, 5000) 5秒关闭
+
+        //window.parent.$.messager.show({
+        //    title: '提示',
+        //    msg: "修改成功！",
+        //    timeout: 2000,
+        //    //style: {
+        //    //    left:80, // 与左边界的距离
+        //    //    top:80// 与顶部的距离
+        //    //}
+        //});
+    }
+    function editFormError() {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改失败！",
+            timeout: 2000
+        });
+    }
+    function editFormError(val) {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: val + ",修改失败！",
+            timeout: 2000
+        });
+    }
+</script>
+

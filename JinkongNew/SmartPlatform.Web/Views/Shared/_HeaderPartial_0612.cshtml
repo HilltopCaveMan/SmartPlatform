@@ -1,0 +1,83 @@
+﻿<div class="topheader">
+    <div class="container">
+
+        <div class="headercontainer" style="float:left;">
+            <div class="headlogo">
+                <img src="~/Content/Images/carwebLogo.png" height="50" />
+            </div>
+        </div>
+
+        <ul class="nav-right">
+            <li class="nav-li">欢迎您！</li>
+            <li class="nav-li">
+                <div class="userinfo">
+                    <span class="username">@Session["UserName"]</span>
+                    <i class="arrow"></i>
+                    <div class="userinfodrop">
+                        <div class="avatar">
+                            <img src="~/Content/Images/userphoto.jpg" width="65" />
+                            <div class="changetheme">
+                                <a class="default"></a>
+                                <a class="blueline"></a>
+                                <a class="greenline"></a>
+                                <a class="contrast"></a>
+                                <a class="custombg"></a>
+                            </div>
+                        </div><!--avatar-->
+                        <div class="userdata">
+                            <span id="CROLE" class="email">youremail@yourdomain.com</span>
+                            <ul>
+                                <li><a id="editPWD" href="#">修改密码</a></li>
+                                <li><a id="exit" href="#">退出</a></li>
+                            </ul>
+                        </div><!--userdata-->
+                    </div><!--userinfodrop-->
+                </div>
+            </li>
+            <li class="nav-li"><a class="aexit" href="#" onclick="exit()">[&nbsp;退出&nbsp;]</a></li>
+            <li class="nav-li" style="border:0px;"><a style="color:white;" href="../CarMonitor/VersionInfo" target="_self" title="2016-5-20,平台版本升级公告">[&nbsp;<img width="18" height="12" src="/Content/Images/msg.gif" />&nbsp;<span style="color: white; font-weight:bold;">平台升级公告</span>&nbsp;]</a></li>
+        </ul>
+
+        <div class="headersearch" style="padding-top:10px; display:none;">
+            <input id="search_key" class="easyui-searchbox" data-options="menu:'#mm',searcher:doSearch" style="width:320px;height:34px;" />
+            <div id="mm">
+                <div data-options="name:'CarNo'">车辆编号</div>
+                <div data-options="name:'TerNo'">终端编号</div>
+            </div>
+        </div>
+    </div>
+</div><!--topheader-->
+
+<script type="text/javascript" language="javascript">
+
+    function doSearch(value, name) {
+        $("#fame")[0].contentWindow.doSearch(value, name);
+    }
+
+    function exit() {
+        $.ajax({
+            type: 'post',
+            url: '/Account/UserCance',
+            success: function (data) {
+                window.location.href = "/Account/Login";
+            }
+        });
+    }
+
+    $(function () {
+        if ($("#search_key").next() != null
+            && $("#search_key").next().children() != null
+            && $("#search_key").next().children().eq(2) != null) {
+            var o = $("#search_key").next().children().eq(2);
+            if (o != null
+                && o != undefined
+                && o.length > 0) {
+                $(o).bind("blur", function () {
+                    SearchValue = $(this).val(); 
+                });
+            }
+        }
+    });
+
+</script>
+<!--header-->

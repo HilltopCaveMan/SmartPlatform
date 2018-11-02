@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="VersionInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="VersionInfo" type="GModel.Basic.VersionInfo" />
+  </alias>
+  <resultMaps>
+    <resultMap id="VersionInfoResult" class="VersionInfo">
+      <result property="VerId" column="VerId" type="string" dbType="varchar"/>
+      <result property="VerName" column="VerName" type="string" dbType="varchar"/>
+      <result property="VerNumber" column="VerNumber" type="string" dbType="varchar"/>
+      <result property="AppType" column="AppType" type="string" dbType="varchar"/>
+      <result property="AppUrl" column="AppUrl" type="string" dbType="varchar"/>
+      <result property="Publisher" column="Publisher" type="string" dbType="varchar"/>
+      <result property="PublishDate" column="PublishDate" type="DateTime" dbType="DateTime"/>
+      <result property="Description" column="Description" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectMenuInfo" parameterClass="VersionInfo" resultMap="VersionInfoResult">
+      SELECT t.ver_id   as VerId,
+          t.ver_name        as VerName,
+          t.ver_number      as VerNumber,
+          t.app_type        as AppType,
+          t.app_url         as AppUrl,
+          t.publisher       as Publisher,
+          t.publish_date    as PublishDate,
+          t.description     as Description
+      FROM VERSION_INFO t 
+      WHERE t.ver_id=#VerId#
+    </select>
+    
+    <select id="SelectVerInfoPage" parameterClass="VersionInfo" resultMap="VersionInfoResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT t.ver_id   as VerId,
+      t.ver_name        as VerName,
+      t.ver_number      as VerNumber,
+      lower(t.app_type) as AppType,
+      t.app_url         as AppUrl,
+      t.publisher       as Publisher,
+      t.publish_date    as PublishDate,
+      t.description     as Description
+      FROM VERSION_INFO t
+      ORDER BY t.publish_date desc
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+    <select id="SelectVerInfoCount" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM VERSION_INFO WHERE 1=1
+    </select>
+
+    <insert id="InsertVersionInfo" parameterClass="VersionInfo">
+      INSERT INTO VERSION_INFO
+      (ver_id,ver_name,ver_number,publisher,publish_date,app_type,app_url,description)
+      VALUES(#VerId#,#VerName#,#VerNumber#,#Publisher#,sysdate,#AppType#,#AppUrl#,#Description#)
+    </insert>
+
+    <update id="UpdateVersionInfo" parameterClass="VersionInfo">
+      UPDATE VERSION_INFO
+      SET ver_name=#VerName#,ver_number=#VerNumber#,publisher=#Publisher#,
+      publish_date=#PublishDate#,app_type=#AppType#,
+      app_url=#AppUrl#,description=#Description# WHERE ver_id=#VerId#
+    </update>
+
+    <delete id="DeleteVersionInfo" parameterClass="string">
+      DELETE FROM VERSION_INFO
+      WHERE  ver_id=#VerId#
+    </delete>
+
+  </statements>
+</sqlMap>

@@ -1,0 +1,235 @@
+﻿@model  System.Collections.ArrayList
+<div class="easyui-layout" style="width:100%;height:100%;">
+    <div data-options="region:'west',split:true" style="width:55%">
+        <table id="BindCarInfoTable" style=" height:100%">
+            <thead>
+                <tr>
+                    <th data-options="field:'CAR_ID', hidden: true ">车辆ID</th>
+                    <th data-options="field:'CAR_NO',align:'center',width:'20%'">车牌号</th>
+                    <th data-options="field:'TYPE_NAME',align:'center',width:'20%'">车辆类型</th>
+                    <th data-options="field:'BUSINESSDIVISIONNAME',align:'center',width:'40%'">所属企业</th>
+                    @foreach (var item in Model)
+                    {
+                        <th data-options="field:'@item.ToString()',width:80">@item.ToString()</th>
+                    }
+                </tr>
+            </thead>
+        </table>
+        <div id="BindCarInfoTb" style="padding:5px;height:auto">
+            <div>
+                车牌号: <input id="BindCarNoSel" class="easyui-textbox" style="width:100px; height:25px;" />&nbsp;&nbsp;
+                车辆类型:<input id="BindCarTypeSel" class="easyui-combobox" style="width:100px; height:25px;" />&nbsp;&nbsp;
+
+                所属企业:<input type="text" class="easyui-combotree" id="DeptSel" style="width:150px;" />
+                <a href="#" onclick="GetBindCarInfoByParam()" class="easyui-linkbutton" iconcls="icon-search">查找</a>
+            </div>
+        </div>
+    </div>
+    <div data-options="region:'center'" style="width:45%">
+        <div class="easyui-layout" style="width:100%;height:100%;">
+            <div data-options="region:'north'" style="height:68%">
+                <table id="BindTerInfoTable"></table>
+                <div id="BindTerInfoTb" style="padding:5px; height:auto">
+                    终端编码：<input id="BindTerNoSel" class="easyui-textbox" style="width:100px; height:25px;" />&nbsp;&nbsp;
+                    所属企业：<input id="BindDeptSel" class="easyui-combotree" style="width:150px; height:25px;" />&nbsp;&nbsp;
+                    <a href="#" onclick="BindGetTerInfo()" class="easyui-linkbutton" iconcls="icon-search">查找</a>
+                </div>
+            </div>
+            <div data-options="region:'center',split:true" style="height:8%">
+                <div style="width:100%; height:100%; text-align:center; vertical-align:bottom">
+                    <a id="SaleReturnDevice" class="easyui-linkbutton" onclick="BindTerCar()" iconcls="icon-down" ">选择</a>
+                    <a id="SaleReturnDevice" class="easyui-linkbutton" onclick="BindCancelTerCar()" iconcls="icon-top">取消</a>
+
+                </div>
+              
+            </div>
+            <div data-options="region:'south',split:true" style="height:25%">
+                <table id="BindTerSelTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    var BindCarInfoGrid;
+    var BindTerGrid;
+    var BindTerSelGrid;
+    var BindCarId = "kkk";
+    $(function () {
+        LoadCarInfoList();
+        LoadTerInfoList();
+        BindLoadTerSelList();
+        //$('#BindCarTypeSel').combobox({ textField: "text", valueField: "id", editable: false }).combobox("loadData", data);
+
+        $('#BindCarTypeSel').combobox({
+            url: '/CarType/GetCarTypeList',
+            valueField: 'TypeId',
+            textField: 'TypeName',
+            editable: false,
+            onLoadSuccess: function () {
+
+            }
+        });
+
+        $("#DeptSel").combotree({
+            url: '/Dept/GetOrgNode'
+        });
+
+        $("#BindDeptSel").combotree({
+            url: '/Dept/GetOrgNode'
+        });
+    })
+
+
+
+    function LoadCarInfoList() {
+        BindCarInfoGrid = $('#BindCarInfoTable').datagrid({
+            url: "/CarInfo/GetCarList",
+            singleSelect: true,
+            fitColumns: true,
+            pagination: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            queryParams: { CarNo: $("#BindCarNoSel").val(), TypeId: $("#BindCarTypeSel").combobox('getValue'), Businessdivisionid: $("#DeptSel").combotree('getValue') },//查询参数
+            onSelect: function (rowIndex, rowData) {
+                var row = $('#BindCarInfoTable').datagrid('getSelected');
+                if (row != null) {
+                    var param = { CarId: row.CAR_ID };
+                    $("#BindTerSelTable").datagrid('load', param);
+                }
+            },
+            toolbar: "#BindCarInfoTb"
+        })
+    }
+
+    function LoadTerInfoList() {
+        BindCarInfoGrid = $('#BindTerInfoTable').datagrid({
+            url: "/Terminal/GetNotBindTerList",
+            columns: [[
+               { field: 'TerGuid', title: '', width: 0, hidden: true },
+               { field: 'TerNo', title: '终端编号', width: 100, align: 'center' },
+               { field: 'Businessdivisionname', title: '所属企业', width: 120, align: 'center' },
+            { field: 'ProModel', title: '终端类型', width: 120, align: 'center' },
+    { field: 'TerSimcard', title: 'SIM卡号', width: 120, align: 'center' }
+            ]],
+            singleSelect: false,
+            pagination: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 10, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //分页中下拉选项的数值
+            pageList: [10, 20, 30],
+            onSelect: function (rowIndex, rowData) {
+            },
+            toolbar: "#BindTerInfoTb"
+        })
+    }
+
+    function BindLoadTerSelList() {
+        BindTerSelGrid = $('#BindTerSelTable').datagrid({
+            url: "/Terminal/GetTerSelList",
+            columns: [[
+               { field: 'TerGuid', title: '', width: 0, hidden: true },
+               { field: 'TerNo', title: '终端编号', width: 100, align: 'center' },
+               { field: 'Businessdivisionname', title: '所属企业', width: 120, align: 'center' },
+            { field: 'ProModel', title: '终端类型', width: 120, align: 'center' },
+            { field: 'TerSimcard', title: 'SIM卡号', width: 120, align: 'center' }
+            
+            ]],
+            singleSelect: false,
+            pagination: true,
+            rownumbers: true, //是否加行号
+            pagination: false, //是否显式分页
+            queryParams: { CarId: BindCarId }
+        })
+    }
+
+    function RemoveTer() {
+        var rows = $('#BindTerInfoTable').datagrid('getSelections');
+        for (var i = 0; i < rows.length; i++) {
+            $('#BindTerInfoTable').datagrid('deleteRow');
+            var row = rows[i];
+            $('#BindTerSelTable').datagrid('appendRow', {
+                TerGuid: row.TerGuid,
+                TerNo: row.TerNo,
+                Businessdivisionname: row.Businessdivisionname,
+                TerFcno: row.TerFcno,
+                TerVerno: row.TerVerno,
+                TerSoftver: row.TerSoftver,
+                TerHardver: row.TerHardver
+            });
+        }
+    }
+
+    function BindTerCar() {
+        var rows = $('#BindTerInfoTable').datagrid('getSelections');
+        var BTerID = "";
+        if (rows != null && rows.length > 0) {
+            for (i = 0; i < rows.length; i++) {
+                if (i < (rows.length - 1)) {
+                    BTerID += rows[i].TerGuid + "&&--__";
+                } else {
+                    BTerID += rows[i].TerGuid;
+                }
+            }
+        }
+        var BCarId = "";
+        var row = $('#BindCarInfoTable').datagrid('getSelected');
+        if (row != null) {
+            BCarId = row.CAR_ID;
+        }
+        if (BTerID != "" && BCarId != "") {
+            $.post("/Terminal/BindTerCar", { TerIds: BTerID, CarId: BCarId }, function (e) {
+                if (e == "true") {
+                    $("#BindTerInfoTable").datagrid("reload");
+                    $("#BindTerSelTable").datagrid("reload");
+                    alert("绑定成功！");
+                } else {
+                    alert("绑定失败！");
+                }
+            })
+        } else if (BTerID == "") {
+            $.messager.alert('警告', '请选择要绑定的终端', 'error');
+        } else if (BCarId == "") {
+            $.messager.alert('警告', '请选择要绑定的车辆', 'error');
+        }
+    }
+
+
+    function BindCancelTerCar() {
+        var rows = $('#BindTerSelTable').datagrid('getSelections');
+        var BTerID = "";
+        if (rows != null && rows.length > 0) {
+            for (i = 0; i < rows.length; i++) {
+                if (i < (rows.length - 1)) {
+                    BTerID += rows[i].TerGuid + "&&--__";
+                } else {
+                    BTerID += rows[i].TerGuid;
+                }
+            }
+        }
+
+        $.post("/Terminal/BindTerCar", { TerIds: BTerID }, function (e) {
+            if (e == "true") {
+                $("#BindTerInfoTable").datagrid("reload");
+                $("#BindTerSelTable").datagrid("reload");
+                alert("绑定成功！");
+            } else {
+                alert("绑定失败！");
+            }
+        })
+    }
+
+
+
+    function GetBindCarInfoByParam() {
+
+        var param = { CarNo: $("#BindCarNoSel").val(), TypeId: $("#BindCarTypeSel").combobox('getValue'), Businessdivisionid: $('#DeptSel').combotree('getValue') };
+        $("#BindCarInfoTable").datagrid("load", param);
+    }
+</script>
+

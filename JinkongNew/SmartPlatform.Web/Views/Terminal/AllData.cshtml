@@ -1,0 +1,775 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table style="margin:5px;">
+            <tr>
+                <td style="padding-left: 10px;">
+                    终端类型：
+                </td>
+                <td>
+                    <input id="TerTypeSel" type="text" class="easyui-combobox" style="width:120px; height:25px;" panelheight="110" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input id="AllDataDeptSel" class="easyui-combobox" style="width:150px; height:25px;" />
+                </td>
+                <td>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="checkbox" id="AllDataDept" name="check2"> <label for="ChildrenDept">查询子企业 </label>
+                </td>
+                <td style="padding-left: 15px;">
+                    状态类型：
+                </td>
+                <td>
+                    <input id="StateTypeSel" name="StateTypeSel" type="text" class="easyui-combobox" style="width:100px; height:25px;" panelheight="110" />
+                    <span id="DayPanel">
+                        <input id="DayNumber" name="DayNumber" type="text" class="easyui-combobox" style="width:80px; height:25px;" panelheight="110" />
+                    </span>
+                    <span id="DaySpanPanel">
+                        <input id="DaySpanNumber" name="DaySpanNumber" type="text" class="easyui-combobox" style="width:80px; height:25px;" panelheight="110" />
+                    </span>
+                </td>
+                <td style="padding-left: 15px;">
+                    工作模式：
+                </td>
+                <td>
+                    <input id="TerModelSel" name="TerModelSel" type="text" class="easyui-combobox" style="width:100px; height:25px;" panelheight="110" />
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    对象类型：
+                </td>
+                <td>
+                    <input id="ObjTypeSel" name="ObjTypeSel" type="text" class="easyui-combobox" style="width:80px; height:25px;" panelheight="60" />
+                </td>
+                <td style="padding-left:15px;">
+                    关键字：
+                </td>
+                <td>
+                    <input id="SearchKey" name="SearchKey" type="text" style="width:80px; height:20px;" />
+                </td>
+                @if (ViewBag.admin != false)
+                {
+                    <td style="padding-left: 15px;">
+                        终端编号区间：
+                    </td>
+                    <td>
+                        <input id="StartTerNoSel" type="text" style="width: 80px;height:20px">
+                        --
+                        <input id="EndTerNoSel" type="text" style="width: 80px;height:20px">
+                    </td>
+                }
+                <td style="padding-left: 15px;">
+                    月新增设备：
+                </td>
+                <td>
+                    <input id="AddTerSel" name="AddTerSel" type="text" class="easyui-combobox" style="width:100px; height:25px;" panelheight="120" />
+                </td>
+                <td style="padding-left: 15px;">
+                    月结清设备：
+                </td>
+                <td>
+                    <input id="OverTerSel" name="OverTerSel" type="text" class="easyui-combobox" style="width:100px; height:25px;" panelheight="120" />
+                </td>
+                <td>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetTerListData()">查询</a>
+                </td>
+                <td>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="ExportData()">导出</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="AllData"></table>
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    var AllData;
+    var Sendcmd = '@ViewBag.SendCmd';
+
+    $(function () {
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height:100,
+            noheader: true,
+            style: { marginBottom: 5}
+        });
+
+        //终端类型下拉框
+        $('#TerTypeSel').combobox({
+            data: [{ "ProName": "请选择终端类型", "ProId": "-1" },
+                { "ProName": "一代无线GPS", "ProId": "0" },
+                { "ProName": "二代无线GPS", "ProId": "1" },
+                { "ProName": "Homer3M", "ProId": "2" },
+                { "ProName": "Homer3B-2", "ProId": "3" },
+                { "ProName": "五代无线GPS", "ProId": "4" },
+                { "ProName": "五代有线GPS", "ProId": "5" },
+                { "ProName": "联动设备", "ProId": "6" }],
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) == 0;
+            },
+            valueField: 'ProId',
+            textField: 'ProName',
+            onLoadSuccess: function () {
+                $('#TerTypeSel').combobox('setValue','-1');
+            }
+        });
+
+        //绑定对象类型
+        InitCarTerTypeSel();
+
+        //绑定状态类型
+        InitStateTypeSel();
+
+        //绑定工作模式
+        InitTerModelSel();
+
+        //初始化离线天数
+        InitDayNumber();
+        $("#DayPanel").hide();
+
+        //初始化停车天数
+        InitDaySpanNumber();
+        $("#DaySpanPanel").hide();
+
+        //初始新增设备月份
+        InitAddTerSel();
+
+        //初始结清设备月份
+        InitOverTerSel();
+
+        $("input, textarea, select").uniform();
+        //终端用户表格高度
+        $("#AllData").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+        loadAllData();
+
+        $("#AllDataDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" }
+            @*onLoadSuccess: function () {
+                $('#parentid').combotree('setValue', '@ViewBag.FatherID');
+            }*@
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#AllDataDeptSel'));
+
+        /*
+        $(".textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown",
+            function (e) {
+                if (e.keyCode == "13") {
+                    $('#AllDataDeptSel').combotree('tree').tree("search", $(this).val());
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        $('#AllDataDeptSel').combotree('tree').tree("collapseAll");
+                    }
+                }
+            }
+        );
+        */
+
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                GetTerListData();
+            }
+        });
+    });
+
+    //绑定对象类型
+    function InitCarTerTypeSel() {
+        var data = [
+            { "id": "1", "text": "终端编号" },
+            { "id": "2", "text": "车牌号" }
+        ];
+
+        $('#ObjTypeSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#ObjTypeSel').combobox('setValue', 1);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //绑定状态类型
+    function InitStateTypeSel() {
+        var data = [
+            { "id": "0", "text": "全部" },
+            { "id": "1", "text": "在线设备" },
+            { "id": "2", "text": "离线设备" },
+            { "id": "3", "text": "到期设备" },
+            { "id": "4", "text": "库存设备" },
+            { "id": "5", "text": "休眠设备" },
+            { "id": "6", "text": "停车设备" },
+            { "id": "7", "text": "其他设备" }
+        ];
+
+        $('#StateTypeSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onSelect: function (node) {
+                    if (node.id == "2")
+                    {
+                        $("#DayPanel").show();
+                    }
+                    else
+                    {
+                        $("#DayPanel").hide();
+                    }
+                    if (node.id == "6")
+                    {
+                        $("#DaySpanPanel").show();
+                    }
+                    else
+                    {
+                        $("#DaySpanPanel").hide();
+                    }
+                },
+                onLoadSuccess: function () {
+                    $('#StateTypeSel').combobox('setValue', 0);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //绑定工作模式
+    function InitTerModelSel() {
+        var data = [
+            { "id": "0", "text": "全部" },
+            { "id": "1", "text": "标准模式" },
+            { "id": "2", "text": "精准模式" },
+            { "id": "3", "text": "追车模式" },
+            { "id": "4", "text": "其他" }
+        ];
+
+        $('#TerModelSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#TerModelSel').combobox('setValue', 0);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //初始离线天数
+    function InitDayNumber() {
+        var data = [
+            { "id": "2.1", "text": "2天以上" },
+            { "id": "3.1", "text": "3天以上" },
+            { "id": "4.1", "text": "4天以上" },
+            { "id": "5.1", "text": "5天以上" },
+            { "id": "6.1", "text": "6天以上" },
+            { "id": "7.1", "text": "7天以上" },
+            { "id": "8.1", "text": "8天以上" },
+            { "id": "9.1", "text": "9天以上" },
+            { "id": "10.1", "text": "10天以上" },
+            { "id": "11.1", "text": "11天以上" },
+            { "id": "12.1", "text": "12天以上" },
+            { "id": "13.1", "text": "13天以上" },
+            { "id": "14.1", "text": "14天以上" },
+            { "id": "15.1", "text": "15天以上" }
+        ];
+
+        $('#DayNumber')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#DayNumber').combobox('setValue', 7.1);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //初始停车天数
+    function InitDaySpanNumber() {
+        var data = [
+            { "id": "6", "text":"全部" },
+            { "id": "0", "text":"1天之内" },
+            { "id": "1", "text":"1-2天" },
+            { "id": "2", "text":"2-3天" },
+            { "id": "3", "text":"3-4天" },
+            { "id": "4", "text":"4-5天" },
+            { "id": "5", "text":"5天以上" }
+        ];
+
+        $('#DaySpanNumber')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#DaySpanNumber').combobox('setValue', 6);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //初始化新增设备月份
+    function InitAddTerSel()
+    {
+        var data = [
+            { "id": "0", "text": "请选择月份" },
+            { "id": "1", "text": "一月" },
+            { "id": "2", "text": "二月" },
+            { "id": "3", "text": "三月" },
+            { "id": "4", "text": "四月" },
+            { "id": "5", "text": "五月" },
+            { "id": "6", "text": "六月" },
+            { "id": "7", "text": "七月" },
+            { "id": "8", "text": "八月" },
+            { "id": "9", "text": "九月" },
+            { "id": "10", "text": "十月" },
+            { "id": "11", "text": "十一月" },
+            { "id": "12", "text": "十二月" }
+        ];
+
+        $('#AddTerSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#AddTerSel').combobox('setValue', 0);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //初始化结清设备月份
+    function InitOverTerSel() {
+        var data = [
+            { "id": "0", "text": "请选择月份" },
+            { "id": "1", "text": "一月" },
+            { "id": "2", "text": "二月" },
+            { "id": "3", "text": "三月" },
+            { "id": "4", "text": "四月" },
+            { "id": "5", "text": "五月" },
+            { "id": "6", "text": "六月" },
+            { "id": "7", "text": "七月" },
+            { "id": "8", "text": "八月" },
+            { "id": "9", "text": "九月" },
+            { "id": "10", "text": "十月" },
+            { "id": "11", "text": "十一月" },
+            { "id": "12", "text": "十二月" }
+        ];
+
+        $('#OverTerSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#OverTerSel').combobox('setValue', 0);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    var toolvalue = [];
+
+    if (Sendcmd == "true") {
+        var SendCMDBtn = {
+            text: '发送命令',
+            iconCls: 'icon-add',
+            handler: function () {
+                var rows = AllData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else {
+                    var ss = rows[0].Tertypeid;
+                    var TerNo = rows[0].TerNo;
+                    if (ss == "0") {  //一代无线GPS
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "1") { //二代无线GPS
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD_New?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "2") { //Homer3M
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "3") { //Homer3B-2
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "4") { //五代无线GPS
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD_Wudai?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "5") { //五代有线GPS
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=false', { title: TerNo, width: 860, height: 500 });
+                    }
+                }
+            }
+        };
+        toolvalue.push(SendCMDBtn);
+    }
+
+    var HistoryDataBtn = {
+        text: '查看历史数据',
+        iconCls: 'icon-search',
+        handler: function () {
+            var row = AllData.datagrid('getSelected');
+            if (row) {
+                var type = row.Tertypeid;
+                var TerNo = row.TerNo;
+                var DeptId = row.Businessdivisionid;
+
+                if (type == "2" || type == "3" || type == "5") {
+                    window.parent.$.DialogOpen('/Terminal/YXHistoryData?TerNo=' + TerNo + '&DeptId=' + DeptId, { title: TerNo, width: 860, height: 550, resizable: true, modal: true });
+                }
+                else {
+                    window.parent.$.DialogOpen('/Terminal/HistoryData?TerNo=' + TerNo + '&DeptId=' + DeptId, { title: TerNo, width: 860, height: 550, resizable: true, modal: true });
+                }
+            } else {
+                window.parent.$.messager.alert('警告', '您没有选择要查看的终端', 'info');
+            }
+        }
+    };
+    toolvalue.push(HistoryDataBtn);
+
+    var MilageDataBtn = {
+        text: '查看里程',
+        iconCls: 'icon-search',
+        handler: function () {
+            var row = AllData.datagrid('getSelected');
+            if (row) {
+                var type = row.Tertypeid;
+                var TerNo = row.TerNo;
+                var DeptId = row.Businessdivisionid;
+                if (type == "2" || type == "3" || type == "5") {
+                    window.parent.$.DialogOpen('/Terminal/MilageData?TerNo=' + TerNo + '&DeptId=' + DeptId, { title: '里程统计(' + TerNo + ')', width: 560, height: 370 });
+                }
+                else {
+                    window.parent.$.messager.alert('警告', '您所选终端类型不支持查看里程', 'info');
+                }
+            } else {
+                window.parent.$.messager.alert('警告', '您没有选择要查看的终端', 'info');
+            }
+        }
+    };
+    toolvalue.push(MilageDataBtn);
+
+    function loadAllData() {
+        AllData = $('#AllData').datagrid({
+            url: '@Url.Action("GetTerData", "Terminal")',
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center', sortable: true, formatter: function (value, row) { return '<a style="color:blue;cursor:pointer;text-decoration:underline;">' + value + '</a>' } },
+                { field: 'CarNo', title: '车牌号', width: 120, align: 'center' },
+                { field: 'CarAdminName', title: '车主姓名', width: 120, align: 'center' },
+                { field: 'StateName', title: '终端状态', width: 80, align: 'center', sortable: true },
+                {
+                    field: 'Rtime', title: '回传时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                {
+                    field: 'StopLong', title: '停车时长', width: 100, align: 'center', sortable: true, formatter: function (value, row) {
+                        var longstr = "";
+                        if (parseInt(value.substring(0, value.indexOf('天'))) != 0){
+                            longstr += value.substring(0, value.indexOf('天')+1);
+                        }
+                        if (parseInt(value.substring(value.indexOf('天')+1, value.indexOf('小时'))) != 0) {
+                            longstr += value.substring(value.indexOf('天')+1, value.indexOf('小时') + 2);
+                        }
+                        if (parseInt(value.substring(value.indexOf('小时'), value.indexOf('分钟'))) != 0) {
+                            longstr += value.substring(value.indexOf('小时')+2, value.indexOf('分钟') + 2);
+                        }
+                        return longstr;
+                    }
+                },
+                { field: 'Rawdataid', title: '联动设备', width: 150, align: 'center'},
+                {
+                    field: 'ActTime', title: '最新激活时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                {
+                    field: 'ActCount', title: '激活次数', width: 150, align: 'center', formatter: function (value, row) {
+                        if (value == null)
+                        {
+                            return '<a style="color:blue;cursor:pointer;">0</a>';
+                        }
+                        else
+                        {
+                            return '<a style="color:blue;cursor:pointer;">' + value + '</a>';
+                        }
+                    }
+                },
+                {
+                    field: 'Positioningtime', title: '定位时间', width: 150, align: 'center',formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'Position', title: '地理位置', width: 300, align: 'center' },
+                {
+                    field: 'Ifposition', title: '实际定位', width: 0, align: 'center', sortable: true, formatter: function (value, row) {
+                        switch (value) {
+                            case "定位":
+                                return "GPS";
+                            case "不定位":
+                                if (row.ProName == "一代无线GPS" || row.ProName == "二代无线GPS" || row.ProName == "五代无线GPS") {
+                                    return "基站";
+                                }
+                                else {
+                                    return "否";
+                                }
+                            default:
+                                if (row.ProName == "一代无线GPS" || row.ProName == "二代无线GPS" || row.ProName == "五代无线GPS") {
+                                    return "其他";
+                                }
+                                else {
+                                    return "否";
+                                }
+                        }
+                    }
+                },
+                {
+                    field: 'TerModel', title: '设备工作模式', width: 0, align: 'center', sortable: true, formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "标准模式";
+                            case "2":
+                                return "精准模式";
+                            case "3":
+                                return "追车模式";
+                            default:
+                                return "其他";
+                        }
+                    }
+                },
+                {
+                    field: 'Ifblinddata', title: '盲区数据标志', width: 90, align: 'center', sortable: true, formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "盲区数据";
+                            default:
+                                return "正常数据";
+                        }
+                    }
+                },
+
+                { field: 'ProName', title: '终端类型', width: 120, align: 'center' },
+                {
+                    field: 'TerStatus', title: '设备状态', width: 120, align: 'center', sortable: true, formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "测试";
+                            case "2":
+                                return "待激活";
+                            case "3":
+                                return "已激活";
+                            case "4":
+                                return "已拆除";
+                            case "5":
+                                return "到期";
+                            case "6":
+                                return "休眠";
+                            case "7":
+                                return "已使用";
+                            default:
+                                return "其他";
+                        }
+                    }
+                },
+                { field: 'Businessdivisionid', title: '', width: 0, hidden: true },
+                { field: 'Businessdivisionname', title: '所属企业', width: 120, sortable: true, align: 'center' },
+                {
+                    field: 'Totalworktime', title: '工作时间', width: 60, align: 'center'
+                },
+                {
+                    field: 'Ter_Innettime', title: '入网时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                {
+                    field: 'Ter_Activetime', title: '设备激活时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'Postbacktimes', title: '回传次数', width: 110, align: 'center' },
+                { field: 'TerSimcard', title: 'SIM卡号', width: 110, align: 'center' },
+                { field: 'Latitude', title: '纬度', width: 120, align: 'center' },
+                { field: 'Longitude', title: '经度', width: 90, align: 'center' },
+                { field: 'Programverson', title: '设备软件版本', width: 90, align: 'center' },
+                { field: 'TerVbatt', title: '设备电池电压', width: 90, align: 'center' },
+                { field: 'Ntervalltime', title: '设备间隔时间', width: 90, align: 'center' },
+                { field: 'Gsmrssi', title: 'GSM信号强度', width: 0, align: 'center' },
+                { field: 'TerStatrtimes', title: '设备启动次数', width: 90, align: 'center' },
+                {
+                    field: 'Northorsouth', title: '蓝牙绑定', width: 120, align: 'center', formatter: function (value, row) {
+                        if (value == "1") {
+                            return "已绑蓝牙";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    field: 'Eastorwest', title: '蓝牙状态', width: 120, align: 'center', formatter: function (value, row) {
+                        if (value == "1") {
+                            return "正常";
+                        }
+                        else if (value == "0") {
+                            if (row.ProName == "一代无线GPS" || row.ProName == "二代无线GPS" || row.ProName == "五代无线GPS")
+                            {
+                                return "有线蓝牙断开";
+                            }
+                            else
+                            {
+                                return "蓝牙断开";
+                            }
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+
+                { field: 'Sleeptime', title: '设备休眠时间', width: 120, align: 'center' },
+                { field: 'Speed', title: 'GPS速度', width: 90, align: 'center' },
+                { field: 'Visualsatellite', title: '可视卫星颗数', width: 90, align: 'center' },
+                { field: 'Usesatellite', title: '使用卫星颗数', width: 90, align: 'center' },
+                { field: 'Height', title: 'GPS高度（海拔）', width: 120, align: 'center' },
+                { field: 'Direction', title: 'GPS方向', width: 90, align: 'center' },
+                { field: 'Blinddatanum', title: '盲区数据数量', width: 120, align: 'center' },
+                { field: 'Gpsverson', title: '设备硬件版本', width: 120, align: 'center' }
+            ]],
+            //fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            multiSort: true,
+            remoteSort:false,
+            pageList: [50, 100, 150],
+            queryParams: {  },//查询参数
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true,
+            singleSelect: true,
+            toolbar: toolvalue,
+            onClickCell: function (rowIndex, field, value)
+            {
+                if (field == "TerNo")
+                {
+                    window.parent.$.DialogOpen('/Terminal/TerInfo?TerNo=' + value, { title: '(' + value + ')详细信息', width: 650, height: 600 });
+                }
+                if (field == "ActCount")
+                {
+                    var terno = $(this).datagrid('getRows')[rowIndex].TerNo;
+                    window.parent.$.DialogOpen('/Terminal/TerActData?TerNo=' + terno, { title: terno, width: 500, height: 400 });
+                }
+            }
+        });
+    }
+   
+    //为表格增加参数重载数据
+    function GetTerListData() {
+        var DeptId = $('#AllDataDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#AllDataDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var ObjType = $('#ObjTypeSel').combobox('getValue');
+        var ObjValue = $('#SearchKey').val();
+        var ProId = $('#TerTypeSel').combobox('getValue');
+        var StateId = $('#StateTypeSel').combobox('getValue');
+        var DayNumber = $('#DayNumber').combobox('getValue');
+        var DaySpanNumber = $('#DaySpanNumber').combobox('getValue');
+        var TerModel = $('#TerModelSel').combobox('getValue');
+        var AddTerMonth = $('#AddTerSel').combobox('getValue');
+        var OverTerMonth = $('#OverTerSel').combobox('getValue');
+        var param = { ObjType: ObjType, ObjValue: ObjValue, ProId: ProId, StateId: StateId, DeptId: DeptId, ChildrenSel: Children, StartTerNo: $("#StartTerNoSel").val(), EndTerNo: $("#EndTerNoSel").val(), DayNumber: DayNumber, DaySpanNumber: DaySpanNumber, TerModel: TerModel, AddTerMonth: AddTerMonth, OverTerMonth: OverTerMonth };
+        $("#AllData").datagrid("load", param);
+    }
+
+    //导出
+    function ExportData() {
+        var DeptId = $('#AllDataDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#AllDataDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var ObjType = $('#ObjTypeSel').combobox('getValue');
+        var ObjValue = $('#SearchKey').val();
+        var ProId = $('#TerTypeSel').combobox('getValue');
+        var StateId = $('#StateTypeSel').combobox('getValue');
+        var DayNumber = $('#DayNumber').combobox('getValue');
+        var DaySpanNumber = $('#DaySpanNumber').combobox('getValue');
+        var TerModel = $('#TerModelSel').combobox('getValue');
+        var AddTerMonth = $('#AddTerSel').combobox('getValue');
+        var OverTerMonth = $('#OverTerSel').combobox('getValue');
+        var target = parent.$('#target');
+        target.loadingOverlay();
+        $.post("/Terminal/GetUpLoadTerData", { ObjType: ObjType, ObjValue: ObjValue, ProId: ProId, StateId: StateId, DeptId: DeptId, ChildrenSel: Children, StartTerNo: $("#StartTerNoSel").val(), EndTerNo: $("#EndTerNoSel").val(), DayNumber: DayNumber, DaySpanNumber: DaySpanNumber, TerModel: TerModel, AddTerMonth: AddTerMonth, OverTerMonth: OverTerMonth }, function (e) {
+            target.loadingOverlay('remove');
+            if (e.indexOf("Files") > 0) {
+                var arr = e.split(',');
+                if (arr.length == 2)
+                {
+                    window.location.href = arr[0];
+                }
+                else
+                {
+                    for (var i = 0; i < arr.length - 1; i++) {
+                        if (arr[i] != "" && arr[i] != null) {
+                            window.open(arr[i]);
+                        }
+                    }
+                }
+            } else {
+                window.parent.$.messager.alert('警告','导出失败，请重新导出！', 'info');
+            }
+        })
+    }
+</script>
+

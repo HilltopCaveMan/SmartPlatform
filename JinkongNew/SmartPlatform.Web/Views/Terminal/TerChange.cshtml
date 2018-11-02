@@ -1,0 +1,154 @@
+﻿<form>
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        <p>
+            <label>所扫设备</label>
+            <div class="field">
+                <input id="ScanTers" type="text" onchange="GetScanTers()" placeholder=""/>
+            </div>
+        </p>
+        <br />
+        <div>
+            <table id="SelectTer"></table>
+        </div>
+        <br />
+        <p>
+            <label><i style="color:red;">*</i>流转到企业</label>
+            <div class="field">
+                <input name="ExChangeDeptId" id="ExChangeDeptId" class="textbox" type="text" style="height:30px;" />
+                <b>
+                </b>
+            </div>
+        </p>
+    </div>
+
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" type="button" id="search" onclick="ExChange()">确定</button>
+    </div>
+</form>
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script type="text/javascript" language="javascript">
+    var cnt = 0;
+    var arrters = [];
+    var terguids = "";
+    $(function () {
+        $("input, textarea, select").uniform();
+        $("#ScanTers").focus();
+        //流转到的企业
+        $("#ExChangeDeptId").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true
+        });
+        LoadDataTable();
+        BindSearchEvent($(".textbox-text"), $('#ExChangeDeptId'));
+    })
+    function GetScanTers()
+    {
+        var ter = $("#ScanTers").val();
+        if (ter.length == 15)
+        {
+            var newter = $("#ScanTers").val().substring(4);
+            if (arrters.indexOf(newter) == -1) {
+                arrters.push(newter);
+                LoadDataTable();
+            }
+        }
+        else if (ter.length == 11) {
+            var newter = $("#ScanTers").val().substring(0);
+            if (arrters.indexOf(newter) == -1) {
+                arrters.push(newter);
+                LoadDataTable();
+            }
+        }
+        else {
+            window.parent.$.messager.alert("提示", "无效的设备号,只支持11位或15位设备号！", "info");
+            $("#ScanTers").focus();
+        }
+        $("#ScanTers").val('')
+    }
+
+    function LoadDataTable()
+    {
+        TerminalData = $('#SelectTer').datagrid({
+            url: '@Url.Action("GetSelectTerList", "Terminal")',
+            columns: [[
+                { field: 'TerGuid', title: '', width: 0, hidden: true },
+                { field: 'TerNo', title: '终端编号', width: 80, align: 'center' },
+                { field: 'ProName', title: '终端类型', width: 80, align: 'center' },
+                { field: 'DeptId', title: '', width: 0, hidden: true },
+                { field: 'Businessdivisionname', title: '所属企业', width: 80, align: 'center' }
+            ]],
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: false, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            pageList: [10, 20, 30],//分页中下拉选项的数值
+            singleSelect: true,
+            width:'510px;',
+            queryParams: { "SelectTers": arrters.join(',') },//查询参数
+            onLoadSuccess: function (data)
+            {
+                terguids = "";
+                if (data.rows.length > 0) 
+                {
+                    for (var i = 0; i < data.rows.length;i++)
+                    {
+                        var terguid=data.rows[i].TerGuid;
+                        if (terguid != "")
+                        {
+                            terguids += terguid+","
+                        }
+                    }
+                }
+            },
+            toolbar: [{
+                text: '移除',
+                iconCls: 'icon-remove',
+                handler: function () {
+                    var rows = TerminalData.datagrid('getSelections');
+                    if (rows.length <= 0) {
+                        window.parent.$.messager.alert('警告', '您没有选择要移除的终端', 'error');
+                    }
+                    else {
+                        var terno = rows[0].TerNo;
+                        window.parent.$.messager.confirm('确定', '您确定要移除吗', function (t) {
+                            if (t) {
+                                if (arrters.indexOf(terno) > -1) {
+                                    arrters.splice(arrters.indexOf(terno), 1);
+                                    LoadDataTable();
+                                }
+                            }
+                        });
+                    }
+                }
+            }]
+        });
+    }
+
+    function ExChange() {
+        var DeptId = $("#ExChangeDeptId").combotree('getValue');
+        $.post("/Terminal/TerExChangeForm", { DeptId: DeptId, TerGuid: terguids }, function (e) {
+            if (e > 0) {
+                var ifr = window.parent.document.getElementById('/Terminal/TerminalIndex');
+                var win = ifr.window || ifr.contentWindow;
+                win.$('#TerminalTable').datagrid('reload');
+                window.parent.$(".dialog").dialog('close');
+                window.parent.$.messager.show({
+                    title: '提示',
+                    msg: "流转成功！",
+                    timeout: 2000
+                });
+            } else {
+                window.parent.$.messager.show({
+                    title: '提示',
+                    msg: "流转失败！",
+                    timeout: 2000
+                });
+            }
+        });
+    }
+
+</script>

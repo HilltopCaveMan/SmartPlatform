@@ -1,0 +1,345 @@
+﻿
+<div id="mapdiv">
+    <div id="MapContainer">
+        <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+        <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+    </div>
+    <div id="map-TrailNew" style="height:100%;float:left;width:70%;">
+    </div>
+    <div style="height:100%;float:left;width:30%;background:#fff;">
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" /> 
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">回传时间</th>
+                    <th class="head1">当前位置</th>
+                    @*//<th class="head1">车牌号</th>*@
+                    <th class="head0">终端编号</th>
+                    <th class="head1">终端状态</th>
+                    <th class="head0">定位方式</th>
+                    <th class="head1">纬度</th>
+                    <th class="head0">经度</th>
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=3xyzXPzwlGKFZWULrsKdioWb"></script>
+<link href="~/assets/BMapLib/DrawingManager_min.css" rel="stylesheet" />
+<link href="~/assets/BMapLib/SearchInfoWindow_min.css" rel="stylesheet" />
+<script src="~/assets/BMapLib/SearchInfoWindow_min.js"></script>
+<script src="~/assets/BMapLib/DrawingManager.js"></script>
+<script src="~/assets/javascripts/DrawingManager_min.js"></script>
+<script src="~/assets/javascripts/DistanceTool_min.js"></script>
+<script src="~/assets/javascripts/TextIconOverlay_min.js"></script>
+<script src="~/assets/javascripts/MarkerClusterer_min.js"></script>
+<script type="text/javascript" language="javascript">
+    var data = null;
+    var sh;
+    var count = 0;
+    var PLAYSTATU = "stop";
+    var BeginTime;
+    var EndTime;
+    var Spend;
+    var CarTable, tableHeight;
+    var datapic = [];
+    var points = new Array();   //坐标数组
+    var lineList = new Array();//记录要绘制的线
+    var arrowLineList = new Array();//记录绘制的箭头线
+    var arrowLineLengthRate = 15 / 10;//15是你初始时设置的地图显示范围，10是你初始时设置的箭头的长度，当地图放大缩小时保证箭头线长度一致
+
+    // 百度地图API功能
+    var BmarkerClusterer = null;
+    var map = new BMap.Map("map-TrailNew");
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 15);
+    map.addControl(new BMap.NavigationControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));
+    map.addControl(new BMap.MapTypeControl({ anchor: BMAP_ANCHOR_TOP_LEFT }));
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    var myDis = new BMapLib.DistanceTool(map);
+    map.clearOverlays();
+    var opts = {
+        enableMessage: false//设置不允许信息窗发送短息
+    };
+
+    $(function () {
+        $('#mapdiv').height(window.innerHeight);
+        tableHeight = $('#mapdiv').height() - 115;
+        jQuery("input, textarea, select").uniform();
+        $.ajax({
+            url: "/HistoryTrail/GetRealtimeData",
+            data: { TerNo: '@ViewBag.TerNo' },
+            type: "POST",
+            success: function (data) {
+                var realdata = eval('[' + data + ']'); 
+                var point = new BMap.Point(realdata[0].BaiduLongitude, realdata[0].BaiduLatitude);
+                map.centerAndZoom(point, 15);
+                points.push(point); //标注数组
+                var marker = new BMap.Marker(point);
+                map.setCenter(point);
+                map.addOverlay(marker); 
+                CarTable = $('#dyntable').DataTable();
+                CarTable.destroy();
+                datapic.push(realdata[0]);  //将对象添加到数组中
+                LoadDataTable(datapic);
+                window.setTimeout("GetData('@ViewBag.TerNo')", 5000);
+            }, error: function (data) {
+                window.setTimeout("GetData('@ViewBag.TerNo')", 5000);
+            }
+        })
+    })
+
+    function GetData(TerNo) {
+        $.ajax({
+            url: "/HistoryTrail/GetRealtimeData",
+            data: { TerNo: TerNo },
+            type: "POST",
+            success: function (data) {
+                var realdata = eval('[' + data + ']');
+                if (realdata[0].Rtime != datapic[datapic.length - 1].Rtime) { //判断时间是否相等
+                    var point = new BMap.Point(realdata[0].BaiduLongitude, realdata[0].BaiduLatitude);
+                    var mapLatLngBounds = map.getBounds(); //获取边界
+                    if (!mapLatLngBounds.containsPoint(point)) {
+                        map.panTo(point);
+                    }
+                    points.push(point);
+                    Polyline = new BMap.Polyline(points, {
+                        strokeColor: "#000", strokeWeight: 3, strokeOpacity: 0.8
+                    });
+                    datapic.push(realdata[0]);
+                    CarTable = $('#dyntable').DataTable();
+                    CarTable.destroy();
+                    LoadDataTable(datapic);
+                    myIcon = new BMap.Icon("../assets/images/Cirle.png", new BMap.Size(15, 10));
+                    marker = new BMap.Marker(point, { icon: myIcon }, { offset: new BMap.Size(20, 50) });
+                    map.addOverlay(marker);
+                    map.addOverlay(Polyline);
+                    //画箭头
+                    //lineList[lineList.length] = Polyline;//记录要绘制的线
+                    //arrowLineList[arrowLineList.length] = addArrow(Polyline,10,Math.PI / 7);//记录绘制的箭头线
+                }
+                window.setTimeout("GetData('" + TerNo + "')", 5000);
+            }, error: function (data) {
+                window.setTimeout("GetData('" + TerNo + "')", 5000);
+            }
+        });
+    }
+
+    map.addEventListener("tilesloaded", function () {
+        //清除上一次绘制的箭头线，不清除上一次的箭头线，当地图放大时箭头线也会跟着放大
+        //for (var i = 0; i < arrowLineList.length; i++) {
+        //    map.removeOverlay(arrowLineList[i]);//清除制定的覆盖物，可以是直线、标注等
+        //}
+        //arrowLineList.length = 0;
+        //重新绘制箭头线
+        //for (var i = 0; i < lineList.length; i++) {
+        //    arrowLineList[arrowLineList.length] = addArrow(lineList[i], 15 / arrowLineLengthRate, Math.PI / 7);//记录绘制的箭头线
+        //}
+    });
+
+    //画箭头
+    function addArrow(polyline, length, angleValue) { //绘制箭头的函数  
+        var linePoint = polyline.getPath();//线的坐标串  
+        var arrowCount = linePoint.length;
+        for (var i = 1; i < arrowCount; i++) { //在拐点处绘制箭头  
+            var pixelStart = map.pointToPixel(linePoint[i - 1]);
+            var pixelEnd = map.pointToPixel(linePoint[i]);
+            var angle = angleValue;//箭头和主线的夹角  
+            var r = length; // r/Math.sin(angle)代表箭头长度  
+            var delta = 0; //主线斜率，垂直时无斜率  
+            var param = 0; //代码简洁考虑  
+            var pixelTemX, pixelTemY;//临时点坐标  
+            var pixelX, pixelY, pixelX1, pixelY1;//箭头两个点  
+            if (pixelEnd.x - pixelStart.x == 0) { //斜率不存在是时  
+                pixelTemX = pixelEnd.x;
+                if (pixelEnd.y > pixelStart.y) {
+                    pixelTemY = pixelEnd.y - r;
+                }
+                else {
+                    pixelTemY = pixelEnd.y + r;
+                }
+                //已知直角三角形两个点坐标及其中一个角，求另外一个点坐标算法  
+                pixelX = pixelTemX - r * Math.tan(angle);
+                pixelX1 = pixelTemX + r * Math.tan(angle);
+                pixelY = pixelY1 = pixelTemY;
+            }
+            else  //斜率存在时  
+            {
+                delta = (pixelEnd.y - pixelStart.y) / (pixelEnd.x - pixelStart.x);
+                param = Math.sqrt(delta * delta + 1);
+
+                if ((pixelEnd.x - pixelStart.x) < 0) //第二、三象限  
+                {
+                    pixelTemX = pixelEnd.x + r / param;
+                    pixelTemY = pixelEnd.y + delta * r / param;
+                }
+                else//第一、四象限  
+                {
+                    pixelTemX = pixelEnd.x - r / param;
+                    pixelTemY = pixelEnd.y - delta * r / param;
+                }
+                //已知直角三角形两个点坐标及其中一个角，求另外一个点坐标算法  
+                pixelX = pixelTemX + Math.tan(angle) * r * delta / param;
+                pixelY = pixelTemY - Math.tan(angle) * r / param;
+
+                pixelX1 = pixelTemX - Math.tan(angle) * r * delta / param;
+                pixelY1 = pixelTemY + Math.tan(angle) * r / param;
+            }
+
+            var pointArrow = map.pixelToPoint(new BMap.Pixel(pixelX, pixelY));
+            var pointArrow1 = map.pixelToPoint(new BMap.Pixel(pixelX1, pixelY1));
+            var Arrow = new BMap.Polyline([
+                pointArrow,
+             linePoint[i],
+                pointArrow1
+            ], { strokeColor: "blue", strokeWeight: 3, strokeOpacity: 0.5 });
+            map.addOverlay(Arrow);
+        }
+    }
+
+    //百度地图 标记点击事件
+    function addClickHandler(sContent, marker) {
+        marker.addEventListener("click", function (e) {
+            openInfo(sContent, e)
+        });
+    };
+    //信息窗口
+    function openInfo(sContent, e) {
+        var p = e.target;
+        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+        var infoWindow = new BMap.InfoWindow(sContent, opts);  // 创建信息窗口对象
+        map.openInfoWindow(infoWindow, point); //开启信息窗口
+    };
+    function LoadDataTable(data) { 
+        CarTable = $('#dyntable').dataTable({
+            language: {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "search": "模糊查询",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "前一页",
+                    "sNext": "后一页",
+                    "sLast": "末页"
+                }
+            },
+            "dom":
+                    "<'row'<'span12'l>r>" +
+                    "t" +
+                    "<'row'<'span6'i><'span6'p>>",
+            data: data,
+            columns: [
+        { "data": "Rtime" },
+        { "data": "Position" },
+        { "data": "TerNo" },
+        {
+            "data": "TerStatus", "render": function (data, type, full, meta) {
+                switch (data) {
+                    case "1":
+                        return "测试";
+                        break;
+                    case "2":
+                        return "待激活";
+                        break;
+                    case "3":
+                        return "已激活";
+                        break;
+                    case "4":
+                        return "已拆除";
+                        break;
+                    default:
+                        return "其他";
+                        break;
+
+                }
+
+                //return type === 'display' && data.length > 40 ?
+                //'<span title="' + data + '">' + data.substr(0, 38) + '...</span>' :
+                //data;
+            }
+        },
+        { "data": "Ifposition" },
+        { "data": "BaiduLatitude" },
+        { "data": "BaiduLongitude" }
+            ],
+            "columnDefs": [{
+                targets: [0],
+                orderData: [0, 1]  //如果第一列进行排序，有相同数据则按照第二列顺序排列
+            }, {
+                targets: [1],
+                orderData: [1, 0]  //如果第二列进行排序，有相同数据则按照第一列顺序排列
+            }, {
+                targets: [2],
+                orderData: [2, 0]  //如果第五列进行排序，有相同数据则按照第一列顺序排列
+            }],
+            lengthChange: true,
+            pageLength: 10,
+            pagingType: "full_numbers",
+            scrollX: true,
+            scrollY: tableHeight,
+            ordering: true,
+            "order": [[0, 'desc'], [2, 'asc']]
+        });
+    }
+
+    //调用百度地图
+    function BaiDuMap() {
+        @*var terno = '@ViewBag.TerNo'
+        window.open("/HistoryTrail/BDRealTrail?TerNo=" + terno);
+        window.close();*@
+        $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+        $("#BaiDuMap").css({ "background": "#0094ff", "color": "#ffffff" });
+    }
+    //调用谷歌地图
+    function GoogleMap() {
+        var terno = '@ViewBag.TerNo'
+        window.open("/HistoryTrail/RealTrail?TerNo=" + terno);
+        window.close();
+        $("#GoogleMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#BaiDuMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+</script>
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 13px;
+        right: 600px;
+        border: 1px solid #999;
+    }
+
+    #MapContainer div {
+        width: 75px;
+        float: left;
+        text-align: center;
+    }
+
+    #BaiDuMap {
+        cursor: pointer;
+        color: #fff;
+        background: #0094ff;
+    }
+
+    #GoogleMap {
+        cursor: pointer;
+        background: #ffffff;
+        color: #797070;
+    }
+</style>

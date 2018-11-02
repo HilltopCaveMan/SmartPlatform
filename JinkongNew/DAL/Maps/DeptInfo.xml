@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="DeptInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="DeptInfo" type="GModel.Basic.DeptInfo" />
+  </alias>
+  <resultMaps>
+    <resultMap id="DeptInfoResult" class="DeptInfo">
+      <result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+      <result property="Fatherid" column="Fatherid" type="string" dbType="varchar"/>
+      <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+      <result property="Isdel" column="Isdel" type="string" dbType="varchar"/>
+      <result property="DepType" column="DepType" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectDeptInfo" parameterClass="string" resultMap="DeptInfoResult">
+      SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,FATHERID AS Fatherid,BUSINESSDIVISIONCODE AS Businessdivisioncode,ISDEL AS Isdel,DEPTYPE AS DepType
+      FROM DEPT_INFO WHERE ISDEL='0' AND BUSINESSDIVISIONID = #value#
+    </select>
+    <select id="SelectDeptInfoByCode" parameterClass="string" resultMap="DeptInfoResult">
+      SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,FATHERID AS Fatherid,BUSINESSDIVISIONCODE AS Businessdivisioncode,ISDEL AS Isdel,DEPTYPE AS DepType
+      FROM DEPT_INFO WHERE ISDEL='0' AND BUSINESSDIVISIONCODE = #value#
+    </select>
+    <select id="SelectDeptInfoPage" parameterClass="map" resultMap="DeptInfoResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,FATHERID AS Fatherid,BUSINESSDIVISIONCODE AS Businessdivisioncode,ISDEL AS Isdel,DEPTYPE AS DepType
+      FROM DEPT_INFO WHERE  ISDEL='0'
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    <select id="SelectDeptInfoCount" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM DEPT_INFO WHERE ISDEL='0'
+    </select>
+    <!--根据企业名称查询企业是否存在-->
+    <select id="SelectDeptCountByDeptName" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM DEPT_INFO WHERE ISDEL='0' AND BUSINESSDIVISIONNAME=#value#
+    </select>
+    <insert id="InsertDeptInfo" parameterClass="DeptInfo">
+      INSERT INTO DEPT_INFO
+      (BUSINESSDIVISIONID,BUSINESSDIVISIONNAME,FATHERID,BUSINESSDIVISIONCODE,ISDEL,DEPTYPE)
+      VALUES(sys_guid(),#Businessdivisionname#,#Fatherid#,#Businessdivisioncode#,'0',#DepType#)
+    </insert>
+    <!--修改部门,不修改部门编码-->
+    <update id="UpdateDeptInfo" parameterClass="string">
+      UPDATE DEPT_INFO
+      SET BUSINESSDIVISIONNAME=#Businessdivisionname#,FATHERID=#Fatherid#,BUSINESSDIVISIONCODE=#Businessdivisioncode#
+      WHERE ISDEL='0' AND BUSINESSDIVISIONID=#Businessdivisionid#
+    </update>
+    <!--修改部门,包括部门编码-->
+    <update id="UpdateDeptInfoInCode" parameterClass="string">
+      UPDATE DEPT_INFO
+      SET BUSINESSDIVISIONNAME=#Businessdivisionname#,FATHERID=#Fatherid#,BUSINESSDIVISIONCODE=#Businessdivisioncode#
+      WHERE ISDEL='0'  AND BUSINESSDIVISIONID=#Businessdivisionid# 
+    </update>
+    <!--找出部门,最大的部门编码-->
+    <select id="SelectMaxCodeDeptInfo" parameterClass="string" resultMap="DeptInfoResult">
+      SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,FATHERID AS Fatherid,BUSINESSDIVISIONCODE AS Businessdivisioncode,ISDEL AS Isdel,DEPTYPE AS DepType
+      FROM DEPT_INFO WHERE length(BUSINESSDIVISIONCODE)&lt;=(length(#value#)+4) and BUSINESSDIVISIONCODE LIKE #value#||'%' and ISDEL=0 ORDER BY businessdivisioncode desc
+    </select>
+
+    <!--找出部门和他的子部门-->
+    <select id="SelectChildDeptInfo" parameterClass="string" resultMap="DeptInfoResult">
+      SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,FATHERID AS Fatherid,BUSINESSDIVISIONCODE AS Businessdivisioncode,ISDEL AS Isdel,DEPTYPE AS DepType
+      FROM DEPT_INFO WHERE FATHERID=#value# and ISDEL=0 ORDER BY businessdivisioncode asc
+    </select>
+    
+    <!--假删除,根据企业ID-->
+    <update id="DeleteDeptInfo" parameterClass="string">
+      UPDATE DEPT_INFO
+      SET ISDEL='1' WHERE BUSINESSDIVISIONID =#value#
+    </update>
+
+    <!--假删除,根据企业ID，包括所有子企业-->
+    <update id="DeleteDeptByDeptId" parameterClass="string" >
+      UPDATE DEPT_INFO DI SET DI.ISDEL='1' 
+      WHERE DI.BUSINESSDIVISIONID IN
+      (
+      SELECT TA.BUSINESSDIVISIONID
+      FROM DEPT_INFO TA
+      JOIN (SELECT DI.BUSINESSDIVISIONCODE
+      FROM DEPT_INFO DI
+      WHERE DI.BUSINESSDIVISIONID =
+      #value#) TB
+      ON TA.BUSINESSDIVISIONCODE LIKE TB.BUSINESSDIVISIONCODE || '%'
+      AND TA.ISDEL = '0')
+    </update>
+    
+
+    <!--查询所有未删除的部门-->
+    <select id="SelectDeptData" resultClass="int">
+      SELECT d.*,fd.BUSINESSDIVISIONNAME as FBUSINESSDIVISIONNAME ,fd.BUSINESSDIVISIONCODE as FBUSINESSDIVISIONCODE,fd.BUSINESSDIVISIONNAME
+      FROM DEPT_INFO d left join DEPT_INFO fd on d.BUSINESSDIVISIONID=d.FATHERID WHERE d.ISDEL='0'
+    </select>
+    <!--查询某企业下的最大部门编号-->
+    <select id="SelectAllChildrenDeptInfo" parameterClass="string" resultMap="DeptInfoResult">
+      SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,FATHERID AS Fatherid,BUSINESSDIVISIONCODE AS Businessdivisioncode,ISDEL AS Isdel,DEPTYPE AS DepType
+      FROM DEPT_INFO WHERE length(BUSINESSDIVISIONCODE)&lt;=(length(#value#)+4) and BUSINESSDIVISIONCODE LIKE #value#||'%' and ISDEL=0 ORDER BY businessdivisioncode asc
+    </select>
+    <!--查询某企业下的子企业数量-->
+    <select id="SelectDeptInfoCountByFatherId" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM DEPT_INFO WHERE  ISDEL='0' AND FATHERID=#value#
+    </select>
+  </statements>
+</sqlMap>

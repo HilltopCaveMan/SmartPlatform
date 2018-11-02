@@ -1,0 +1,34 @@
+﻿
+<div style="width:150px;height:300px;position:absolute;top:30px;left:10px;z-index:1000;">
+    <table id="vlb" data-options="rownumbers:true,singleSelect:true,toolbar:''" style="width:150px;height:300px;">
+        <thead>
+            <tr>
+                <th data-options="field:'f1',width:120">车辆编号</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div id="allmap">
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#vlb').datagrid({
+            data: [
+                { f1: 'FTC003RFCDZ0' },
+                { f1: 'FTC003RFCDZ0' },
+                { f1: 'FTC003RFCDZ0' },
+                { f1: 'FTC003RFCDZ0' },
+                { f1: 'FTC003RFCDZ0' }
+            ],
+            rownumbers: true,
+            singleSelect: true
+        });
+    })
+
+
+</script>
+
+
+<iframe src="~/assets/BMapLib/2.html" width="700" height="600" style="margin-left:280px"></iframe>
+

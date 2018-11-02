@@ -1,0 +1,81 @@
+﻿<div class="topheader">
+    <div class="container">
+        <ul class="nav-left">
+            <li class="nav-li">欢迎您！</li>
+            <li class="nav-li">
+                <div class="userinfo">
+                    <span class="username">@Session["UserName"]</span>
+                    <i class="arrow"></i>
+                    <div class="userinfodrop">
+                        <div class="avatar">
+                            <img src="~/Content/Images/userphoto.jpg" width="85" />
+                            <div class="changetheme">
+                                <a class="default"></a>
+                                <a class="blueline"></a>
+                                <a class="greenline"></a>
+                                <a class="contrast"></a>
+                                <a class="custombg"></a>
+                            </div>
+                        </div><!--avatar-->
+                        <div class="userdata">
+                            <span class="email">youremail@yourdomain.com</span>
+                            <ul>
+                                <li><a id="editPWD" href="#" onclick="editPWD()">修改密码</a></li>
+                                <li><a id="exit" href="#">退出</a></li>
+                            </ul>
+                        </div><!--userdata-->
+                    </div><!--userinfodrop-->
+                </div>
+            </li>
+            <li class="nav-li"><a class="aexit" href="#" onclick="exit()">[&nbsp;退出&nbsp;]</a></li>
+        </ul>
+        @*<ul class="nav-right">
+                <li class="nav-li" style="padding:0 10px">客服电话：010-82118388</li>
+            </ul>*@
+    </div>
+</div><!--topheader-->
+
+<nav class="headernav headerborder header3 stylemanger" id="header">
+    <div class="headercontainer">
+        <div class="headlogo">
+            <img src="~/Content/Images/carwebLogo_index.png" height="50" />
+        </div>
+    </div>
+    <div class="headerright">
+        <ul id="SUL" class="profile_summary  navbar-right">
+            <li id="SCLJK"><a href="/CarMonitor/BDMonitorIndex_511" style="font-size:14px;">车辆监控</a></li>
+            @*<li id="SZDJK"><a href="/Terminal/TerminalMonitor" style="font-size:14px;">终端监控</a></li>*@
+            <li id="STJBB"><a href="/CarReport/Index" style="font-size:14px;">统计报表</a></li>
+            <li id="SXTGL"><a href="/Home/Index" class="active" style="font-size:14px;">系统管理</a></li>
+        </ul>
+    </div>
+</nav>
+<!--header-->
+<script type="text/javascript" language="javascript">
+    window.setInterval(function () {
+        $.ajax({
+            type: 'post',
+            url: '/Home/GetSession',
+            success: function (data) {
+                var sessionResult = data;
+                if (sessionResult == "登录失效") {
+                    $.messager.confirm('确定', '登录超时，请重新登录', function (t) {
+                        window.location.href = "/Account/Login";
+                    })
+
+                }
+
+            }
+        });
+    }, 30000);
+    function exit() {
+        $.ajax({
+            type: 'post',
+            url: '/Account/UserCance',
+            success: function (data) {
+                window.location.href = "/Account/Login";
+
+            }
+        });
+    }
+</script>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="TerminalInfoView" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="TerminalInfoView" type="GModel.Car.TerminalInfoView" />
+  </alias>
+  <resultMaps>
+    <resultMap id="TerminalInfoViewResult" class="TerminalInfoView">
+      <result property="TerGuid" column="TerGuid" type="string" dbType="varchar"/>
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+      <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+      <result property="TerSoftver" column="TerSoftver" type="string" dbType="varchar"/>
+      <result property="TerHardver" column="TerHardver" type="string" dbType="varchar"/>
+      <result property="TerState" column="TerState" type="string" dbType="varchar"/>
+      <result property="TerSimcard" column="TerSimcard" type="string" dbType="varchar"/>
+      <result property="TerInnettime" column="TerInnettime" type="DateTime" dbType="DateTime"/>
+      <result property="TerTypeid" column="TerTypeid" type="string" dbType="varchar"/>
+      <result property="ProId" column="ProId" type="string" dbType="varchar"/>
+      <result property="ProModel" column="ProModel" type="string" dbType="varchar"/>
+      <result property="ProName" column="ProName" type="string" dbType="varchar"/>
+      <result property="CarId" column="CarId" type="string" dbType="varchar"/>
+      <result property="CarNo" column="CarNo" type="string" dbType="varchar"/>
+      <result property="CarAdminName" column="CarAdminName" type="string" dbType="varchar"/>
+      <result property="TerPctline" column="TerPctline" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectTerminalInfoView" parameterClass="string" resultMap="TerminalInfoViewResult">
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      TER_SOFTVER AS TerSoftver,TER_HARDVER AS TerHardver,TER_STATE AS TerState,TER_SIMCARD AS TerSimcard,TER_INNETTIME AS TerInnettime,
+      TER_TYPEID AS TerTypeid,PRO_ID AS ProId,PRO_MODEL AS ProModel,PRO_NAME AS ProName,CAR_ID AS CarId,CAR_NO AS CarNo,CAR_ADMINNAME AS CarAdminName,WORKSTATE as TerPctline
+      FROM TERMINAL_INFO_VIEW
+    </select>
+    <select id="SelectTerminalInfoViewPage" parameterClass="map" resultMap="TerminalInfoViewResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      TER_SOFTVER AS TerSoftver,TER_HARDVER AS TerHardver,TER_STATE AS TerState,TER_SIMCARD AS TerSimcard,TER_INNETTIME AS TerInnettime,TER_TYPEID AS TerTypeid,
+      PRO_ID AS ProId,PRO_MODEL AS ProModel,PRO_NAME AS ProName,CAR_ID AS CarId,CAR_NO AS CarNo,CAR_ADMINNAME AS CarAdminName,WORKSTATE as TerPctline
+      FROM TERMINAL_INFO_VIEW WHERE 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TER_NO like '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="CarAdminName">
+          CAR_ADMINNAME like '%'||#CarAdminName#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <!--<isNotEmpty prepend="AND" property="CarId">
+          CAR_ID = #CarId#
+        </isNotEmpty>-->
+        <isNotEmpty prepend="AND" property="Bind">
+          CAR_ID IS NOT NULL
+        </isNotEmpty>
+
+        <isNotEmpty prepend="AND" property="NotBind">
+          CAR_ID IS NULL
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ProId">
+          PRO_ID = #ProId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          BUSINESSDIVISIONCODE LIKE #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="OR" property="CheckTernos">
+          TER_NO in ($CheckTernos$)
+        </isNotEmpty>
+    </dynamic>
+      ORDER BY TER_NO ASC
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+    <select id="SelectTerminalInfoViewCount" parameterClass="map" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO_VIEW where 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TER_NO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="CarAdminName">
+          CAR_ADMINNAME like '%'||#CarAdminName#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <!--<isNotEmpty prepend="AND" property="CarId">
+          CAR_ID = #CarId#
+        </isNotEmpty>-->
+        <isNotEmpty prepend="AND" property="Bind">
+          CAR_ID IS NOT NULL
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="NotBind">
+          CAR_ID IS NULL
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ProId">
+          PRO_ID = #ProId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          BUSINESSDIVISIONCODE LIKE #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="OR" property="CheckTernos">
+          TER_NO in ($CheckTernos$)
+        </isNotEmpty>
+      </dynamic>
+    </select>
+
+
+    <select id="SelectNotBindTerminalInfoViewPage" parameterClass="map" resultMap="TerminalInfoViewResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT TI.TER_GUID AS TerGuid,
+      TI.TER_NO AS TerNo,
+      TI.DEPT_ID AS DeptId,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      TI.TER_SOFTVER AS TerSoftver,
+      TI.TER_HARDVER AS TerHardver,
+      TI.TER_STATE AS TerState,
+      TI.TER_SIMCARD AS TerSimcard,
+      TI.TER_INNETTIME AS TerInnettime,
+      TI.TER_TYPEID AS TerTypeid,
+      PI.PRO_ID AS ProId,
+      PI.PRO_MODEL AS ProModel,
+      PI.PRO_NAME AS ProName,
+      CI.CAR_ID AS CarId,
+      CI.CAR_NO AS CarNo,
+      CI.CAR_ADMINNAME AS CarAdminName,
+      RD.WORKSTATE as TerPctline
+      FROM TERMINAL_INFO TI
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      JOIN PRODUCTS_INFO PI
+      ON TI.TER_TYPEID = PI.PRO_ID
+      LEFT JOIN CAR_INFO CI
+      ON TI.CAR_ID = CI.CAR_ID
+      LEFT JOIN REALTIME_DATA RD
+      ON RD.TER_NO=TI.TER_NO WHERE (CI.CAR_ID is null or CI.CAR_ID='')
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TI.TER_NO like '%'|| #TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="CarId">
+          CAR_ID = #CarId#
+        </isNotEmpty>
+      </dynamic>
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    <select id="SelectNotBindTerminalInfoViewCount" parameterClass="map" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO TI
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      JOIN PRODUCTS_INFO PI
+      ON TI.TER_TYPEID = PI.PRO_ID
+      LEFT JOIN CAR_INFO CI
+      ON TI.CAR_ID = CI.CAR_ID
+      LEFT JOIN REALTIME_DATA RD
+      ON RD.TER_NO=TI.TER_NO WHERE (CI.CAR_ID is null or CI.CAR_ID='')
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TER_NO like '%'|| #TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="CarId">
+          CAR_ID = #CarId#
+        </isNotEmpty>
+      </dynamic>
+    </select>
+    <select id="SelectTerminalInfoViewByTerNos" parameterClass="string" resultMap="TerminalInfoViewResult">
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      TER_SOFTVER AS TerSoftver,TER_HARDVER AS TerHardver,TER_STATE AS TerState,TER_SIMCARD AS TerSimcard,TER_INNETTIME AS TerInnettime,
+      TER_TYPEID AS TerTypeid,PRO_ID AS ProId,PRO_MODEL AS ProModel,PRO_NAME AS ProName,CAR_ID AS CarId,CAR_NO AS CarNo,CAR_ADMINNAME AS CarAdminName,WORKSTATE as TerPctline
+      FROM TERMINAL_INFO_VIEW WHERE TER_NO in ($value$)
+    </select>
+    <select id="SelectTerminalInfoViewByTerNosCount" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO_VIEW WHERE TER_NO in ($value$)
+    </select>
+  </statements>
+</sqlMap>

@@ -1,0 +1,505 @@
+﻿<div id="contentwrapper" class="contentwrapper withrightpanel">
+    <div id="MapContainer">
+        <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+        <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+    </div>
+    <div id="div_RailMap" style="height:550px;"></div>
+</div><!--contentwrapper-->
+<div class="rightpanel12">
+    <div class="rightpanelinner">
+        <div class="widgetbox uncollapsible">
+            <div class="title"><h4>终端编号</h4></div>
+            <div class="widgetcontent nopadding">
+                <div class="chatsearch">
+                    <input id="search" type="text" value="终端号(为空时,点回车显示全部)..." onblur="javascript: $('#search').val('终端号(为空时,点回车显示全部)...');" onfocus="javascript: $('#search').val('');" alt="搜索框为空时,点回车显示全部"/>
+                </div>
+                <div class="box-scroll">
+                    <div style="height:auto;">
+                        <a href="#" class="easyui-linkbutton" onclick="DelRail()" iconcls="icon-remove" plain="false">删除</a>
+                        <a href="#" class="easyui-linkbutton" onclick="DeleteOverly()" iconcls="icon-search" plain="false">清除地图覆盖物</a>
+
+                        @*<a href="#" class="easyui-linkbutton" onclick="SelectCar()" iconcls="icon-add" plain="true">选择车辆</a>
+                        <a href="#" class="easyui-linkbutton" onclick="LookCar()" iconcls="icon-search" plain="true">查看车辆</a>*@
+                    </div>
+                    <ul id="RailList" class="contactlist">
+                        @*<li class="online"><a href=""><img src="~/assets/images/05.png" /> <span>围栏一</span></a><span class="msgcount">3</span></li>
+                        <li class="online"><a href=""><img src="~/assets/images/05.png" /> <span>围栏二</span></a><span class="msgcount">1</span></li>*@
+                    </ul>
+                </div>
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
+    </div><!--rightpanelinner-->
+</div><!--rightpanel-->
+<input type="hidden" id="hid_PointVal" />
+<input type="hidden" id="hid_Type" />
+<input type="hidden" id="hid_AreaId" />
+<input type="hidden" id="hid_AreaMaptype" value="2"/>
+<input type="hidden" id="hid_TerNoStr"/>
+<input type="hidden" id="hid_CenterloglatZoom" />
+<script src="http://maps.google.cn/maps/api/js?sensor=false&language=zh-CN&libraries=drawing"></script>
+<script src="~/assets/javascripts/markerclusterer.js"></script>
+<script src="~/assets/javascripts/NameOverlay.js"></script>
+<script type="text/javascript" language="javascript">
+    var RailMap = {};
+    RailMap.pics = null;//数据
+    RailMap.Rails = [];//面状图元
+    RailMap.map = null;//地图
+    RailMap.markers = [];//标注
+    RailMap.CarMarkers = [];//车的标记
+    RailMap.markerClusterer = null;
+    RailMap.infoWindow = null;
+    var IndexNum = 0;
+    var data = null;
+    var lineSymbol_blue = {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 5,
+        strokeColor: '#5A5AAD'
+    };
+
+    var lineSymbol_red = {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 5,
+        strokeColor: '#FF0000'
+    };
+
+    function PostVal() {
+        $.post("/RailManager/InsertRail", { RailData: $("#hid_PointVal").val(), RailRname: $("#RailName").val(), RailShapetype: $("#hid_Type").val() }, function (e) {
+            RailMap.infowindow.close();
+            window.location.reload();
+        })
+    }
+
+    function initRailMap() {
+        var latlng = new google.maps.LatLng(39.91, 116.38);
+        var options = {
+            'zoom': 5,
+            'center': latlng,
+            'mapTypeId': google.maps.MapTypeId.ROADMAP,
+        };
+        RailMap.map = new google.maps.Map(document.getElementById('div_RailMap'), options);
+        RailMap.infoWindow = new google.maps.InfoWindow();
+        var drawingManager = new google.maps.drawing.DrawingManager({
+            drawingMode: 0,
+            drawingControl: true,
+            drawingControlOptions: {
+                position: google.maps.ControlPosition.TOP_CENTER,
+                drawingModes: [
+                  google.maps.drawing.OverlayType.CIRCLE,
+                  google.maps.drawing.OverlayType.POLYGON,
+                  google.maps.drawing.OverlayType.RECTANGLE
+                ]
+            },
+            markerOptions: {
+                icon: 'images/beachflag.png'
+            },
+            circleOptions: {
+                strokeColor: "red",    //边线颜色。
+                fillColor: "red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+                strokeWeight: 1,       //边线的宽度，以像素为单位。
+                strokeOpacity: 0.6,	   //边线透明度，取值范围0 - 1。
+                fillOpacity: 0.4,      //填充的透明度，取值范围0 - 1。
+                strokeStyle: 'solid'   //边线的样式，solid或dashed。
+            }
+        });
+        drawingManager.setMap(RailMap.map);
+        google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
+            var PointArr;
+            CurrentShape = event.overlay;
+            if (event.type == google.maps.drawing.OverlayType.POLYGON) { //多边形
+                PointArr = event.overlay.getPath();
+                var PolygonVal = "";
+                if (PointArr != null) {
+                    if (PointArr.length > 100) {
+                        $.messager.alert('警告', '多边形不能超过100个折点', 'error');
+                        CurrentShape.setMap(null);
+                        return;
+                    }
+                    else {
+                        for (var i = 0; i < PointArr.length; i++) {
+                            PolygonVal += PointArr.getAt(i);
+                        }
+                        $("#hid_PointVal").val(PolygonVal);
+                        var lat = PointArr.getAt(PointArr.length - 1).lat();
+                        var lng = PointArr.getAt(PointArr.length - 1).lng();
+                        var zoom = RailMap.map.getZoom();
+                        $("#hid_CenterloglatZoom").val(lng + "," + lat + "," + zoom);
+                        $("#hid_Type").val("2");
+                    }
+                }
+            } else if (event.type == google.maps.drawing.OverlayType.CIRCLE) { //圆
+                PointArr = event.overlay.getCenter();
+                var Radius = event.overlay.getRadius();
+                $("#hid_PointVal").val(PointArr + "$" + Radius);
+                $("#hid_CenterloglatZoom").val(PointArr.lng() + "," + PointArr.lat() + "," + RailMap.map.getZoom());
+                $("#hid_Type").val("1");
+            } else if (event.type == google.maps.drawing.OverlayType.RECTANGLE) { //方形
+                PointArr = event.overlay.getBounds();
+                $("#hid_PointVal").val(PointArr);
+                $("#hid_CenterloglatZoom").val(PointArr.getCenter().lng() + "," + PointArr.getCenter().lat() + "," + RailMap.map.getZoom());
+                $("#hid_Type").val("0");
+            }
+            CurrentShape.setMap(null);
+            parent.$.DialogOpen('/RailManager/TaMap', { title: "添加车辆", width: 900, height: 600 });
+        });
+    }
+
+    function deletePoint()
+    {
+        if (CurrentShape != null)
+        {
+            CurrentShape.setMap(null);
+        }
+    }
+
+    RailMap.init = function (data) {
+        RailMap.pics = data;
+        RailMap.showMarkers();
+    };
+
+    RailMap.showMarkers = function () {
+        RailMap.markers = [];
+        RailMap.CarMarkers = [];
+        if (RailMap.markerClusterer) {
+            RailMap.markerClusterer.clearMarkers();
+        }
+        RailMap.clear();
+        var panel = $('#RailList');
+        panel.empty();
+        if (RailMap.pics == null)
+        {
+            return;
+        }
+        var numMarkers = RailMap.pics.length;
+        for (var i = 0; i < numMarkers; i++) {
+            //列表
+            var img = $('<img />');
+            $(img).attr({ "src": "../assets/images/05.png" });
+            var span = $('<span></span>');
+            $(span).text(RailMap.pics[i].Area_Terno);
+            var a = $('<a href="#" AreaId="' + RailMap.pics[i].AreaId + '"></a>');
+            $(a).append(img);
+            $(a).append(span);
+
+            var li = $('<li class="online"></li>');
+            $(li).append(a);
+            $(panel).append(li);
+
+            $(a).click(function () {
+                $(this).parent().parent().find('a').removeClass('active');
+                $(this).addClass('active');
+                $("#hid_AreaId").val($(this).attr('AreaId'));
+                return true;
+            });
+
+            //标注
+            var fn = RailMap.markerClickFunction(RailMap.pics[i]);
+            $(li).click(fn);
+        }
+        window.setTimeout(RailMap.time, 0);
+    };
+
+    RailMap.markerClickFunction = function (pic) {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            RailMap.clear();
+            if (pic.Area_Type == 1) {    //圆形
+                var m = pic.Area_Data.split('|');
+                var x = parseFloat(m[0].split(',')[1]);
+                var y = parseFloat(m[0].split(',')[0]);
+                var radius=parseFloat(m[1]);
+                var populationOptions = {
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    map: RailMap.map,
+                    center: new google.maps.LatLng(x,y),
+                    radius: radius
+                };
+                var circle = new google.maps.Circle(populationOptions);
+                CurrentShape = circle;
+                RailMap.Rails.push(circle);
+                RailMap.map.setCenter(circle.getCenter());
+            } else if (pic.Area_Type == 0) {   //方形
+                var m = pic.Area_Data.split('|');
+                var rectangle = new google.maps.Rectangle({
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    map: RailMap.map,
+                    bounds: new google.maps.LatLngBounds(
+                      new google.maps.LatLng(m[0].split(',')[1], m[0].split(',')[0]),
+                      new google.maps.LatLng(m[1].split(',')[1], m[1].split(',')[0]))
+                });
+                CurrentShape = rectangle;
+                RailMap.Rails.push(rectangle);
+                RailMap.map.setCenter(rectangle.getBounds().getCenter());
+            } else if (pic.Area_Type == 2) {   //多边形
+                //面状图元
+                var triangleCoords = new Array();
+                var Points = pic.Area_Data.split('|');
+                for (n = 0; n < Points.length; n++) {
+                    var Point = Points[n];
+                    triangleCoords.push(new google.maps.LatLng(parseFloat(Point.split(',')[1]), parseFloat(Point.split(',')[0])));
+                }
+                //第一个点闭合
+                var FPoint = Points[0];
+                triangleCoords.push(new google.maps.LatLng(parseFloat(FPoint.split(',')[1]), parseFloat(FPoint.split(',')[0])));
+
+                var Polygon = new google.maps.Polygon({
+                    paths: triangleCoords,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35
+                });
+                RailMap.Rails.push(Polygon);
+                Polygon.setMap(RailMap.map);
+                var patharr = Polygon.getPath();
+                RailMap.map.setCenter(patharr.getAt(patharr.length - 1));
+            }
+        };
+    };
+
+    RailMap.CarmarkerClickFunction = function (pic,car,latlng,state)
+    {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            var infoHtml = '<div class="info"><table><tr><td>车牌号码：</td><td>' + car.CAR_NO + '</td></tr><tr><td>终端编号：</td><td>' + car.TER_NO + '</td></tr><tr><td>车辆状态：</td><td>' + state + '</td></tr></table></div>';
+            RailMap.infoWindow.setContent(infoHtml);
+            RailMap.infoWindow.setPosition(latlng);
+            RailMap.infoWindow.open(RailMap.map);
+        };
+    }
+
+    RailMap.markerOutFunction = function () {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            RailMap.infoWindow.close();
+        }
+    }
+
+    RailMap.clear = function () {
+        for (var i = 0, marker = RailMap.markers[i]; i++;) {
+            marker.setMap(null);
+        }
+        for (var index = 0, marker = RailMap.CarMarkers[index]; index++;) {
+            marker.setMap(null);
+        }
+        for (var k = 0; k < RailMap.Rails.length; k++) {
+            RailMap.Rails[k].setMap(null);
+        }
+    };
+
+    RailMap.change = function () {
+        RailMap.clear();
+        RailMap.showMarkers();
+    };
+
+    RailMap.time = function () {
+        //for (var k = 0; k < RailMap.Rails.length; k++) {
+        //    RailMap.Rails[k].setMap(RailMap.map);
+        //}
+
+        //for (var i = 0, marker; marker = RailMap.markers[i]; i++) {
+        //    marker.setMap(RailMap.map);
+        //}
+
+        //for (var index = 0, marker; marker = RailMap.CarMarkers[index]; index++) {
+        //    marker.setMap(RailMap.map);
+        //}
+
+        //if (RailMap.pics.length > 0) {
+        //    var bounds = new google.maps.LatLngBounds();
+        //    //for (var n = 0; n < RailMap.pics.length; n++) {
+        //    //    var MaxLatLng = new google.maps.LatLng(RailMap.pics[n].RailMaxx, RailMap.pics[n].RailMaxy);
+        //    //    var MinLatLng = new google.maps.LatLng(RailMap.pics[n].RailMinx, RailMap.pics[n].RailMiny);
+        //    //    bounds.extend(MaxLatLng);
+        //    //    bounds.extend(MinLatLng);
+        //    //}
+        //    RailMap.map.setCenter(bounds.getCenter());
+        //    RailMap.map.fitBounds(bounds);
+        //}
+
+        //var options = {
+        //    gridSize: 40,
+        //    minimumClusterSize: 2,
+        //    maxZoom: 21
+        //};
+        //if (RailMap.CarMarkers.length > 0) {
+        //    RailMap.markerClusterer = new MarkerClusterer(RailMap.map, RailMap.CarMarkers, options, RailMap.infoWindow);
+        //}
+    };
+
+
+    //调用百度地图
+    function BaiDuMap() {
+        window.location.href = '/RailManager/BDRailIndex';
+        $("#BaiDuMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+    //调用谷歌地图
+    function GoogleMap() {
+        window.location.href = '/RailManager/RailIndex';
+        $("#GoogleMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#BaiDuMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+    //删除
+    function DelRail() {
+        var AreaId = $("#hid_AreaId").val();
+        if (AreaId == "") {
+            $.messager.alert('警告', '您没有选择', 'error');
+        }
+        else {
+            $.messager.confirm('确定', '您确定要删除吗', function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '/RailManager/Delete?AreaId=' + AreaId,
+                        type: "post",
+                        success: function (r) {
+                            $.messager.alert('提示', r, 'info');
+                            //window.location.reload();
+                            Refresh();
+                            if (CurrentShape != null) {
+                                CurrentShape.setMap(null);
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    }
+
+    //添加围栏
+    function AddAreaInfo()
+    {
+        var SelectTerNoStr = $("#hid_TerNoStr").val();
+        var Areatype=$("#hid_Type").val();
+        var AreaData=$("#hid_PointVal").val();
+        var AreaMaptype = $("#hid_AreaMaptype").val();
+        var CenterloglatZoom = $("#hid_CenterloglatZoom").val();
+        $.ajax({
+            type: 'post',
+            cache: false,
+            url: '/RailManager/AddCarIdstr',
+            data: { SelectTerNoStr: SelectTerNoStr, AreaType: Areatype, AreaData: AreaData, AreaMaptype: AreaMaptype, CenterloglatZoom: CenterloglatZoom },
+            success: function (data) {
+                if (data == "成功") {
+                    window.parent.$.messager.alert('提示', '添加成功', 'info');
+                    //RailMap.infowindow.open(RailMap.map);
+                    //window.location.reload();
+                    if (CurrentShape != null) {
+                        CurrentShape.setMap(null);
+                    }
+                    Refresh();
+                    RailMap.clear();
+                } else {
+                    $.messager.alert('提示',data,'info');
+                }
+            }
+        });
+    }
+
+    //选择车辆
+    function SelectCar() {
+        var RailId = $("#hid_AreaId").val();
+        if (RailId == "") {
+            $.messager.alert('警告', '您没有选择', 'error');
+        }
+        else {
+            $.DialogOpen('/RailManager/TaMap?Rid=' + RailId, { title: '选择车辆', width: 900, height: 600 });
+        }
+    }
+
+    //查看车辆
+    function LookCar() {
+        var RailId = $("#hid_AreaId").val();
+        if (RailId == "") {
+            $.messager.alert('警告', '您没有选择', 'error');
+        }
+        else {
+            $.DialogOpen('/RailManager/LoadCarOnmap?Rid=' + RailId, { title: '查看车辆', width: 900, height: 600 });
+        }
+    }
+
+    //清除覆盖物
+    function DeleteOverly()
+    {
+        RailMap.clear();
+    }
+
+    function Refresh()
+    {
+        $.post("/RailManager/getRailList", { Area_Terno: $("#search").val() == null ? "" : $("#search").val() }, function (e) {
+            data = eval(e);
+            RailMap.init(data);
+        });
+    }
+
+    $(function () {
+        initRailMap();
+
+        Refresh();
+
+        $('#search').keyup(function (event) {
+            if (event.keyCode == 13) {
+                Refresh();
+            }
+        });
+    });
+</script>
+
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 5px;
+        right: 300px;
+        border: 1px solid #999;
+    }
+
+    #MapContainer div {
+        width: 75px;
+        float: left;
+        text-align: center;
+    }
+
+    #BaiDuMap {
+        background: #ffffff;
+        color: #797070;
+        cursor: pointer;
+    }
+
+    #GoogleMap {
+        color: #fff;
+        cursor: pointer;
+        background: #0094ff;
+    }
+</style>

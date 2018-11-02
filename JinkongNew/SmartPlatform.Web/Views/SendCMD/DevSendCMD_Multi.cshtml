@@ -1,0 +1,310 @@
+﻿
+@{
+    ViewBag.Title = "DevSendCMD_Multi";
+}
+@using (Ajax.BeginForm("DevSendCMD_Multi", "SendCommand", null, new AjaxOptions()))
+{
+    <input type="hidden" id="veList" name="veList" value="@ViewData["Ter_ID"]" />
+    <input type="hidden" id="re_veList" name="re_veList" value="false" />
+    <div style="margin-left: 15px; display: none">
+        <input type="radio" name="SendMethod" value="1" checked="checked" />
+        &nbsp;TCP
+        <input type="button" value="......" id="dosubmit" onclick="send()" class="btn btn-warning btn-small" />
+        <div style="display: none">
+            <input type="radio" name="SendMethod" value="2" />
+            &nbsp;短信&nbsp;&nbsp;
+            <input type="checkbox" name="online" id="online" />&nbsp; 未在线是否缓存发送
+            <span id="yxTime">命令有效时间：<input type="text" id="validity" name="validity" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd H:mm:ss' })" /></span>
+        </div>
+    </div>
+     <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+            <colgroup>
+                <col class="con0" width="20%" />
+                <col class="con1" width="20%" />
+                <col class="con0" width="20%" />
+                <col class="con1" width="20%" />
+                <col class="con0" width="20%" />
+            </colgroup>
+            <thead>
+                <tr style="text-align:center;">
+                    <th class="head0">工作模式</th>
+                    <th class="head1">定时时间</th>
+                    <th class="head0">定位次数</th>
+                    <th class="head1">工作时间(分钟)</th>
+                    <th class="head0">间隔时间(分钟)</th>
+                    <th class="head0" style="display: none">IP</th>
+                    <th class="head1" style="display: none">端口号</th>
+                    <th class="head0" style="display: none">上传时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="center" style="border-top:none;">
+                        <select id="gzmss" name="gzmss" onchange="selectChange(this.options[this.options.selectedIndex].value)">
+                            <option value="0">标准模式</option>
+                            <option value="1">精准模式</option>
+                            <option value="2">追车模式</option>
+                        </select>
+                    </td>
+                    <td class="center" style="border-top:none;">
+                        <select id="dssjs" name="dssjs">
+                            <option value="0">不设置</option>
+                            <option value="8">8:00</option>
+                            <option value="9">9:00</option>
+                            <option value="10">10:00</option>
+                            <option value="11">11:00</option>
+                            <option value="12">12:00</option>
+                            <option value="13">13:00</option>
+                            <option value="14">14:00</option>
+                            <option value="15">15:00</option>
+                            <option value="16">16:00</option>
+                            <option value="17">17:00</option>
+                            <option value="18">18:00</option>
+                            <option value="19">19:00</option>
+                            <option value="20">20:00</option>
+                            <option value="21">21:00</option>
+                            <option value="22">22:00</option>
+                            <option value="23">23:00</option>
+                            <option value="24">00:00</option>
+                            <option value="1">1:00</option>
+                            <option value="2">2:00</option>
+                            <option value="3">3:00</option>
+                            <option value="4">4:00</option>
+                            <option value="5">5:00</option>
+                            <option value="6">6:00</option>
+                            <option value="7">7:00</option>
+                        </select>
+                    </td>
+                    <td class="center" style="border-top:none;">
+                        <input type="text" name="dwcs" id="dwcs" style="width: 60px" value="1" />
+                    </td>
+                    <td style="border-top:none;">
+                        <input type="text" name="gzsjs" id="gzsjs" style="width: 60px" value="2" disabled="disabled" />
+                    </td>
+                    <td class="center" style="border-top:none;">
+                        <input type="text" name="xmsjs" id="xmsjs" style="width: 60px" value="1440" disabled="disabled" />
+                    </td>
+                    <td style="display: none">
+                        <input type="text" name="ips" id="ips" value="0.0.0.0" style="width: 80px" />
+                    </td>
+                    <td style="display: none">
+                        <input type="text" name="ports" id="ports" value="0" style="width: 60px" />
+                    </td>
+                    <td style="display: none">
+                        <input type="text" name="scsjs" id="scsjs" value="0" style="width: 60px" disabled="disabled" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    <div style="height:50px;text-align:center;padding:5px;">
+        <input type="button" value="设置" onclick="submitTcp('1');" class="" />
+        <input type="button" value="时间修正" onclick="submitTcp('2');" class="" />
+        <input type="button" value="刷新状态" onclick="ReLoad()" class="" />
+    </div>
+    <table id="SendCMDListTable"></table>
+
+    <div style="margin-bottom: 5px;" id="resultCmdButton">
+    </div>
+    <div style="clear: both"></div>
+}
+<script type="text/javascript">
+
+    $(function () {
+        $("input, textarea, select").uniform();
+        $("#dwcs").change(function () {
+            ss = $("#dwcs").val().toString();
+            if (isNaN(ss) == true) {
+                window.parent.$.messager.alert('提示', '回传次数范围为大于0的整数次', 'error');
+                return false;
+            }
+            else if ($("#gzmss").val() == 2) {
+                if (parseInt($("#dwcs").val()) > 0) {
+                    var vTime = 24 * 60;
+                    $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                } else {
+                    window.parent.$.messager.alert('提示', '回传次数范围为大于0的整数次', 'error');
+                    return;
+                }
+            } else {
+                if (parseInt($("#dwcs").val()) > 0) {
+                    var vTime = 24 * 60;
+                    $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                } else {
+                    window.parent.$.messager.alert('提示', '回传次数范围为大于0的整数次', 'error');
+                    return;
+                }
+            }
+
+
+        });
+        $("#yxTime").hide();
+        $("#online").click(
+            function () {
+                if ($("#online").attr("checked")) {
+                    $("#yxTime").show();
+                } else {
+                    $("#yxTime").hide();
+                }
+            }
+        );
+        loadSendListTable();
+    });
+    function ReLoad() {
+    }
+
+    function loadSendListTable() {
+        TerminalData = $('#SendCMDListTable').datagrid({
+            url: '@Url.Action("GetSendCMDListByTerNos", "SendCMD")',
+            height: 300,
+            columns: [[
+                { field: 'DeviceId', title: '终端编号', width: 80, align: 'center' },
+                { field: 'SendinfoDescription', title: '命令信息',width:550, align: 'center' },
+                {
+                    field: 'SendinfoStatus', title: '执行状态', width: 140, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case 0.0:
+                                return "待发送";
+                            case 1.0:
+                                return "待定";
+                            case 2.0:
+                                return "已发送，未执行";
+                            case 3.0:
+                                return "发送成功，命令执行成功";
+                            case 6.0:
+                                return "命令失效";
+                            case 9.0:
+                                return "执行失败";
+                            default:
+                                return "";
+                        }
+                    }
+                },
+                { field: 'SendinfoUserid', title: '操作人员', width: 80, align: 'center' },
+                 {
+                     field: 'SendinfoPtime', title: '设置时间', width: 150, align: 'center', formatter: function (value, row) {
+                         switch (value) {
+
+                             case "0001-01-01 00:00:00":
+                                 return "";
+                             default:
+                                 return value;
+                         }
+                     }
+                 },
+                  {
+                      field: 'ReceiptTime', title: '执行成功时间', width: 150, align: 'center', formatter: function (value, row) {
+                          switch (value) {
+                              
+                              case "0001-01-01 00:00:00":
+                                  return "";
+                              default:
+                                  return value;
+                          }
+                      }
+                  }
+            ]],
+            //fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            queryParams: { "DeviceId": '@ViewData["Ter_ID"]' },//查询参数
+            //detailFormatter: function (index, row) {
+            //    return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+            //    $('#ddv-' + index).append(nav);
+            //    $('#dg').datagrid('fixDetailRowHeight', index);
+            //},
+            pagination: true
+            //singleSelect: true,
+            //toolbar: TerManager
+        });
+    }
+
+    function submitTcp(sens) {
+        if (sens == '1') {
+            ss = $("#dwcs").val().toString();
+            if (isNaN(ss) == true) {
+                window.parent.$.messager.alert('提示', '请设置回传次数范围为大于0的整数次', 'error');
+                return false;
+            }
+            else if ($("#gzmss").val() == 2) {
+                if (parseInt($("#dwcs").val()) > 0) {
+                    var vTime = 24 * 60;
+                    $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                } else {
+                    window.parent.$.messager.alert('提示', '回传次数范围为大于0的整数次', 'error');
+                    return;
+                }
+            } else {
+                if (parseInt($("#dwcs").val()) > 0) {
+                    var vTime = 24 * 60;
+                    $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                } else {
+                    window.parent.$.messager.alert('提示', '回传次数范围为大于0的整数次', 'error');
+                    return;
+                }
+            }
+        }
+        var ips = $("#ips").val();
+        var ports = $("#ports").val();
+        var gzmss = $("#gzmss").val();
+        var gzsjs = $("#gzsjs").val();
+        var dssjs = $("#dssjs").val() * 60;
+        var xmsjs = $("#xmsjs").val();
+        var scsjs = $("#scsjs").val();
+        var dwcs = $("#dwcs").val();
+        if (parseInt($("#dwcs").val()) > 0) {
+            window.parent.$.messager.confirm('确定', "确定发送命令吗？", function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '@Url.Content("~/SendCMD/DevSendCMD_Multi")',
+                            type: 'POST',
+                            //dataType: 'json',
+                            data: "{'devid':'" + '@ViewData["Ter_ID"]' + "','ips':'" + ips + "','ports':'" + ports + "','gzmss':'" + gzmss + "','gzsjs':'" + gzsjs + "','dssjs':'" + dssjs + "','xmsjs':'" + xmsjs + "','scsjs':'" + scsjs + "','sends':'" + sens + "','dwcs':'" + dwcs + "','CmandType':'" + sens + "'}",
+                            contentType: 'application/json; charset=utf-8',
+                            success: function (data) {
+                                if (data.toString() == "true") {
+
+                                    window.parent.$.messager.show({
+                                        title: '提示',
+                                        msg: "命令发送成功",
+                                        timeout: 2000,
+                                    });
+                                }
+                                else {
+                                    window.parent.$.messager.alert('提示', "发送失败：" + data.toString(), 'error');
+                                }
+                            },
+                            error: function (data) {
+                            }
+                        });
+                    }
+                });
+
+            } else {
+                window.parent.$.messager.alert('提示', '回传次数范围为大于0的整数次', 'error');
+
+                return;
+            }
+        }
+        function selectChange(index) {
+            switch (index) {
+            case "0":
+                $("#gzsjs").attr("value", '2'); //填充内容
+                break;
+            case "1":
+                $("#gzsjs").attr("value", '2'); //填充内容
+                break;
+            case "2":
+                $("#gzsjs").attr("value", '2'); //填充内容
+                break;
+            default:
+                $("#gzsjs").attr("value", '2');//填充内容
+            }
+        }
+</script>

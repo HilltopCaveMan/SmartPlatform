@@ -1,0 +1,73 @@
+﻿@model GModel.RoleRight.MenuInfo
+    @using (Ajax.BeginForm("AddMenuForm", "MenuInfo", new AjaxOptions(), new { @class = "" }))
+    {
+        <div class="stdform" style="padding:20px 70px 10px 60px">
+        <p>
+            <label><i>*</i>菜单名</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuName, new { @class = "textbox"})
+                <b>
+                    @Html.ValidationMessageFor(model => model.MenuName)
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>父菜单名:</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuParent, new { @class = "easyui-combotree", panelheight = "150"})
+                <b>
+                    
+                </b>
+            </div>
+        </p>
+            <p>
+                <label><i>*</i>菜单类型:</label>
+                <div class="field">
+                   @Html.TextBoxFor(m => m.MenuType, new { @class = "easyui-combobox", panelheight = "80"})
+                    <b>
+                       
+                    </b>
+                </div>
+            </p>
+        <p>
+            <label>菜单URL</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuUrl, new { @class = "textbox" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.MenuUrl)
+                </b>
+            </div>
+        </p>
+            <p>
+                <label>菜单图标</label>
+                <div class="field">
+                    @Html.TextBoxFor(m => m.MenuIcon, new { @class = "textbox" })
+                    <b>
+                        @Html.ValidationMessageFor(model => model.MenuIcon)
+                    </b>
+                </div>
+            </p>
+    </div>
+    <div>
+        @Html.ValidationSummary(true, "")
+    </div>
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" type="submit">确定</button>
+        <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+    </div>
+    }
+<script type="text/javascript">
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    }
+
+    $(function () {
+        var data = [{ "id": 1, "text": "菜单" }, { "id": 2, "text": "按钮" }];
+        $('#MenuType').combobox({ textField: "text", valueField: "id", editable: false }).combobox("loadData", data);
+
+        $("#MenuParent").combotree({
+            url: '/MenuInfo/GetMenuNode'
+        });
+    })
+</script>

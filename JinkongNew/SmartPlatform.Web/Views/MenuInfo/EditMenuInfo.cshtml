@@ -1,0 +1,111 @@
+﻿@model GModel.RoleRight.MenuInfo
+@using (Ajax.BeginForm("EditMenuForm", "MenuInfo", new AjaxOptions(), new { @class = "" }))
+{
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        @Html.HiddenFor(m => m.MenuId, new { @class = "" })
+        <p>
+            <label><i>*</i>菜单名</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuName, new { @class = "textbox" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.MenuName)
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>父菜单名:</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuParent, new { @class = "easyui-combotree", panelheight = "150", @style = "height:30px" })
+                <b>
+
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>菜单类型:</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuType, new { @class = "easyui-combobox", panelheight = "80", @style = "height:30px" })
+                <b>
+
+                </b>
+            </div>
+        </p>
+        <p id="AddMenuUrl">
+            <label>菜单URL</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuUrl, new { @class = "textbox" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.MenuUrl)
+                </b>
+            </div>
+        </p>
+        <p id="AddMenuIcon">
+            <label>菜单图标</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.MenuIcon, new { @class = "textbox" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.MenuIcon)
+                </b>
+            </div>
+        </p>
+    </div>
+    <div class="formfooter">
+        <input class="stdbtn btn_blue" type="submit" value="确定" />
+        <input class="stdbtn btn_default" type="button" value="取消" onclick="clearForm()"/>
+    </div>
+    <div>
+        @Html.ValidationSummary(true, "")
+    </div>
+}
+
+<script type="text/javascript">
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close')
+    }
+
+    $(function () {
+
+        //$('#MenuParentName').combotree({
+        //    url: '/MenuManager/GetMenuTreeAll',
+        //    onSelect: function (node) {
+        //        $("#MENUPARENT").val(node.id);
+        //       // $("#MenuParentName").val(node.id);
+
+
+        //    }
+        //});
+        $("#MenuParent").combotree({
+            url: '/MenuInfo/GetMenuNode',
+            onLoadSuccess: function () {
+                $('#MenuParent').combotree('setValue', '@ViewBag.MenuParent');
+            }
+        });
+
+        var data = [{ "id": 1, "text": "菜单" }, { "id": 2, "text": "按钮" }];
+        $('#MenuType').combobox({ textField: "text", valueField: "id", editable: false }).combobox({
+            onLoadSuccess: function () {
+                $('#MenuType').combobox('setValue', 1);
+            }
+        }).combobox("loadData", data);
+
+    });
+    function editFormSucceed() {
+        var ifr = window.parent.document.getElementById('/MenuInfo/MenuInfoIndex');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#menuInfoTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改成功！",
+            timeout: 2000,
+        });
+    };
+    function editFormError() {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改失败！",
+            timeout: 2000,
+        });
+    };
+</script>

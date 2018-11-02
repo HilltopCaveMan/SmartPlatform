@@ -1,0 +1,231 @@
+﻿<div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+    <table>
+        <tr>
+            <td style="padding-left: 15px;">
+                查询类型：
+            </td>
+            <td>
+                <input id="SelectType" class="easyui-combobox" style="width:100px; height:30px;" />
+            </td>
+            <td style="padding-left: 15px;">
+                <ul class="photosharing_menu">
+                    <li>回传时间&nbsp;<input class="easyui-datetimebox" id="begintime" style="width:180px;height:31px;" ></li>
+                    <li>&nbsp;到&nbsp;<input class="easyui-datetimebox" id="endtime" style="width:180px;height:31px;"></li>
+                </ul>
+            </td>
+            
+            <td colspan="2">
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetHistoryData()">查询</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="DownLoadData()">导出</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<table id="HistoryData" style="height:460px;"></table>
+<script type="text/javascript" language="javascript">
+    $(function () {
+        $("#SelectType").combotree({
+            data: [{ "id": "0", "text": "全部数据" }, { "id": "1", "text": "时间段内" }],
+            editable: true,
+            panelHeight: 100,
+            queryParams: { isTree: "false" },
+            onLoadSuccess: function () {
+                $('#SelectType').combotree('setValue', '0');
+            },
+            onSelect: function (node) {
+                if (node.id == "0") {
+                    $('#begintime').datetimebox({ disabled: true });
+                    $('#endtime').datetimebox({ disabled: true });
+                }
+                else {
+                    $('#begintime').datetimebox({ disabled: false });
+                    $('#endtime').datetimebox({ disabled: false });
+                }
+            }
+        });
+        loadSendHistoryListTable();
+    });
+
+    //导出数据
+    function DownLoadData() {
+        var tnstr = '@ViewBag.TerNo';
+        var distr = '@ViewBag.DeptId';
+        var bt = "";
+        var et = "";
+        var selecttype = $('#SelectType').combotree("getValue");
+        if (selecttype == "1") {
+            bt = $("#begintime").datetimebox("getValue");
+            et = $("#endtime").datetimebox("getValue");
+            if (bt == "" && et == "") {
+                window.parent.$.messager.alert('警告', '请选择时间', 'error');
+                return;
+            }
+        }
+        $.post("/HistoryTrail/DownLoadExcel2", { TerNo: tnstr, DeptId: distr, st: bt, ed: et }, function (e) {
+            if (e.indexOf("Files") > 0) {
+                window.location.href = e;
+            } else {
+                alert("导出失败，请重新导出！");
+            }
+        })
+    }
+
+    //点击查询
+    function GetHistoryData() {
+        var tnstr = '@ViewBag.TerNo';
+        var distr = '@ViewBag.DeptId';
+        var selecttype = $('#SelectType').combotree("getValue");
+        if (selecttype == "1") {
+            bt = $("#begintime").datetimebox("getValue");
+            et = $("#endtime").datetimebox("getValue");
+            if (bt == "" && et == "") {
+                window.parent.$.messager.alert('警告', '请选择时间', 'error');
+            }
+            else {
+                var param = { TerNo: tnstr, DeptId: distr, st: bt, ed: et };
+                $("#HistoryData").datagrid("load", param);
+            }
+        }
+        else {
+            loadSendHistoryListTable();
+        }
+
+    }
+
+    function loadSendHistoryListTable() {
+        TerminalData = $('#HistoryData').datagrid({
+            url: '@Url.Action("GetTerHistoryData", "HistoryTrail")',
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center' },
+                {
+                    field: 'TerStatus', title: '设备状态', width: 120, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "测试";
+                            case "2":
+                                return "待激活";
+                            case "3":
+                                return "已激活";
+                            case "4":
+                                return "已拆除";
+                            default:
+                                return "其他";
+                        }
+                    }
+                },
+                {
+                    field: 'Rtime', title: '回传时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'Positioningtime', title: '定位时间', width: 150, align: 'center' },
+                { field: 'Position', title: '地理位置', width: 300, align: 'center' },
+                {
+                    field: 'Ifposition', title: '实际定位', width: 0, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "定位":
+                                return "GPS";
+                            case "不定位":
+                                return "基站";
+                            default:
+                                return "其他";
+                        }
+                    }
+                },
+                {
+                    field: 'TerModel', title: '设备工作模式', width: 0, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "标准模式";
+                            case "2":
+                                return "精准模式";
+                            case "3":
+                                return "追车模式";
+                            default:
+                                return "其他";
+                        }
+                    }
+                },
+                {
+                    field: 'Ifblinddata', title: '盲区数据标志', width: 90, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "盲区数据";
+                            default:
+                                return "正常数据";
+                        }
+                    }
+                },
+                { field: 'TerSimcard', title: 'SIM卡号', width: 110, align: 'center' },
+                { field: 'Totalworktime', title: '工作时间', width: 60, align: 'center'},
+                {
+                    field: 'Ter_Innettime', title: '入网时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'Latitude', title: '纬度', width: 120, align: 'center' },
+                { field: 'Longitude', title: '经度', width: 90, align: 'center' },
+                { field: 'Programverson', title: '设备软件版本', width: 90, align: 'center' },
+                { field: 'TerVbatt', title: '设备电池电压', width: 90, align: 'center' },
+                { field: 'Ntervalltime', title: '设备间隔时间', width: 90, align: 'center' },
+                { field: 'Gsmrssi', title: 'GSM信号强度', width: 0, align: 'center' },
+                { field: 'TerStatrtimes', title: '设备启动次数', width: 90, align: 'center' },
+                { field: 'Usesatellite', title: '使用卫星颗数', width: 90, align: 'center' },
+                {
+                    field: 'Northorsouth', title: '蓝牙绑定', width: 120, align: 'center', formatter: function (value, row) {
+                        if (value == "1") {
+                            return "已绑蓝牙";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    field: 'Eastorwest', title: '蓝牙状态', width: 120, align: 'center', formatter: function (value, row) {
+                        if (value == "1") {
+                            return "正常";
+                        }
+                        else if (value == "0") {
+                            return "有线蓝牙断开";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                @if(ViewBag.admin==true)
+                {   
+                    @: { field: 'Sleeptime', title: '设备休眠时间', width: 120, align: 'center' },
+                    @: { field: 'Speed', title: 'GPS速度', width: 90, align: 'center' },
+                    @: { field: 'Visualsatellite', title: '可视卫星颗数', width: 90, align: 'center' },
+                    @: { field: 'Height', title: 'GPS高度（海拔）', width: 120, align: 'center' },
+                    @: { field: 'Direction', title: 'GPS方向', width: 90, align: 'center' },
+                }
+                { field: 'Blinddatanum', title: '盲区数据数量', width: 120, align: 'center' },
+                { field: 'Gpsverson', title: '设备硬件版本', width: 120, align: 'center' }
+            ]],
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            pageList: [15, 30, 45],
+            queryParams: { "TerNo": '@ViewBag.TerNo', "DeptId": '@ViewBag.DeptId', "st": "", "ed": "" },//查询参数
+            pagination: true
+        });
+    }
+
+</script>

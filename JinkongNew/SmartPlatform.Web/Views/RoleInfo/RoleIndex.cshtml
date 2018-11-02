@@ -1,0 +1,198 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    角色名称：
+                </td>
+                <td>
+                    <input id="RoleName_Sel" type="text" style="width: 100px;height:20px">
+                </td>
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input id="Role_DeptSel" class="easyui-combobox" style="width:200px; height:30px;" />
+                    @*<input class="easyui-textbox" id="TerDeptSel" style="width:150px;">*@
+                </td>
+                @*<td style="padding-left: 15px;">
+                    终端类型:
+                </td>
+                <td>
+                    <input id="TerTypeSel" type="text" class="easyui-combobox" style="width:160px; height:30px;" />
+                </td>*@
+                <td>
+                    &nbsp;&nbsp;<input type="checkbox" id="Role_ChildrenDept" name="check2"> <label for="Role_ChildrenDept">查询子企业 </label>
+                </td>
+
+                <td style="padding-left: 15px;">
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetRoleList()">查询</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="RoleInfoTable"></table>
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+
+    var RoleManager = [];
+    var AddRoleVal = '@ViewBag.AddRole';
+    var EditRoleVal = '@ViewBag.EditRole';
+    var DelRoleVal = '@ViewBag.DelRole';
+    var RightManagerVal = '@ViewBag.RightManager';
+
+    if (AddRoleVal == "true") {
+        var AddRoleBtn = {
+            text: '添加',
+            iconCls: 'icon-add',
+            handler: function () { window.parent.$.DialogOpen('/RoleInfo/AddRoleInfo', { title: "添加角色", width: 380, height: 280 }); }
+        };
+        RoleManager.push(AddRoleBtn);
+    }
+
+    if (EditRoleVal == "true") {
+        var EditRoleBtn = {
+            text: '修改',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = $('#RoleInfoTable').datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '请选中所要修改的角色！', 'error');
+                } else {
+                    var id = rows[0].RoleId;
+                    window.parent.$.DialogOpen('/RoleInfo/EditRoleInfo?RoleId=' + id, { title: "修改角色", width: 400, height: 250 });
+                }
+            }
+        };
+        RoleManager.push(EditRoleBtn);
+    }
+
+    if (DelRoleVal == "true") {
+        var DelRoleBtn = {
+            text: '删除',
+            iconCls: 'icon-remove',
+            handler: function () {
+                var rows = $('#RoleInfoTable').datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择要删除的角色', 'error');
+                }
+                else {
+                    var id = rows[0].RoleId;
+                    window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+                        if (t) {
+                            $.ajax({
+                                url: '/RoleInfo/DelRoleInfo?RoleId=' + id,
+                                type: "post",
+                                success: function (r) {
+                                    if (r > 0) {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除成功！",
+                                            timeout: 2000,
+                                        });
+                                        $('#RoleInfoTable').datagrid('reload');
+                                    } else if (r == -2) {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "此角色下存在用户，无法删除角色！",
+                                            timeout: 2000,
+                                        });
+                                    } else {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除失败！",
+                                            timeout: 2000,
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+        };
+        RoleManager.push(DelRoleBtn);
+    }
+
+    if (RightManagerVal == "true") {
+        var RightManagerBtn = {
+            text: '权限分配',
+            iconCls: 'icon-lock',
+            handler: function () {
+                var row = $('#RoleInfoTable').datagrid('getSelected');
+                if ( row == null || row.RoleId == null || row.RoleId == "") {
+                    window.parent.$.messager.alert('警告', '请首先选择角色组', 'error');
+                }
+                else {
+                    window.parent.$.DialogOpen('/RoleInfo/RightManager?RoleId=' + row.RoleId + '&RoleName=' + row.RoleName, { title: "权限分配", width: 320, height: 500 });
+                }
+            }
+        };
+        RoleManager.push(RightManagerBtn);
+    }
+
+    //为表格增加参数重载数据
+    function GetRoleList() {
+        var DeptId = $('#Role_DeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#Role_ChildrenDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var param = { RoleName: $("#RoleName_Sel").val(), DeptId: DeptId, ChildrenSel: Children };
+        $("#RoleInfoTable").datagrid("load", param);
+    }
+    $(function () {
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 50,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+        $("input, textarea, select").uniform();
+        $('#RoleInfoTable').height($(document.body).height() - $("#SearchTerBar").height() - 37);
+        var roleInfoTable = $('#RoleInfoTable').datagrid({
+            url: '/RoleInfo/GetRoleList',
+            columns: [[
+                { field: 'RoleId', width: 150, align: 'center', hidden: true },
+                { field: 'RoleName', title: '角色名', width: 150, align: 'center', sortable: true },
+                { field: 'Businessdivisionname', title: '所属企业', width: 150, align: 'center', sortable: true },
+                { field: 'RoleRemark', title: '描述', width: 200, align: 'center', sortable: true },
+                { field: 'RoleDate', title: '创建时间', width: 150, align: 'center' },
+
+            ]],
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            pageList: [15, 30, 45],
+            fitColumns: true,
+            singleSelect: true,
+            toolbar: RoleManager
+        });
+        $("#Role_DeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" }
+            @*onLoadSuccess: function () {
+            $('#parentid').combotree('setValue', '@ViewBag.FatherID');
+        }*@
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#Role_DeptSel'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#Role_DeptSel').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#Role_DeptSel').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+    });
+</script>
+

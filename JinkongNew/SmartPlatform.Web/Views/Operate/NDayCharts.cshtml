@@ -1,0 +1,74 @@
+﻿<div class="tabcontant">
+    <table id="ChartsTable" data-options="rownumbers:true,singleSelect:true,toolbar:''" class="easyui-datagrid" style="height:auto"></table>
+</div>
+
+<div id="Omap"></div>
+<script type="text/javascript">
+   
+
+
+    $(function () {
+       var dg= $('#ChartsTable').datagrid({
+            data: [
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' },
+                { f1: '北京事业部', f2: 'FTC003RFCDZ004311', f3: 'W303164344', f4: 'F17856', f5: '北京雷沃博多工程机械有限公司', f6: '周兆华', f7: '天津市天津市塘沽区', f8: '2014-11-26 15:34:34' }
+               
+            ],
+            columns: [[
+                { field: 'f1', title: '事业部', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: '车辆编号', width: 100, align: 'center', sortable: true },
+                { field: 'f3', title: 'GPS编号', width: 100, align: 'center', sortable: true },
+                { field: 'f4', title: '机型', width: 100, align: 'center', sortable: true },
+                { field: 'f5', title: '经销商', width: 100, align: 'center', sortable: true },
+                { field: 'f6', title: '最终用户', width: 100, align: 'center', sortable: true },
+                { field: 'f7', title: '最新地理位置', width: 100, align: 'center', sortable: true },
+                {
+                    field: 'f8', title: '最后回传时间', width: 100, align: 'center', sortable: true, formatter: function (value, row) {
+                        switch (value) {
+
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                }
+
+            ]],
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+
+                $('#ddv-' + index).append(nav);
+
+                $('#dg').datagrid('fixDetailRowHeight', index);
+
+            },
+            pagination: true
+
+       });
+
+       dg.datagrid('enableFilter', []);
+
+    });
+
+</script>
+
+
+
+
+
+

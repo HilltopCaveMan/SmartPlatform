@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="UserInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="UserInfo" type="GModel.Basic.UserInfo" />
+</alias>
+<resultMaps>
+	<resultMap id="UserInfoResult" class="UserInfo">
+    <result property="UserId" column="UserId" type="string" dbType="varchar"/>
+    <result property="UserName" column="UserName" type="string" dbType="varchar"/>
+    <result property="UserLname" column="UserLname" type="string" dbType="varchar"/>
+    <result property="UserPasswrd" column="UserPasswrd" type="string" dbType="varchar"/>
+    <result property="UserPhone" column="UserPhone" type="string" dbType="varchar"/>
+    <result property="UserEmail" column="UserEmail" type="string" dbType="varchar"/>
+    <result property="EnterId" column="EnterId" type="string" dbType="varchar"/>
+    <result property="RoleId" column="RoleId" type="string" dbType="varchar"/>
+    <result property="UserDate" column="UserDate" type="DateTime" dbType="DateTime"/>
+    <result property="UserIsdel" column="UserIsdel" type="string" dbType="varchar"/>
+    <result property="UserDeptcode" column="UserDeptcode" type="string" dbType="varchar"/>
+    <result property="UserBuildcode" column="UserBuildcode" type="string" dbType="varchar"/>
+    <result property="UserFunct" column="UserFunct" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectUserInfo" parameterClass="string" resultMap="UserInfoResult">
+    SELECT USER_ID AS UserId,USER_NAME AS UserName,USER_LNAME AS UserLname,USER_PASSWRD AS UserPasswrd,USER_PHONE AS UserPhone,USER_EMAIL AS UserEmail,ENTER_ID AS EnterId,ROLE_ID AS RoleId,USER_DATE AS UserDate,USER_ISDEL AS UserIsdel,USER_DEPTCODE as UserDeptcode,USER_BUILDCODE as UserBuildcode,USER_FUNCT as UserFunct
+    FROM USER_INFO WHERE USER_ISDEL =0 AND  USER_ID=#UserId#
+  </select>
+  <select id="SelectTerUserInfo" parameterClass="string" resultMap="UserInfoResult">
+    SELECT USER_ID AS UserId,USER_NAME AS UserName,USER_LNAME AS UserLname,USER_PASSWRD AS UserPasswrd,USER_PHONE AS UserPhone,USER_EMAIL AS UserEmail,
+    ENTER_ID AS EnterId,ROLE_ID AS RoleId,USER_DATE AS UserDate,USER_ISDEL AS UserIsdel,USER_DEPTCODE as UserDeptcode,USER_BUILDCODE as UserBuildcode,(SELECT wm_concat(ter_no) FROM SETMANAGER WHERE USERNAME=USER_INFO.user_lname) as UserFunct
+    FROM USER_INFO WHERE USER_ISDEL =0 AND USER_ID=#UserId#
+  </select>
+	<select id="SelectUserInfoPage" parameterClass="map" resultMap="UserInfoResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT USER_ID AS UserId,USER_NAME AS UserName,USER_LNAME AS UserLname,USER_PASSWRD AS UserPasswrd,USER_PHONE AS UserPhone,USER_EMAIL AS UserEmail,ENTER_ID AS EnterId,ROLE_ID AS RoleId,USER_DATE AS UserDate,USER_ISDEL AS UserIsdel,USER_DEPTCODE as UserDeptcode,USER_BUILDCODE as UserBuildcode,USER_FUNCT as UserFunct
+    FROM USER_INFO WHERE  USER_ISDEL =0
+    <isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+  <!--根据角色ID查询此角色下的用户数量-->
+	<select id="SelectUserInfoCount" parameterClass="string" resultClass="int">
+    SELECT count(*)
+    FROM USER_INFO WHERE USER_ISDEL =0 AND ROLE_ID=#value#
+  </select>
+	<insert id="InsertUserInfo" parameterClass="UserInfo">
+    INSERT INTO USER_INFO
+    (USER_ID,USER_NAME,USER_LNAME,USER_PASSWRD,USER_PHONE,USER_EMAIL,ENTER_ID,ROLE_ID,USER_DATE,USER_ISDEL,USER_DEPTCODE,USER_BUILDCODE,USER_FUNCT)
+    VALUES(#UserId#,#UserName#,#UserLname#,#UserPasswrd#,#UserPhone#,#UserEmail#,#EnterId#,#RoleId#,sysdate,0,#UserDeptcode#,#UserBuildcode#,#UserFunct#)
+  </insert>
+	<update id="UpdateUserInfo" parameterClass="UserInfo">
+    UPDATE USER_INFO
+    SET USER_NAME=#UserName#,USER_LNAME=#UserLname#,USER_PHONE=#UserPhone#,USER_EMAIL=#UserEmail#,ENTER_ID=#EnterId#,ROLE_ID=#RoleId#,USER_DEPTCODE=#UserDeptcode#,USER_FUNCT=#UserFunct#
+    WHERE USER_ISDEL =0 AND USER_ID=#UserId#
+  </update>
+  <!--假删除-->
+	<update id="DeleteUserInfo" parameterClass="string">
+    UPDATE USER_INFO SET USER_ISDEL =1
+    WHERE USER_ISDEL=0 AND USER_ID=#value#
+  </update>
+
+  <!--新增statements-->
+  <select id="SelectUserInfoByLoginName" parameterClass="UserInfo" resultMap="UserInfoResult">
+    SELECT USER_ID AS UserId,USER_NAME AS UserName,USER_LNAME AS UserLname,USER_PASSWRD AS UserPasswrd,USER_PHONE AS UserPhone,USER_EMAIL AS UserEmail,ENTER_ID AS EnterId,ROLE_ID AS RoleId,USER_DATE AS UserDate,USER_ISDEL AS UserIsdel,USER_DEPTCODE as UserDeptcode,USER_BUILDCODE as UserBuildcode,USER_FUNCT as UserFunct
+    FROM USER_INFO WHERE USER_ISDEL =0 AND USER_LNAME=#UserLname#
+  </select>
+
+  <update id="UpdateUserPWD" parameterClass="UserInfo">
+    UPDATE USER_INFO
+    SET USER_PASSWRD=#UserPasswrd#
+    WHERE USER_ISDEL =0 AND USER_LNAME=#UserLname#
+  </update>
+
+
+  <update id="UserInfoReset" parameterClass="UserInfo">
+    UPDATE USER_INFO
+    SET USER_PASSWRD=#UserPasswrd#
+    WHERE USER_ID=#UserId#
+  </update>
+  
+
+
+</statements>
+</sqlMap>

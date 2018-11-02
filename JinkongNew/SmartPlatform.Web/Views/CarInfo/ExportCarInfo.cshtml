@@ -1,0 +1,215 @@
+﻿@model  System.Collections.ArrayList
+<div id="ExportShow">
+    <form>
+        <div id="TableDiv" style="padding: 30px 90px 0px 50px; width: 150px; overflow-y: scroll;">
+            <table id="CarOrgTable" style="width:150px;height:300px; overflow-y:scroll;">
+                <thead>
+                    <tr>
+                        <th data-options="field:'CHECKALL',width:70,align:'center'">
+                            <input type="checkbox" id="checkboxall" name="checkboxall" checked="checked" /> 全选
+                        </th>
+                        <th data-options="field:'车牌号',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车牌号" />
+                            车牌号
+                        </th>
+                        <th data-options="field:'车辆类型',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车辆类型" />
+                            车辆类型
+                        </th>
+                        <th data-options="field:'车辆颜色',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车辆颜色" />
+                            车辆颜色
+                        </th>
+                        <th data-options="field:'所属企业',width:120,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="所属企业" />
+                            所属企业
+                        </th>
+                        <th data-options="field:'车主姓名',width:120,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车主姓名" />
+                            车主姓名
+                        </th>
+                        <th data-options="field:'身份证号',width:120,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="身份证号" />
+                            身份证号
+                        </th>
+                        <th data-options="field:'终端编号',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="终端编号" />
+                            终端编号
+                        </th>
+                        <th data-options="field:'车主地址',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车主地址" />
+                            车主地址
+                        </th>
+                        <th data-options="field:'车主电话',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车主电话" />
+                            车主电话
+                        </th>
+                        <th data-options="field:'安装人',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="安装人" />
+                            安装人
+                        </th>
+                        <th data-options="field:'安装位置',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="安装位置" />
+                            安装位置
+                        </th>
+                        <th data-options="field:'安装人联系电话',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="安装人联系电话" />
+                            安装人联系电话
+                        </th>
+                        <th data-options="field:'安装地点',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="安装地点" />
+                            安装地点
+                        </th>
+                        <th data-options="field:'安装时间',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="安装时间" />
+                            安装时间
+                        </th>
+                        <th data-options="field:'录入人',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="录入人" />
+                            录入人
+                        </th>
+                        <th data-options="field:'录入人电话',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="录入人电话" />
+                            录入人电话
+                        </th>
+                        <th data-options="field:'合同号',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="合同号" />
+                            合同号
+                        </th>
+                        <th data-options="field:'保险单号',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="保险单号" />
+                            保险单号
+                        </th>
+                        <th data-options="field:'融资金额',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="融资金额" />
+                            融资金额
+                        </th>
+                        <th data-options="field:'贷款年限',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="贷款年限" />
+                            贷款年限
+                        </th>
+                        <th data-options="field:'车辆型号',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车辆型号" />
+                            车辆型号
+                        </th>
+                        <th data-options="field:'发动机号',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="发动机号" />
+                            发动机号
+                        </th>
+                        <th data-options="field:'车架号',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="车架号" />
+                            车架号
+                        </th>
+                        <th data-options="field:'备注',width:70,align:'center'">
+                            <input type="checkbox" name="choose" onclick="OnCarDetails(this)" value="备注" />
+                            备注
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </form>
+</div>
+<div class="formfooter">
+    <button class="stdbtn btn_blue" id="AddEnterBtn" type="button">确定</button>
+    <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+</div>
+<script type="text/javascript">
+    var ShowFieldString = "";
+    var checkitem = document.getElementsByName("choose");
+    var checkcount = 0;
+
+    //获取字段
+    var CarNo = "@ViewBag.CarNo";
+    var DeptId = "@ViewBag.DeptId";
+    var TypeId = "@ViewBag.TypeId";
+    var ChildrenSel = "@ViewBag.ChildrenSel";
+    var Businessdivisionid = "@ViewBag.Businessdivisionid";
+
+    $(function () {
+        $('#ExportShow').height($(document.body).height() - 50);
+        $('#ExportShow').width($(document.body).width() - 30);
+
+        $('#TableDiv').height($('#ExportShow').height() - 50);
+
+        
+        ChooseCheckBox();
+        //点击确定
+        $("#AddEnterBtn").click(function () {
+            SubmitResult();
+        });
+    })
+
+    function SubmitResult() {
+        for (var i = 0; i < checkitem.length; i++) {
+            if (checkitem[i].checked) {
+                ShowFieldString += checkitem[i].value + "|";
+            }
+        }
+        if (CarNo == null || TypeId == undefined) {
+            CarNo = "";
+        }
+        if (TypeId == undefined || TypeId == null) {
+            TypeId = "";
+        }
+        $.post("/CarInfo/ExportCarInfo?ShowFieldString=" + ShowFieldString + "&CarNo=" + CarNo + "&DeptId=" + DeptId
+            + "&TypeId=" + TypeId + "&ChildrenSel=" + ChildrenSel + "&Businessdivisionid=" + DeptId, function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.close();
+                    window.location.href = e;
+                } else {
+                    window.parent.$.messager.alert('提示','没有数据/导出失败，请重新导出！','info');
+                }
+            })
+    }
+
+    //任选
+    function OnCarDetails(obj) {
+        for (var i = 0; i < checkitem.length; i++) {
+            if (checkitem[i].checked == true) {
+                checkcount++;
+            }
+        }
+        if (checkitem.length == checkcount) {
+            $("#checkboxall").attr("checked", true);
+        } else {
+            $("#checkboxall").attr("checked", false);
+        }
+        checkcount = 0;
+    }
+    //全选 全不选
+    function ChooseCheckBox() {
+        var check = $("#checkboxall").is(':checked');
+        if (check) {
+            for (var i = 0; i < checkitem.length; i++) {
+                checkitem[i].checked = true;
+            }
+        } else {
+            for (var i = 0; i < checkitem.length; i++) {
+                checkitem[i].checked = false;
+            }
+        }
+        $("#checkboxall").click(function () {
+            var check = $("#checkboxall").is(':checked');
+            if (check) {
+                for (var i = 0; i < checkitem.length; i++) {
+                    checkitem[i].checked = true;
+                }
+            } else {
+                for (var i = 0; i < checkitem.length; i++) {
+                    checkitem[i].checked = false;
+                }
+            }
+        });
+    }
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    };
+</script>
+<style>
+    #CarOrgTable th {
+        float: left;
+        margin-right: 40px;
+    }
+</style>

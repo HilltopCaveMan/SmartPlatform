@@ -1,0 +1,224 @@
+﻿
+
+<div class="tabcontant">
+    <div id="audit_polluteManager_list_searchPanel"
+         style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+         class="easyui-panel" iconcls="icon-search" title="服务车管理"
+         collapsible="true" minimizable="false" maximizable="false"
+         closable="false">
+        <form id="audit_polluteManager_list_searchForm" method="post">
+            <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        车牌号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        GPS编号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+
+                    <td style="padding-left: 15px;">
+                        机型：
+                    </td>
+
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;" rowspan="2">
+                        <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                        <a class="easyui-linkbutton" icon="icon-search"
+                           href="#">搜索</a> &nbsp;&nbsp;
+                    </td>
+                    </tr>
+                    <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        SIM卡号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        驾驶员名称：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        驾驶员手机号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                   
+                </tr>
+
+            </table>
+        </form>
+    </div>
+
+
+    <table id="ServiceCarTable" data-options="rownumbers:true,singleSelect:true,toolbar:''" class="easyui-datagrid" style="height:auto"></table>
+</div>
+<div id="dd"></div>
+
+<div id="SCarEditPage" style="display:none">
+
+    <table>
+        <tr margin-left="40">
+            <td>车牌号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="3F70001AZ-G" /></td>
+        </tr>
+        <tr>
+            <td>GPS编号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="FR60" /></td>
+        </tr>
+        <tr>
+            <td>SIM卡号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="12345678901" /></td>
+        </tr>
+        <tr>
+            <td>经销商：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="廊坊市机械有限公司" /></td>
+        </tr>
+        <tr>
+            <td>销售状态：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="销售" /></td>
+        </tr>
+        <tr>
+            <td>驾驶员名称：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="吴明远" /></td>
+        </tr>
+        <tr>
+            <td>驾驶员手机号：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="13700011111" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                <a class="easyui-linkbutton" icon="icon-cut"
+                   href="#">确认修改</a> &nbsp;&nbsp;
+            </td>
+        </tr>
+    </table>
+
+
+</div>
+
+
+<div id="SCarDDPage" style="display:none">
+
+    <table>
+        <tr>
+            <td>调度车车牌号：</td>
+            <td>3F70001AZ-G</td>
+        </tr>
+        <tr>
+            <td>调度任务</td>
+            <td><textarea id="textT" style="width:200px;height:150px"></textarea></td>
+        </tr>
+
+        <tr>
+            <td colspan="2" align="center"><a class="easyui-linkbutton" icon="icon-add"
+   href="#">确认添加调度任务任务</a> &nbsp;&nbsp;</td>
+        </tr>
+    </table>
+
+
+</div>
+
+
+
+<script type="text/javascript">
+  
+
+
+    function SCarEditPage() {
+
+        $('#SCarEditPage').dialog({
+                title: '修改服务车参数',
+                width: 300,
+                height: 300,
+                closed: true,
+                cache: false,
+                modal: true,
+            });
+
+        $('#SCarEditPage').css('display', 'block')
+        $('#SCarEditPage').dialog('open')
+
+    }
+
+
+
+    function SCarDDPage() {
+
+        $('#SCarDDPage').dialog({
+            title: '调度服务车',
+            width: 300,
+            height: 300,
+            closed: true,
+            cache: false,
+            modal: true,
+        });
+
+        $('#SCarDDPage').css('display', 'block')
+        $('#SCarDDPage').dialog('open')
+
+    }
+
+
+    $(function () {
+     var dg=   $('#ServiceCarTable').datagrid({
+            data: [
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="SCarEditPage()">修改</a>　　<a href="#" onclick="SCarDDPage()">调度</a>' }
+            ],
+            columns: [[
+                //{ field: 'ck', checkbox: true },
+                { field: 'f1', title: '车牌号', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: 'GPS编号', width: 60, align: 'center' },
+                { field: 'f3', title: 'SIM卡号', width: 80, align: 'center' },
+                { field: 'f4', title: '经销商', width: 40, align: 'center' },
+                { field: 'f5', title: '品牌', width: 100, align: 'center' },
+                { field: 'f6', title: '驾驶员名称', width: 80, align: 'center' },
+                { field: 'f7', title: '驾驶员手机号', width: 80, align: 'center' },
+                { field: 'f8', title: '最新位置', width: 80, align: 'center' },
+                { field: 'f9', title: '操做', width: 80, align: 'center' }
+            ]],
+            //view: detailview,
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true
+        });
+     dg.datagrid('enableFilter', []);
+    });
+
+
+
+</script>

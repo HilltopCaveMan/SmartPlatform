@@ -1,0 +1,735 @@
+﻿<div class="photosharing_head">
+    <ul class="photosharing_menu">
+        <li>开始时间&nbsp;<input class="easyui-datebox" id="HisDate" style="width:100px;height:30px"></li>
+        <li><input class="easyui-timespinner" id="begintime" style="width:100px;height:30px"></li>
+        <li>&nbsp;&nbsp;&nbsp;结束时间&nbsp;<input class="easyui-datebox" id="EndDate" style="width:100px;height:30px"></li>
+        <li><input class="easyui-timespinner" id="endtime" style="width:100px;height:30px;"></li>
+        <li class="marginleft10">
+            播放速度
+            <select id="overviewselect" name="select">
+                <option value="10">快</option>
+                <option value="50">较快</option>
+                <option value="100" selected>正常</option>
+                <option value="500">较慢</option>
+                <option value="1000">慢</option>
+            </select>
+        </li>
+        <li class="marginleft10 trashbtn"><a class="trash" id="onloadData">加载轨迹</a></li>
+        <li class="marginleft10 trashbtn"><a class="trash" id="play">开始动画</a></li>
+        <li class="marginleft10 trashbtn"><a class="trash" id="stop">停止动画</a></li>
+    </ul>
+    <div id="MapContainer">
+        <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+        <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+    </div>
+    <span class="clearall"></span>
+    <div class="Location" style="border: 1px solid #999; top:60px; right:600px; z-index: 1;"><input type="checkbox" name="check1" id="Location" />测距</div>
+</div>
+<div id="mapdiv" style="position:relative;">
+    <div id="map-TrailNew" style="height:100%;float:left;width:100%;">
+    </div>
+    <div style="height:100%;float:left;width:30%;position:absolute;top:0;right:0;background:#fff;">
+        <div class="tableoptions">
+            <button class="deletebutton radius3" id="DownLoadData">导出数据</button>
+        </div>
+
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">更新时间</th>
+                    <th class="head1">当前位置</th>
+                    @*<th class="head0">终端编号</th>*@
+                    <th class="head1">报警状态</th>
+                    <th class="head0">定位方式</th>
+                    @*<th class="head1">谷歌纬度</th>
+                    <th class="head0">谷歌经度</th>
+                    <th class="head0">百度纬度</th>
+                    <th class="head0">百度经度</th>*@
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+<script src="http://maps.google.cn/maps/api/js?sensor=false&language=zh-CN&libraries=drawing"></script>
+<script src="~/assets/javascripts/NameOverlay.js"></script>
+<script type="text/javascript" language="javascript">
+    var TrailMap = {};
+    TrailMap.poly = null;
+    TrailMap.pics = null;
+    TrailMap.map = null;
+    TrailMap.markers = [];
+    TrailMap.infoWindow = null;
+
+    //测距
+    TrailMap.polyline;
+    TrailMap.polylinesArray = [];
+    TrailMap.lenArray = [];
+    TrailMap.Overlay = [];
+    var polymarker;
+    var divLay;
+    var disflag = 0;
+
+    var data = null;
+    var curr_time = new Date();
+    var sh;
+    var count = 0;
+    var PLAYSTATU = "stop";
+    var BeginTime;
+    var EndTime;
+    var Spend;
+    var CarTable, tableHeight;
+    var number = 0;
+    function initTrailMap() {
+        var latlng = new google.maps.LatLng(39.919204, 116.40608);
+        var options = {
+            zoom: 4,
+            center: latlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            maxZoom: 19,
+            minZoom: 1
+        };
+        TrailMap.map = new google.maps.Map(document.getElementById('map-TrailNew'), options);
+        TrailMap.infoWindow = new google.maps.InfoWindow();
+        var lineSymbol = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 5,
+            strokeColor: '#c0392b'
+        };
+        var lineSymbol1 = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 2
+        };
+        TrailMap.poly = new google.maps.Polyline({
+            path: [],
+            icons: [{
+                icon: lineSymbol,
+                offset: '0%'
+            }, {
+                icon: lineSymbol1,
+                offset: '100%',
+            }],
+            map: TrailMap.map
+        });
+        TrailMap.polyline = new google.maps.Polyline({
+            path: [],
+            icons: [{
+                icon: lineSymbol,
+                offset: '0%'
+            }, {
+                icon: lineSymbol1,
+                offset: '100%',
+            }],
+            map: TrailMap.map
+        });
+    }
+
+    TrailMap.init = function (data) {
+        TrailMap.pics = data;
+        TrailMap.poly.setMap(TrailMap.map);
+        TrailMap.showMarkers();
+    };
+
+    TrailMap.showMarkers = function () {
+        var path = TrailMap.poly.getPath();
+        TrailMap.markers = [];
+        var numMarkers = TrailMap.pics.length;
+        if (numMarkers > 0) {
+            for (var i = (numMarkers - 1) ; i >= 0; i--) {
+                if ((data[i].GoogleLongitude > 70.0 && data[i].GoogleLongitude < 140.0) && (data[i].GoogleLatitude > 15.0 && data[i].GoogleLatitude < 55.0)) {
+                    var latLng = new google.maps.LatLng(data[i].GoogleLatitude, data[i].GoogleLongitude);
+                    path.push(latLng);
+                    if (i == (data.length - 1)) {
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            title: '#' + path.getLength(),
+                            'icon': '../Content/Icon/start.png'
+                        });
+                        var fn = TrailMap.markerClickFunction(data[i], latLng);
+                        google.maps.event.addListener(marker, 'click', fn);
+                        TrailMap.markers.push(marker);
+                    } else if (i == 0) {
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            title: '#' + path.getLength(),
+                            'icon': '../Content/Icon/Finish.png'
+                        });
+                        var fn = TrailMap.markerClickFunction(data[i], latLng);
+                        google.maps.event.addListener(marker, 'click', fn);
+                        TrailMap.markers.push(marker);
+                    } else {
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            title: '#' + path.getLength(),
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                strokeColor: "#ff0000 ",
+                                strokeOpacity: 1,
+                                strokeWeight: 2,
+                                scale: 3
+                            }
+                        });
+                        var fn = TrailMap.markerClickFunction(data[i], latLng);
+                        google.maps.event.addListener(marker, 'click', fn);
+                        TrailMap.markers.push(marker);
+                    }
+                }
+            }
+        }
+
+        window.setTimeout(TrailMap.time, 0);
+    };
+
+    TrailMap.markerClickFunction = function (pic, latlng) {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            var status = "";
+            switch (pic.ReplydataName) {
+                case "":
+                    status = "正常";
+                    break;
+                default:
+                    status = pic.ReplydataName;
+                    break;
+            }
+            var infoHtml = '<div class="info">'
+                        + '<h3 class="infowindowheader">' + pic.Rtime + '</h3>'
+                        + '<table ><tr><td>终端编号：</td><td>' + pic.TerNo + '</td></tr><tr><td>报警状态：</td><td>' + status + '</td></tr><tr><td>地理位置：</td> <td>' + pic.Position + '</td> </tr></table></div>'
+            TrailMap.infoWindow.setContent(infoHtml);
+            TrailMap.infoWindow.setPosition(latlng);
+            TrailMap.infoWindow.open(TrailMap.map);
+        };
+    };
+
+    function MapWindow(Latitude, Longitude, Rtime, TerNo, Status, Position, BaiduLatitude, BaiduLongitude) {
+        var infoHtml = '<div class="info">'
+                       + '<h3 class="infowindowheader">' + Rtime + '</h3>'
+                       + '<table ><tr><td>终端编号：</td><td>' + TerNo + '</td></tr><tr><td>报警状态：</td><td>';
+        switch (Status) {
+            case "":
+                infoHtml += "正常";
+                break;
+            default:
+                infoHtml += Status;
+                break;
+        }
+        infoHtml += '</td></tr><tr><td>地理位置：</td> <td>' + Position + '</td> </tr></table></div>'
+        TrailMap.infoWindow.setContent(infoHtml);
+        var latLng = new google.maps.LatLng(Latitude, Longitude);
+        TrailMap.infoWindow.setPosition(latLng);
+        TrailMap.infoWindow.open(TrailMap.map);
+        if (number == "1") {
+            var point = new BMap.Point(BaiduLongitude, BaiduLatitude);
+            var infoWindow = new BMap.InfoWindow(infoHtml, point);  // 创建信息窗口对象
+            map.panTo(point);
+            map.openInfoWindow(infoWindow, point); //开启信息窗口
+        }
+        TrailMap.map.setCenter(latLng);
+    }
+
+    TrailMap.clear = function () {
+        for (var i = 0, marker; marker = TrailMap.markers[i]; i++) {
+            marker.setMap(null);
+        }
+    };
+
+    TrailMap.change = function () {
+        TrailMap.clear();
+        TrailMap.showMarkers();
+    };
+
+    TrailMap.time = function () {
+        if (TrailMap.markers.length > 0) {
+            var bounds = new google.maps.LatLngBounds();
+            for (var i = 0; i < TrailMap.markers.length; i++) {
+                TrailMap.markers[i].setMap(TrailMap.map);
+                bounds.extend(TrailMap.markers[i].getPosition());
+            }
+            TrailMap.map.fitBounds(bounds);
+        }
+    };
+
+    //测距功能  开启测距
+    function getDistance() {
+        if (disflag == 0) {
+            google.maps.event.addListener(TrailMap.map, "click", function (event) {
+                addMarker(event.latLng);
+            });
+            google.maps.event.addListener(TrailMap.map, "dblclick", function (event) {
+                addMarker(event.latLng);
+            });
+        } else if (disflag == 1) {
+            myDis.open();  //开启鼠标测距
+        }
+    }
+    //创建标记
+    function CreateMarker(lat, lng, MyGoToCommunityZoom) {
+        var singapoerCenter = new google.maps.LatLng(lat, lng);
+        var myOptions = {
+            zoom: MyGoToCommunityZoom,
+            center: singapoerCenter,
+            navigationControl: true,
+            scaleControl: true,
+            streetViewControl: true,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        TrailMap.map.setOptions(myOptions);
+    }
+    //测距显示图标
+    function SetIcon() {
+        var icons = TrailMap.polyline.get('icons');
+        icons[0].offset = '100%';
+        TrailMap.polyline.set('icons', icons);
+    }
+    //添加新标记
+    function addMarker(location) {
+        var path = TrailMap.polyline.getPath();
+        path.push(location);
+        SetIcon();
+        var icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            strokeColor: "#ff0000 ",
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 3
+        }
+        var myOptions = {
+            position: location,
+            draggable: true,
+            map: TrailMap.map,
+            icon: icon
+        };
+        polymarker = new google.maps.Marker(myOptions);
+        TrailMap.lenArray.push(polymarker);
+        var dis = (TrailMap.polyline.getLength() / 1000).toFixed(3)
+
+        if (TrailMap.lenArray.length == 0) {
+            divLay = new NameOverlay(location, "0公里");
+            TrailMap.Overlay.push(divLay);
+            divLay.setMap(TrailMap.map);
+        } else {
+            divLay = new NameOverlay(location, dis + "公里");
+            TrailMap.Overlay.push(divLay);
+            divLay.setMap(TrailMap.map);
+        }
+    }
+    //清除测距/新标记
+    function DisClear() {
+        if (disflag == 0) {
+            for (var i = 0; i < TrailMap.lenArray.length; i++) {
+                TrailMap.lenArray[i].setMap(null);
+            }
+            TrailMap.lenArray = [];
+            for (var k = 0; k < TrailMap.Overlay.length; k++) {
+                TrailMap.Overlay[k].setMap(null);
+            }
+            TrailMap.Overlay = [];
+            TrailMap.polyline.setPath([]);
+            google.maps.event.clearListeners(TrailMap.map);
+        }
+    }
+    //画出路径覆盖层
+    function drawOverlay() {
+        //路线数组
+        var flightPlanCoordinates = [];
+        //将坐标压入路线数组
+        if (TrailMap.lenArray) {
+            for (i in TrailMap.lenArray) {
+                flightPlanCoordinates.push(TrailMap.lenArray[i].getPosition());
+            }
+        }
+        //路径选项
+        var myOptions = {
+            path: flightPlanCoordinates,
+            map: TrailMap.map,
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        };
+        TrailMap.polyline = new google.maps.Polyline(myOptions);
+        //清除原有折线路径
+        if (TrailMap.polylinesArray) {
+            for (i in TrailMap.polylinesArray) {
+                TrailMap.polylinesArray[i].setMap(null);
+            }
+            TrailMap.polylinesArray = [];
+        }
+        TrailMap.polyline.setMap(TrailMap.map);
+        TrailMap.polylinesArray.push(TrailMap.polyline);
+    }
+
+    ///距离算法
+    google.maps.LatLng.prototype.distanceFrom = function (latlng) {
+        var lat = [this.lat(), latlng.lat()]
+        var lng = [this.lng(), latlng.lng()] //var R = 6371; // km (change this constant to get miles)
+        var R = 6378137; // In meters
+        var dLat = (lat[1] - lat[0]) * Math.PI / 180;
+        var dLng = (lng[1] - lng[0]) * Math.PI / 180;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat[0] * Math.PI / 180) * Math.cos(lat[1] * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return Math.round(d);
+    }
+
+    google.maps.Marker.prototype.distanceFrom = function (marker) {
+        return this.getPosition().distanceFrom(marker.getPosition());
+    }
+
+    google.maps.Polyline.prototype.getLength = function () {
+        var d = 0;
+        var path = this.getPath();
+        var latlng;
+        for (var i = 0; i < path.getLength() - 1; i++) {
+            latlng = [path.getAt(i), path.getAt(i + 1)];
+            d += latlng[0].distanceFrom(latlng[1]);
+        }
+        return d;
+    }
+
+    // 删除所有叠加物
+    function deleteOverlays() {
+        if (TrailMap.lenArray) {
+            for (i in TrailMap.lenArray) {
+                TrailMap.lenArray[i].setMap(null);
+            }
+            TrailMap.lenArray.length = 0;
+        }
+
+        //清除原有折线路径
+        if (TrailMap.polylinesArray) {
+            for (i in TrailMap.polylinesArray) {
+                TrailMap.polylinesArray[i].setMap(null);
+            }
+            TrailMap.polylinesArray = [];
+        }
+    }
+
+    $(function () {
+        $('#mapdiv').height(window.innerHeight - 54);
+        tableHeight = $('#mapdiv').height() - 155;
+       
+        //$('#HisDate').datebox().datebox('calendar').calendar({
+        //    validator: function (date) {
+        //        var now = new Date();
+        //        var d1 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        //        return d1 >= date;
+        //    }
+        //});
+        //$('#endtime').datetimebox().datetimebox('calendar').calendar({
+        //    validator: function (date) {
+        //        var now = new Date();
+        //        var d1 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        //        return d1 >= date;
+        //    }
+        //});
+
+        $("#begintime").timespinner({ showSeconds: true });
+        $("#endtime").timespinner({ showSeconds: true });
+        $("#begintime").timespinner("setValue","00:00:00");
+        $("#endtime").timespinner("setValue","23:59:59");
+        $("#HisDate").datebox("setValue", myformatter(curr_time));
+        $("#EndDate").datebox("setValue", myformatter(curr_time));
+        var StartDate = $("#HisDate").datebox("getValue") +" "+ $("#begintime").timespinner("getValue");
+        var EndDate = $("#EndDate").datebox("getValue") + " " + $("#endtime").timespinner("getValue");
+        jQuery("input, textarea, select").uniform();
+        initTrailMap();
+        $.post("/HistoryTrail/GetYXTrailList", { CarId: "@ViewBag.CarId", TerNo: "@ViewBag.TerNo", st: StartDate, ed: EndDate }, function (e) {
+            if (e != null && e != "") {
+                data = eval(e);
+                TrailMap.init(data);
+                LoadDataTable(data);
+            }
+        });
+        jQuery("#play").click(function () {
+            if (number == "0") {
+                count = 0;
+                PLAYSTATU = "stop";
+                $('#stop').text('停止动画');
+                //BeginTime = jQuery('#begintime').datetimebox('getValue');
+                //EndTime = jQuery('#endtime').datetimebox('getValue');
+                Spend = jQuery('#overviewselect').val();
+                var CarId;
+                window.clearInterval(sh);
+                sh = window.setInterval('animateCircle()', Spend);
+            } else if (number == "1") {
+                count = 0;
+                PLAYSTATU = "stop";
+                $('#stop').text('停止动画');
+                //BeginTime = jQuery('#begintime').datetimebox('getValue');
+                //EndTime = jQuery('#endtime').datetimebox('getValue');
+                Spend = jQuery('#overviewselect').val();
+                var CarId;
+                window.clearInterval(sh);
+                n = data.length - 1;
+                if (n >= 0) {
+                    window.setTimeout("fun()", 1000);
+                }
+            }
+        });
+        jQuery("#stop").click(function () {
+            if (PLAYSTATU == "stop") {
+                window.clearInterval(sh);
+                PLAYSTATU = "contiue";
+                $('#stop').text('继续动画');
+                window.clearInterval("fun()");
+            } else if (PLAYSTATU == "contiue" && count > 0) {
+                PLAYSTATU = "stop";
+                $('#stop').text('停止动画');
+                sh = window.setInterval('animateCircle()', Spend);
+            }
+        });
+        jQuery("#overviewselect").change(function () {
+            if (PLAYSTATU == "stop" && count > 0) {
+                Spend = jQuery('#overview;select').val();
+                var CarId;
+                window.clearInterval(sh);
+                sh = window.setInterval('animateCircle()', Spend);
+            }
+        });
+
+        $("#onloadData").click(function () {
+            TrailMap.poly.setMap(null);
+            TrailMap.poly.setPath([]);
+            for (var i = 0; i < TrailMap.markers.length; i++) {
+                TrailMap.markers[i].setMap(null);
+            }
+            TrailMap.markers = [];
+            if ($("#HisDate").datebox("getValue") == "" || $("#EndDate").datebox("getValue") == "" || $("#begintime").timespinner("getValue") == "" || $("#endtime").timespinner("getValue") == "") {
+                window.parent.$.messager.alert('提示', "请填写日期和时间段！",'info');
+                return;
+            }
+            var StartDate = $("#HisDate").datebox("getValue") + " " + $("#begintime").timespinner("getValue");
+            var EndDate = $("#EndDate").datebox("getValue") + " " + $("#endtime").timespinner("getValue");
+            var tianshu = (new Date(EndDate).getTime() - new Date(StartDate).getTime()) / (24 * 60 * 60 * 1000);
+            if (tianshu  > 7 || tianshu < 0) {
+                window.parent.$.messager.alert('提示', "结束日期应不小于开始日期且天数最多为7天！", 'info');
+                return;
+            }
+            $.post("/HistoryTrail/GetYXTrailList", { CarId: "@ViewBag.CarId", TerNo: "@ViewBag.TerNo",st: StartDate, ed: EndDate }, function (e) {
+                if (e != null && e != "") {
+                    data = eval(e);
+                    TrailMap.init(data);
+                    CarTable = $('#dyntable').DataTable();
+                    CarTable.destroy();
+                    LoadDataTable(data);
+                    if (TrailMap.infoWindow != null) {
+                        TrailMap.infoWindow.close();
+                    }
+                }
+                if(e=="[]"){
+                    window.parent.$.messager.alert('提示', "当前条件下，无轨迹记录！",'info');
+                }
+            });
+        });
+
+        $('#dyntable tbody').on('click', 'tr', function () {
+            var tbdata = CarTable.fnGetData(this);
+
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                CarTable.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            MapWindow(
+                //$(this).find("td").eq(5).html(),
+                //$(this).find("td").eq(6).html(),
+                //$(this).find("td").eq(0).html(),
+                //$(this).find("td").eq(2).html(),
+                //$(this).find("td").eq(3).html(),
+                //$(this).find("td").eq(1).html(),
+                //$(this).find("td").eq(7).html(),
+                //$(this).find("td").eq(8).html()
+
+                tbdata.GoogleLatitude,
+                tbdata.GoogleLongitude,
+                tbdata.Rtime,
+                tbdata.TerNo,
+                tbdata.ReplydataName,
+                tbdata.Position,
+                tbdata.BaiduLatitude,
+                tbdata.BaiduLongitude
+            );
+        });
+
+        //导出数据
+        $("#DownLoadData").click(function (e) {
+            if ($("#HisDate").datebox("getValue") == "" || $("#EndDate").datebox("getValue") == "" || $("#begintime").timespinner("getValue") == "" || $("#endtime").timespinner("getValue") == "") 
+            {
+                window.parent.$.messager.alert('提示', "请填写日期和时间段！",'info');
+                return;
+            }
+            var StartDate = $("#HisDate").datebox("getValue") + " " + $("#begintime").timespinner("getValue");
+            var EndDate = $("#EndDate").datebox("getValue") + " " + $("#endtime").timespinner("getValue");
+            var tianshu = (new Date(EndDate).getTime() - new Date(StartDate).getTime()) / (24 * 60 * 60 * 1000);
+            if (tianshu > 7 || tianshu < 0) {
+                window.parent.$.messager.alert('提示', "结束日期应不小于开始日期且天数最多为7天！", 'info');
+                return;
+            }
+            $.post("/HistoryTrail/YXDownLoadExcel", { CarId: "@ViewBag.CarId", TerNo: "@ViewBag.TerNo", st: StartDate, ed: EndDate }, function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.location.href = e;
+                } else {
+                    window.parent.$.messager.alert('提示', "导出失败，请重新导出！",'info');
+                }
+            })
+        });
+
+        //测距
+        $("#Location").change(function () {
+            if ($('#Location').attr("checked") == 'checked') {
+                getDistance();
+            } else {
+                DisClear();
+            }
+        });
+
+    })
+
+    //调用百度地图
+    function BaiDuMap() {
+        var carid = '@ViewBag.CarId';
+        var terno = '@ViewBag.TerNo';
+        //window.parent.$(".dialog").dialog('close');
+        //window.parent.$.DialogOpen('/HistoryTrail/BDYXTrailNewIndex?CarId=' + carid + '&TerNo=' + terno, { title: '' + terno + '的轨迹', width: '95%', height: '98%' })
+        location.href = '/HistoryTrail/BDYXTrailNewIndex?CarId=' + carid + '&TerNo=' + terno;
+        $("#BaiDuMap").css({ "background": "#0094ff", "color": "#fff" });
+        $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+    //调用谷歌地图
+    function GoogleMap() {
+        $("#GoogleMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#BaiDuMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+    function LoadDataTable(data) {
+        CarTable = $('#dyntable').dataTable({
+            language: {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                "info": "第 _PAGE_ 页 (共 _PAGES_ 页 )",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "search": "模糊查询",
+                "oPaginate": {
+                    "sFirst":"首页",
+                    "sPrevious":"前一页",
+                    "sNext":"后一页",
+                    "sLast":"末页"
+                }
+            },
+            "dom":
+                    "<'row'<'span12'l>r>" +
+                    "t" +
+                    "<'row'<'span6'i><'span6'p>>",
+            data: data,
+            columns: [
+            { "data": "Rtime" },
+            { "data": "Position" },
+            //{ "data": "TerNo" },
+            {
+                "data": "ReplydataName", "render": function (data, type, full, meta) {
+                    switch (data) {
+                        case "":
+                            return "正常";
+                            break;
+                        default:
+                            return data;
+                            break;
+                    }
+                }
+            },
+            { "data": "Ifposition" },
+            //{ "data": "GoogleLatitude" },
+            //{ "data": "GoogleLongitude" },
+            //{ "data": "BaiduLatitude" },
+            //{ "data": "BaiduLongitude" }
+            ],
+            "columnDefs": [{
+                targets: [0],
+                orderData: [0, 1]  //如果第一列进行排序，有相同数据则按照第二列顺序排列
+            }, {
+                targets: [1],
+                orderData: [1, 0]  //如果第二列进行排序，有相同数据则按照第一列顺序排列
+            }, {
+                targets: [2],
+                orderData: [2, 0]  //如果第五列进行排序，有相同数据则按照第一列顺序排列
+            }],
+            lengthChange: true,
+            bAutoWidth:false,
+            pageLength:10,
+            pagingType:"full_numbers",
+            scrollX:true,
+            scrollY:tableHeight,
+            ordering:true,
+            "order": [[0, 'desc'],[2, 'asc']]
+        });
+    }
+
+    function animateCircle() {
+        count = (count + 1);
+        var icons = TrailMap.poly.get('icons');
+        if (count <= 1000) {
+            icons[0].offset = (count / 10) + '%';
+            TrailMap.poly.set('icons', icons);
+        } else {
+            icons[0].offset = (0) + '%';
+            TrailMap.poly.set('icons', icons);
+            window.clearInterval(sh);
+        }
+    }
+    function myformatter(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        return y + '/' + m + '/' + d;
+    }
+</script>
+
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 20px;
+        right:300px;
+        border: 1px solid #999;
+    }
+
+    #MapContainer div {
+        width: 75px;
+        float: left;
+        text-align: center;
+    }
+
+    #BaiDuMap {
+        background: #ffffff;
+        color: #797070;
+        cursor: pointer;
+    }
+
+    #GoogleMap {
+        color: #fff;
+        cursor: pointer;
+        background: #0094ff;
+    }
+</style>

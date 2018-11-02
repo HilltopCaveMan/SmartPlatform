@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="Sendcmd" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="Sendcmd" type="GModel.InterFace.Sendcmd" />
+</alias>
+<resultMaps>
+		<resultMap id="SendcmdResult" class="Sendcmd">
+      <result property="TrId" column="TrId" type="string" dbType="varchar"/>
+      <result property="TrOpdate" column="TrOpdate" type="DateTime" dbType="DateTime"/>
+      <result property="TrSettype" column="TrSettype" type="string" dbType="varchar"/>
+      <result property="TrSetsn" column="TrSetsn" type="string" dbType="varchar"/>
+      <result property="TrSetsn1" column="TrSetsn1" type="string" dbType="varchar"/>
+      <result property="TrCmdtype" column="TrCmdtype" type="string" dbType="varchar"/>
+      <result property="TrCmdtype1" column="TrCmdtype1" type="string" dbType="varchar"/>
+      <result property="TrParam1" column="TrParam1" type="string" dbType="varchar"/>
+      <result property="TrParam2" column="TrParam2" type="string" dbType="varchar"/>
+      <result property="TrParam3" column="TrParam3" type="string" dbType="varchar"/>
+      <result property="TrParam4" column="TrParam4" type="string" dbType="varchar"/>
+      <result property="TrParam5" column="TrParam5" type="string" dbType="varchar"/>
+      <result property="TrParam6" column="TrParam6" type="string" dbType="varchar"/>
+      <result property="TrParam7" column="TrParam7" type="string" dbType="varchar"/>
+      <result property="TrParam8" column="TrParam8" type="string" dbType="varchar"/>
+      <result property="TrUserseq" column="TrUserseq" type="string" dbType="varchar"/>
+      <result property="TrState" column="TrState" type="string" dbType="varchar"/>
+      <result property="TrSenddate" column="TrSenddate" type="DateTime" dbType="DateTime"/>
+      <result property="TrExedate" column="TrExedate" type="DateTime" dbType="DateTime"/>
+    </resultMap>
+</resultMaps>
+<statements>
+
+<select id="SelectSendcmdPage" parameterClass="Sendcmd" resultMap="SendcmdResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+  select table1.*,rownum rn2 from
+  （SELECT TR_ID AS TrId,TR_OPDATE AS TrOpdate,TR_SETTYPE AS TrSettype,TR_SETSN AS TrSetsn,TR_SETSN1 AS TrSetsn1,TR_CMDTYPE AS TrCmdtype,TR_CMDTYPE1 AS TrCmdtype1,TR_PARAM1 AS TrParam1,TR_PARAM2 AS TrParam2,TR_PARAM3 AS TrParam3,TR_PARAM4 AS TrParam4,TR_PARAM5 AS TrParam5,TR_PARAM6 AS TrParam6,TR_PARAM7 AS TrParam7,TR_PARAM8 AS TrParam8,TR_USERSEQ AS TrUserseq,TR_STATE AS TrState,TR_SENDDATE AS TrSenddate,TR_EXEDATE AS TrExedate
+  FROM SENDCMD where 1=1 AND TR_SETSN=#TrSetsn#
+  union
+  SELECT to_char(ID) AS TrId,SENDINFO_PTIME AS TrOpdate,'' as TrSettype,DEVICE_ID  AS TrSetsn,'' as TrSetsn1,'999' as TrCmdtype,'' as TrCmdtype1,'' as TrParam1,
+  SENDINFO_DESCRIPTION AS TrParam2,'' as TrParam3,'' as TrParam4,'' as TrParam5,'' as TrParam6,'' as TrParam7,'' as TrParam8,'' as TrUserseq,to_char(SENDINFO_STATUS) AS TrState,
+  SENDINFO_PTIME  AS TrSenddate,SENDTOTIME AS TrExedate
+  FROM SENDINFO where 1=1 AND DEVICE_ID=#TrSetsn#) table1 order by table1.TrOpdate desc
+  <isGreaterThan property="EndData" compareValue="0">
+    ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData# order by op_b.TrOpdate desc
+  </isGreaterThan>
+</select>
+<select id="SelectSendcmdCount" parameterClass="string" resultClass="int">
+  SELECT count(*)
+  FROM (SELECT TR_ID AS TrId,TR_OPDATE AS TrOpdate,TR_SETTYPE AS TrSettype,TR_SETSN AS TrSetsn,TR_SETSN1 AS TrSetsn1,TR_CMDTYPE AS TrCmdtype,TR_CMDTYPE1 AS TrCmdtype1,TR_PARAM1 AS TrParam1,TR_PARAM2 AS TrParam2,TR_PARAM3 AS TrParam3,TR_PARAM4 AS TrParam4,TR_PARAM5 AS TrParam5,TR_PARAM6 AS TrParam6,TR_PARAM7 AS TrParam7,TR_PARAM8 AS TrParam8,TR_USERSEQ AS TrUserseq,TR_STATE AS TrState,TR_SENDDATE AS TrSenddate,TR_EXEDATE AS TrExedate
+  FROM SENDCMD where 1=1 AND TR_SETSN=#VALUE# 
+  union
+  SELECT to_char(ID) AS TrId,SENDINFO_PTIME AS TrOpdate,'' as TrSettype,DEVICE_ID  AS TrSetsn,'' as TrSetsn1,'999' as TrCmdtype,'' as TrCmdtype1,'' as TrParam1,
+  SENDINFO_DESCRIPTION AS TrParam2,'' as TrParam3,'' as TrParam4,'' as TrParam5,'' as TrParam6,'' as TrParam7,'' as TrParam8,'' as TrUserseq,to_char(SENDINFO_STATUS) AS TrState,
+  SENDINFO_PTIME  AS TrSenddate,SENDTOTIME AS TrExedate
+  FROM SENDINFO where 1=1 AND DEVICE_ID=#VALUE#) table1
+</select>
+
+<select id="SelectSendcmdListByTerNos" parameterClass="Sendcmd" resultMap="SendcmdResult">
+  <isGreaterThan property="EndData" compareValue="0">
+    select * from (select op_a.*, rownum rn from (
+  </isGreaterThan>
+  SELECT TR_ID AS TrId,TR_OPDATE AS TrOpdate,TR_SETTYPE AS TrSettype,TR_SETSN AS TrSetsn,
+  TR_SETSN1 AS TrSetsn1,TR_CMDTYPE AS TrCmdtype,TR_CMDTYPE1 AS TrCmdtype1,TR_PARAM1 AS TrParam1,
+  TR_PARAM2 AS TrParam2,TR_PARAM3 AS TrParam3,TR_PARAM4 AS TrParam4,TR_PARAM5 AS TrParam5,
+  TR_PARAM6 AS TrParam6,TR_PARAM7 AS TrParam7,TR_PARAM8 AS TrParam8,TR_USERSEQ AS TrUserseq,TR_STATE AS TrState,
+  TR_SENDDATE AS TrSenddate,TR_EXEDATE AS TrExedate
+  FROM SENDCMD where 1=1 AND TR_PARAM1 IN (SELECT MAX(TR_PARAM1) FROM SENDCMD WHERE TR_SETSN IN ($TrSetsn$) group by TR_SETSN
+  ) order by TR_PARAM1 desc
+  <isGreaterThan property="EndData" compareValue="0">
+    ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+  </isGreaterThan>
+</select>
+
+<select id="SelectSendcmdCountByTerNos" parameterClass="string" resultClass="int">
+  SELECT count(*)
+  FROM SENDCMD where 1=1 AND TR_PARAM1 IN (SELECT MAX(TR_PARAM1) FROM SENDCMD WHERE TR_SETSN IN ($value$) group by TR_SETSN)
+</select>
+
+<select id="SelectSendcmdList" parameterClass="Sendcmd" resultMap="SendcmdResult">
+  <isGreaterThan property="EndData" compareValue="0">
+    select * from (select op_a.*, rownum rn from (
+  </isGreaterThan>
+  SELECT TR_ID AS TrId,TR_OPDATE AS TrOpdate,TR_SETTYPE AS TrSettype,TR_SETSN AS TrSetsn,
+  TR_SETSN1 AS TrSetsn1,TR_CMDTYPE AS TrCmdtype,TR_CMDTYPE1 AS TrCmdtype1,TR_PARAM1 AS TrParam1,
+  TR_PARAM2 AS TrParam2,TR_PARAM3 AS TrParam3,TR_PARAM4 AS TrParam4,TR_PARAM5 AS TrParam5,
+  TR_PARAM6 AS TrParam6,TR_PARAM7 AS TrParam7,TR_PARAM8 AS TrParam8,TR_USERSEQ AS TrUserseq,TR_STATE AS TrState,
+  TR_SENDDATE AS TrSenddate,TR_EXEDATE AS TrExedate
+  FROM SENDCMD where 1=1 AND  TR_SETSN IN ($TrSetsn$) AND TR_STATE=#TrState#
+  <isGreaterThan property="EndData" compareValue="0">
+    ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+  </isGreaterThan>
+</select>
+
+<select id="SelectSendcmdListCount" parameterClass="Sendcmd" resultClass="int">
+  SELECT count(*)
+  FROM SENDCMD where 1=1 AND TR_SETSN IN ($TrSetsn$) AND TR_STATE=#TrState#
+</select>
+
+<select id="SelectSendcmdHistoryList" parameterClass="Sendcmd" resultMap="SendcmdResult">
+  <isGreaterThan property="EndData" compareValue="0">
+    select * from (select op_a.*, rownum rn from (
+  </isGreaterThan>
+  SELECT TR_ID AS TrId,TR_OPDATE AS TrOpdate,TR_SETTYPE AS TrSettype,TR_SETSN AS TrSetsn,
+  TR_SETSN1 AS TrSetsn1,TR_CMDTYPE AS TrCmdtype,TR_CMDTYPE1 AS TrCmdtype1,TR_PARAM1 AS TrParam1,
+  TR_PARAM2 AS TrParam2,TR_PARAM3 AS TrParam3,TR_PARAM4 AS TrParam4,TR_PARAM5 AS TrParam5,
+  TR_PARAM6 AS TrParam6,TR_PARAM7 AS TrParam7,TR_PARAM8 AS TrParam8,TR_USERSEQ AS TrUserseq,TR_STATE AS TrState,
+  TR_SENDDATE AS TrSenddate,TR_EXEDATE AS TrExedate
+  FROM SENDCMD where 1=1 AND  TR_SETSN IN ($TrSetsn$) AND TR_STATE!='000' AND TR_STATE!='001'
+  union
+  SELECT to_char(ID) AS TrId,SENDINFO_PTIME AS TrOpdate,'' as TrSettype,DEVICE_ID  AS TrSetsn,'' as TrSetsn1,'999' as TrCmdtype,'' as TrCmdtype1,'' as TrParam1,
+  SENDINFO_DESCRIPTION AS TrParam2,'' as TrParam3,'' as TrParam4,'' as TrParam5,'' as TrParam6,'' as TrParam7,'' as TrParam8,'' as TrUserseq,to_char(SENDINFO_STATUS) AS TrState,
+  SENDINFO_PTIME  AS TrSenddate,SENDTOTIME AS TrExedate
+  FROM SENDINFO where 1=1 AND DEVICE_ID IN ($TrSetsn$)
+  <isGreaterThan property="EndData" compareValue="0">
+    ) op_a order by op_a.TrSenddate desc) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+  </isGreaterThan>
+</select>
+
+<select id="SelectSendcmdHistoryListCount" parameterClass="string" resultClass="int">
+  SELECT count(*)
+  FROM (SELECT TR_ID AS TrId,TR_OPDATE AS TrOpdate,TR_SETTYPE AS TrSettype,TR_SETSN AS TrSetsn,
+  TR_SETSN1 AS TrSetsn1,TR_CMDTYPE AS TrCmdtype,TR_CMDTYPE1 AS TrCmdtype1,TR_PARAM1 AS TrParam1,
+  TR_PARAM2 AS TrParam2,TR_PARAM3 AS TrParam3,TR_PARAM4 AS TrParam4,TR_PARAM5 AS TrParam5,
+  TR_PARAM6 AS TrParam6,TR_PARAM7 AS TrParam7,TR_PARAM8 AS TrParam8,TR_USERSEQ AS TrUserseq,TR_STATE AS TrState,
+  TR_SENDDATE AS TrSenddate,TR_EXEDATE AS TrExedate
+  FROM SENDCMD where 1=1 AND  TR_SETSN IN ($TrSetsn$) AND TR_STATE!='000' AND TR_STATE!='001'
+  union
+  SELECT to_char(ID) AS TrId,SENDINFO_PTIME AS TrOpdate,'' as TrSettype,DEVICE_ID  AS TrSetsn,'' as TrSetsn1,'999' as TrCmdtype,'' as TrCmdtype1,'' as TrParam1,
+  SENDINFO_DESCRIPTION AS TrParam2,'' as TrParam3,'' as TrParam4,'' as TrParam5,'' as TrParam6,'' as TrParam7,'' as TrParam8,'' as TrUserseq,to_char(SENDINFO_STATUS) AS TrState,
+  SENDINFO_PTIME  AS TrSenddate,SENDTOTIME AS TrExedate
+  FROM SENDINFO where 1=1 AND DEVICE_ID IN ($TrSetsn$)) table1
+</select>
+
+  <insert id="InsertSendcmd" parameterClass="Sendcmd">
+	INSERT INTO SENDCMD 
+(TR_ID,TR_OPDATE,TR_SETTYPE,TR_SETSN,TR_SETSN1,TR_CMDTYPE,TR_CMDTYPE1,TR_PARAM1,TR_PARAM2,TR_PARAM3,TR_PARAM4,TR_PARAM5,TR_PARAM6,TR_PARAM7,TR_PARAM8,TR_USERSEQ,TR_STATE,TR_SENDDATE,TR_EXEDATE) 
+	VALUES(#TrId#,#TrOpdate:DateTime:1/1/0001 12:00:00 AM#,#TrSettype#,#TrSetsn#,#TrSetsn1#,#TrCmdtype#,#TrCmdtype1#,#TrParam1#,#TrParam2#,#TrParam3#,#TrParam4#,#TrParam5#,#TrParam6#,#TrParam7#,#TrParam8#,#TrUserseq#,#TrState#,#TrSenddate:DateTime:1/1/0001 12:00:00 AM#,#TrExedate:DateTime:1/1/0001 12:00:00 AM#)
+</insert>
+<update id="UpdateSendcmd" parameterClass="Sendcmd">
+UPDATE SENDCMD 
+ SET TR_ID=#TrId#,TR_OPDATE=#TrOpdate#,TR_SETTYPE=#TrSettype#,TR_SETSN=#TrSetsn#,TR_SETSN1=#TrSetsn1#,TR_CMDTYPE=#TrCmdtype#,TR_CMDTYPE1=#TrCmdtype1#,TR_PARAM1=#TrParam1#,TR_PARAM2=#TrParam2#,TR_PARAM3=#TrParam3#,TR_PARAM4=#TrParam4#,TR_PARAM5=#TrParam5#,TR_PARAM6=#TrParam6#,TR_PARAM7=#TrParam7#,TR_PARAM8=#TrParam8#,TR_USERSEQ=#TrUserseq#,TR_STATE=#TrState#,TR_SENDDATE=#TrSenddate#,TR_EXEDATE=#TrExedate#
+WHERE TR_ID = #TrId#
+</update>
+<delete id="DeleteSendcmd" parameterClass="string">
+DELETE FROM SENDCMD 
+WHERE 1=1 $value$ 
+</delete>
+</statements>
+</sqlMap>

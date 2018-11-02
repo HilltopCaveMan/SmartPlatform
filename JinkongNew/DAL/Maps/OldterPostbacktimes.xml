@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="OldterPostbacktimes" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="OldterPostbacktimes" type="GModel.InterFace.OldterPostbacktimes" />
+</alias>
+<resultMaps>
+	<resultMap id="OldterPostbacktimesResult" class="OldterPostbacktimes">
+		<result property="Id" column="Id" type="string" dbType="varchar"/>
+		<result property="Postbacktimes" column="Postbacktimes" type="double" dbType="Real"/>
+		<result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+		<result property="Updatetime" column="Updatetime" type="DateTime" dbType="DateTime"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectOldterPostbacktimes" parameterClass="OldterPostbacktimes" resultMap="OldterPostbacktimesResult">
+    SELECT ID AS Id,POSTBACKTIMES AS Postbacktimes,TER_NO AS TerNo,UPDATETIME AS Updatetime
+    FROM OLDTER_POSTBACKTIMES WHERE TER_NO = #TerNo#
+  </select>
+	<select id="SelectOldterPostbacktimesPage" parameterClass="map" resultMap="OldterPostbacktimesResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+			SELECT ID AS Id,POSTBACKTIMES AS Postbacktimes,TER_NO AS TerNo,UPDATETIME AS Updatetime
+			FROM OLDTER_POSTBACKTIMES  
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectOldterPostbacktimesCount" parameterClass="string" resultClass="int">
+    SELECT count(*)
+    FROM OLDTER_POSTBACKTIMES WHERE TER_NO=#value#
+  </select>
+	<insert id="InsertOldterPostbacktimes" parameterClass="OldterPostbacktimes">
+		INSERT INTO OLDTER_POSTBACKTIMES 
+		(ID,POSTBACKTIMES,TER_NO,UPDATETIME) 
+		VALUES(#Id#,#Postbacktimes#,#TerNo#,#Updatetime:DateTime:1/1/0001 12:00:00 AM#)
+	</insert>
+	<update id="UpdateOldterPostbacktimes" parameterClass="OldterPostbacktimes">
+    UPDATE OLDTER_POSTBACKTIMES
+    SET POSTBACKTIMES=#Postbacktimes#,TER_NO=#TerNo#,UPDATETIME=#Updatetime# WHERE ID=#Id#
+  </update>
+	<delete id="DeleteOldterPostbacktimes" parameterClass="string">
+		DELETE FROM OLDTER_POSTBACKTIMES 
+		WHERE $value$ 
+	</delete>
+</statements>
+</sqlMap>

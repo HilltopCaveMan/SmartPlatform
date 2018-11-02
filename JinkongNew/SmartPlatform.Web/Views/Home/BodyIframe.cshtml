@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "车贷管理网";
+    Layout = "~/Views/Shared/_LayoutIframe.cshtml";
+}
+
+@Html.Partial("_HeaderPartial")
+<iframe id="fame" src="/CarMonitor/MonitorIndex" scrolling="no" frameborder="0" style="width:100%;"></iframe>
+@Html.Partial("_FooterPartial")
+<script type="text/javascript">
+    function reinitIframe() {
+        var iframe = document.getElementById("fame");
+        try {
+            //iframe.height = iframe.contentWindow.document.documentElement.scrollHeight;
+            var ifraHeight = iframe.contentWindow.document.documentElement.scrollHeight
+            jQuery("#fame").css('height', ''+ifraHeight+'px')
+        } catch (ex) { }
+    }
+    window.setInterval("reinitIframe()", 200);
+</script>

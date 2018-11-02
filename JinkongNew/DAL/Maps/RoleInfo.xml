@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="RoleInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="RoleInfo" type="GModel.RoleRight.RoleInfo" />
+    <typeAlias alias="RoleView" type="GModel.RoleRight.RoleView" />
+  </alias>
+  <resultMaps>
+    <resultMap id="RoleInfoResult" class="RoleInfo">
+      <result property="RoleId" column="RoleId" type="string" dbType="varchar"/>
+      <result property="RoleName" column="RoleName" type="string" dbType="varchar"/>
+      <result property="RoleDate" column="RoleDate" type="DateTime" dbType="DateTime"/>
+      <result property="RoleRemark" column="RoleRemark" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+    </resultMap>
+    <resultMap id="RoleViewResult" class="RoleView">
+      <result property="RoleId" column="RoleId" type="string" dbType="varchar"/>
+      <result property="RoleName" column="RoleName" type="string" dbType="varchar"/>
+      <result property="RoleDate" column="RoleDate" type="DateTime" dbType="DateTime"/>
+      <result property="RoleRemark" column="RoleRemark" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+      <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectRoleInfo" parameterClass="string" resultMap="RoleInfoResult">
+      SELECT RI.ROLE_ID     AS RoleId,
+      RI.ROLE_NAME   AS RoleName,
+      RI.ROLE_DATE   AS RoleDate,
+      RI.ROLE_REMARK AS RoleRemark,
+      RI.DEPT_ID     AS DeptId
+      FROM ROLE_INFO RI WHERE RI.ROLE_ID=#value#
+    </select>
+    <select id="SelectRoleInfoPage" parameterClass="RoleView" resultMap="RoleViewResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT RI.ROLE_ID     AS RoleId,
+      RI.ROLE_NAME   AS RoleName,
+      RI.ROLE_DATE   AS RoleDate,
+      RI.ROLE_REMARK AS RoleRemark,
+      RI.DEPT_ID     AS DeptId,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode
+      FROM ROLE_INFO RI JOIN DEPT_INFO DI ON RI.DEPT_ID=DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="RoleName">
+          RI.ROLE_NAME LIKE  '%'||#RoleName#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          RI.DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE LIKE  #Businessdivisioncode#||'%'
+        </isNotEmpty>
+      </dynamic>
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+    <select id="SelectRoleInfoDownList" parameterClass="string" resultMap="RoleViewResult">
+      SELECT RI.ROLE_ID     AS RoleId,
+      DI.BUSINESSDIVISIONNAME||'---'|| RI.ROLE_NAME   AS RoleName,
+      RI.ROLE_DATE   AS RoleDate,
+      RI.ROLE_REMARK AS RoleRemark,
+      RI.DEPT_ID     AS DeptId,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode
+      FROM ROLE_INFO RI JOIN DEPT_INFO DI ON RI.DEPT_ID=DI.BUSINESSDIVISIONID
+      AND DI.BUSINESSDIVISIONCODE LIKE  #value#||'%'
+      UNION
+      SELECT RI.ROLE_ID AS RoleId,
+      DI.BUSINESSDIVISIONNAME||'---'||RI.ROLE_NAME  AS RoleName,
+      RI.ROLE_DATE AS RoleDate,
+      RI.ROLE_REMARK AS RoleRemark,
+      RI.DEPT_ID AS DeptId,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode
+      FROM ROLE_INFO RI
+      JOIN DEPT_INFO DI
+      ON RI.DEPT_ID = DI.BUSINESSDIVISIONID
+      AND DI.BUSINESSDIVISIONNAME='默认企业'
+      <!--AND RI.DEPT_ID = 'C40A4BB10137436BAC67117C446D91E8'-->
+    </select>
+    
+    <select id="SelectRoleInfoCount" parameterClass="RoleView" resultClass="int">
+      SELECT count(*) FROM ROLE_INFO RI JOIN DEPT_INFO DI ON RI.DEPT_ID=DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="RoleName">
+          RI.ROLE_NAME LIKE  '%'||#RoleName#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          RI.DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE LIKE  #Businessdivisioncode#||'%'
+        </isNotEmpty>
+      </dynamic>
+    </select>
+    <insert id="InsertRoleInfo" parameterClass="RoleInfo">
+      INSERT INTO ROLE_INFO
+      (ROLE_ID,ROLE_NAME,ROLE_DATE,ROLE_REMARK,DEPT_ID)
+      VALUES(#RoleId#,#RoleName#,#RoleDate:DateTime:1/1/0001 12:00:00 AM#,#RoleRemark#,#DeptId#)
+    </insert>
+    <update id="UpdateRoleInfo" parameterClass="RoleInfo">
+      UPDATE ROLE_INFO
+      SET ROLE_NAME=#RoleName#,ROLE_REMARK=#RoleRemark# WHERE ROLE_ID=#RoleId#
+    </update>
+    <delete id="DeleteRoleInfo" parameterClass="string">
+      DELETE FROM ROLE_INFO
+      WHERE ROLE_ID IN ('$value$')
+    </delete>
+  </statements>
+</sqlMap>

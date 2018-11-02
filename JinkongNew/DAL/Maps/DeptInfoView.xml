@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="DeptInfoView" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="DeptInfoView" type="GModel.Basic.DeptInfoView" />
+</alias>
+<resultMaps>
+	<resultMap id="DeptInfoViewResult" class="DeptInfoView">
+    <result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+    <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+    <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+    <result property="Fatherid" column="Fatherid" type="string" dbType="varchar"/>
+    <result property="Isdel" column="Isdel" type="string" dbType="varchar"/>
+    <result property="DepType" column="DepType" type="string" dbType="varchar"/>
+    <result property="Fbusinessdivisionname" column="Fbusinessdivisionname" type="string" dbType="varchar"/>
+    <result property="Fbusinessdivisioncode" column="Fbusinessdivisioncode" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectDeptInfoView" parameterClass="string" resultMap="DeptInfoViewResult">
+    SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,FATHERID AS Fatherid,ISDEL AS Isdel,FBUSINESSDIVISIONNAME AS Fbusinessdivisionname,FBUSINESSDIVISIONCODE AS Fbusinessdivisioncode,DEPTYPE AS DepType
+    FROM DEPT_INFO_VIEW 
+  </select>
+	<select id="SelectDeptInfoViewPage" parameterClass="DeptInfoView" resultMap="DeptInfoViewResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,FATHERID AS Fatherid,ISDEL AS Isdel,FBUSINESSDIVISIONNAME AS Fbusinessdivisionname,FBUSINESSDIVISIONCODE AS Fbusinessdivisioncode,DEPTYPE AS DepType
+    FROM DEPT_INFO_VIEW WHERE  ISDEL=#Isdel# AND BUSINESSDIVISIONCODE LIKE #Businessdivisioncode#||'%'
+    <!--LIKE #Businessdivisioncode#||'%'-->
+    <isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectDeptInfoViewCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM DEPT_INFO_VIEW  
+	</select>
+
+  <select id="SelectGroupDeptInfoPage" parameterClass="DeptInfoView" resultMap="DeptInfoViewResult">
+    SELECT BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname,BUSINESSDIVISIONCODE AS Businessdivisioncode,FATHERID AS Fatherid,ISDEL AS Isdel,FBUSINESSDIVISIONNAME AS Fbusinessdivisionname,FBUSINESSDIVISIONCODE AS Fbusinessdivisioncode,DEPTYPE AS DepType
+    FROM DEPT_INFO_VIEW WHERE  ISDEL=#Isdel# AND FATHERID=#Fatherid# AND DEPTYPE=#DepType#
+  </select>
+  <select id="SelectGroupDeptInfoCount" parameterClass="DeptInfoView" resultClass="int">
+    SELECT count(*)
+    FROM DEPT_INFO_VIEW WHERE ISDEL=#Isdel# AND FATHERID=#Fatherid# AND DEPTYPE=#DepType#
+  </select>
+</statements>
+</sqlMap>

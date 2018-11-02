@@ -1,0 +1,151 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout_511.cshtml";
+}
+
+@Html.Partial("_HeaderPartial_0612")
+
+<div class="moitorContent" id="moitorContent">
+
+    <div class="leftpanel" id="rightpanel">
+
+        @*style="border-style: solid; border-width: 1px; border-color: #16A085; "*@
+
+        <nav class="headernav headerborder" id="header">
+            <div class="headerleft">
+                <ul id="CUL" class="profile_summary">
+                    <li id="CCLJK"><a href="/CarMonitor/BDMonitorIndex_511" style="font-size:14px;">车辆监控</a></li>
+                    <li id="CTJBB"><a href="/CarReport/Index" class="active" style="font-size: 14px; background: #dddddd; ">统计报表</a></li>
+                    @{
+                        if (ViewBag.Deptcode != null)
+                        {
+                            <li id="CXTGLAN"><a href="/Home/Index" style="font-size: 14px; ">系统管理</a></li>
+                        }
+                    }
+                </ul>
+            </div>
+        </nav>
+
+        <div class="subcontent chatcontent">
+            <div id="div_menu" class="chatmessage radius2" style="padding:5px;">
+
+                @Html.Partial("_MenuPartial_Report")
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="contentwrapper11" class="contentwrapper withrightpanel">
+        <div id="subcontent" class="subcontent chatcontent">
+            <div id="chatmessage" class="chatmessage radius2" style="padding:5px;">
+                <div id="tabs" class="easyui-tabs" fit="true" tabheight="35">
+                </div>
+                <div id="tabsMenu" class="easyui-menu" style="width:120px;">
+                    <div name="Refresh">刷新</div>
+                    <div name="close">关闭</div>
+                    <div name="Other">关闭其他</div>
+                    <div name="All">关闭所有</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="target"></div>
+@Html.Partial("_FooterPartial")
+
+<script type="text/javascript" src="~/assets/javascripts/Home.js"></script>
+
+<script type="text/javascript">
+
+    var winHeight = 0;
+    var tabs;
+    var ZDJK = '@ViewBag.ZDJK';
+    var flag = '@ViewBag.Flag';
+    window.onresize = function () {
+        $('#systemContent').height(window.innerHeight - 116);
+    }
+
+    $(function () {
+
+        $('#systemContent').height(window.innerHeight - 116);
+        if (flag == "1") {
+            $('#tabs').tabs('add', {
+                title: "报警统计",
+                closable: false,
+                content: '<iframe scrolling="no" id="/CarReport/Index_BJ" frameborder="0"  src="/CarReport/Index_BJ" style="width:100%;height:100%;"></iframe>',
+            });
+        }
+        else {
+            $('#tabs').tabs('add', {
+                title: "统计报表",
+                closable: false,
+                content: '<iframe scrolling="no" id="/CarReport/Index_TJBB" frameborder="0"  src="/CarReport/Index_TJBB" style="width:100%;height:100%;"></iframe>',
+            });
+        }
+        //绑定tabs的右键菜单
+        $("#tabs").tabs({
+            onContextMenu: function (e, title) {
+                e.preventDefault();
+                $('#tabsMenu').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                }).data("tabTitle", title);
+            }
+        });
+
+        //实例化menu的onClick事件
+        $("#tabsMenu").menu({
+            onClick: function (item) {
+                CloseTab(this, item.name);
+            }
+        });
+
+        //几个关闭事件的实现
+        function CloseTab(menu, type) {
+            var curTabTitle = $(menu).data("tabTitle");
+            var tabs = $("#tabs");
+            var currTab = $('#tabs').tabs('getSelected');
+            var url = $(currTab.panel('options').content).attr('src');
+
+            if (type === "Refresh") {
+                tabs.tabs("update", {
+                    tab: currTab,
+                    options: {
+                        content: createFrame(url)
+                    }
+                });
+                return;
+            }
+            if (type === "close") {
+                tabs.tabs("close", curTabTitle);
+                return;
+            }
+
+            var allTabs = tabs.tabs("tabs");
+            var closeTabsTitle = [];
+
+            $.each(allTabs, function () {
+                var opt = $(this).panel("options");
+                if (opt.closable && opt.title != curTabTitle && type === "Other") {
+                    closeTabsTitle.push(opt.title);
+                } else if (opt.closable && type === "All") {
+                    closeTabsTitle.push(opt.title);
+                }
+            });
+
+            for (var i = 0; i < closeTabsTitle.length; i++) {
+                tabs.tabs("close", closeTabsTitle[i]);
+            }
+        }
+    });
+
+    window.onresize = function () {
+        InitInnerHeight();
+        InitUISize();
+    }
+
+</script>
+
+

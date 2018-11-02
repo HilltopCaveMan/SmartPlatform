@@ -1,0 +1,594 @@
+﻿
+<div class="tabcontant">
+    <div id="MyWizard" class="wizard">
+        <ul class="steps">
+            <li data-target="#step2" id="steps2" class="active"><span class="badge badge-info" onclick="setStep(2)">添加车辆</span></li>
+            <li data-target="#step3" id="steps3"><span class="badge" onclick="setStep(3)">信息展示</span></li>
+        </ul>
+    </div>
+    <div class="step-content">
+        <div class="step-pane active" id="step2">
+            <div id="BoundDiv">
+                <table id="NotBoundTable" title="未添加车辆GPS"></table>
+                <div id="tb12" style="padding:2px 5px;">
+                    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="GPSAndMchine()">确定添加</a>
+                    <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="AddCar()">手动添加车辆</a>
+                </div>
+            </div>
+            <div id="CarDiv" class="hidden">
+                <table id="NotAddTable" title="未添加车辆GPS"></table>
+                <div id="tb11" style="padding:2px 5px;">
+                    类型:
+                    <input id="MchineClass" class="easyui-combobox" style="width:100px;height:20px;" />
+                    机型:
+                    <input id="ModelClass" class="easyui-combobox" style="width:100px;height:20px;" />
+                    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="addGPSAndMchine()">确定添加</a>
+                    <a href="#" class="easyui-linkbutton" iconcls="icon-search" onclick="BoundCar()">同步下线车辆</a>
+                </div>
+            </div>
+
+        </div>
+        <div
+              class="step-pane" id="step3">
+            <table id="carTable"></table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var editIndex = undefined;
+    var curRow = null;
+    var RowIndex;
+    var oneeditIndex;
+    var strMchineClassName;
+    var strModelsCode;
+    var modellist
+    var table = null;
+    var messageONE = "";
+    var messageTWO = "";
+    var info = "";
+    var Broundinfo = "";
+
+    $(function () {
+        loadBoundCar();
+    })
+
+    function setStep(i) {
+        switch (i) {
+            case 2:
+                $("#steps2").addClass('active');
+                $("#step2").addClass('active');
+                $("#steps3").removeClass('active');
+                $("#step3").removeClass('active');
+                editIndex = undefined;
+                loadBoundCar();
+                break;
+            case 3:
+                $("#steps3").addClass('active');
+                $("#step3").addClass('active');
+                $("#steps2").removeClass('active');
+                $("#step2").removeClass('active');
+                editIndex = undefined;
+                loadtable1();
+                break;
+        }
+    };
+
+
+
+    function loadtable(MchineClassNameTmp) {
+        var GPSNUMBERPARAM = $("#GPSNUMBERINPUT").val();
+        var strMchineTypeNameTmp = "";
+        var strMchineTypeID = "";
+        $('#NotAddTable').height($(document.body).height() - $("#MyWizard").height() - 61);
+        $('#NotAddTable').datagrid({
+            loadMsg: "正在加载数据",
+            url: '@Url.Action("GPSSelect", "Generation")',
+            title: 'GPS信息',
+            method: "post",
+            singleSelect: true,
+            queryParams: { "GPSNUMBER": GPSNUMBERPARAM },//查询参数
+            pagination: true, //分页
+            fitColumns: true,
+            sortName: "",//排序字段设置
+            sortOrder: "asc",
+            remoteSort: false, //排序必须有
+            data: [],
+            columns:
+                [[
+                 {
+                     field: 'DEVICEID', title: '', width: 60, align: 'center', hidden: true
+                 },
+                {
+                    field: 'VINCODE', title: '车辆编号', width: 60, align: 'center', editor: 'text'
+                },
+                 {
+                     field: 'PRODUCTCODE', title: '产品代码', width: 40, align: 'center',
+                     editor: {
+                         type: 'combobox',
+                         options: {
+                             url: '@Url.Action("GetProductCodeListByModelCode", "Generation")?ModelsCode=' + MchineClassNameTmp,
+                             valueField: 'PRODUCTCODE',
+                             textField: 'PRODUCTCODE',
+                             filter: function (q, row) {
+                                 var opts = $(this).combobox('options');
+                                 return row[opts.textField].indexOf(q) == 0;
+                             },
+                             onSelect: function (node) {
+
+
+                             }
+                         }
+                     }
+                 },
+                 { field: 'strGPSNumber', title: '终端编号', width: 60, align: 'center', editor: 'text' },
+
+                {
+                    field: 'strSIMNumber', title: 'SIM卡号', width: 60, align: 'center', editor: {
+                        type: 'text'
+                       
+                    }
+                },
+                {
+                    field: 'strState', title: '状态', width: 40, align: 'center', formatter: function (value, rec, index) {
+                        return '<img id="statuone' + index + '" src="/assets/themes/icons/no.png ">';
+                    }
+                }
+                ]],
+            onBeforeEdit: function (index, row) {
+                row.editing = true;
+                $('#NotAddTable').datagrid('refreshRow', index);
+            },
+            onAfterEdit: function (index, row, changes) {
+                curRow = row;
+                RowIndex = index;
+                row.editing = false;
+                $('#NotAddTable').datagrid('refreshRow', index);
+                
+            },
+            onClickRow: onClickRow,
+            fitColumns: true,
+            pagination: true,
+            singleSelect: true,
+            rownumbers: true,
+            collapsible: true,
+            striped: true,
+            toolbar: '#tb11'
+        });
+
+
+
+    };
+    function loadBoundCar() {
+        $('#NotBoundTable').height($(document.body).height() - $("#MyWizard").height() - 61);
+        $('#NotBoundTable').datagrid({
+            loadMsg: "正在加载数据",
+            url: '@Url.Action("GetProductsData", "Generation")',
+            title: 'GPS信息',
+            method: "post",
+            singleSelect: true,
+            //queryParams: { "GPSNUMBER": GPSNUMBERPARAM },//查询参数
+            pagination: true, //分页
+            fitColumns: true,
+            sortOrder: 'asc',//desc,asc
+            sortName: 'DEVICEID',
+            remoteSort: false, //排序必须有
+            columns:
+                [[
+                {
+                    field: 'DEVICEID', title: '', width: 60, align: 'center', hidden: true
+                },
+                {
+                    field: 'VINCODE', title: '车辆编号', width: 60, align: 'center'
+                },
+                {
+                    field: 'MODELS', title: '机型', width: 40, align: 'center'
+                },
+                {
+                    field: 'PRODUCTCODE', title: '产品代码', width: 40, align: 'center'
+                },
+                { field: 'strGPSNumber', title: '终端编号', width: 60, align: 'center', editor: 'text' },
+                {
+                    field: 'strSIMNumber', title: 'SIM卡号', width: 60, align: 'center', editor: {
+                        type: 'text',
+                    }
+                },
+                {
+                    field: 'strState', title: '状态', width: 40, align: 'center', formatter: function (value, rec, index) {
+                        return '<img id="statu' + index + '" src="/assets/themes/icons/no.png ">';
+                    }
+                }
+                ]],
+            onBeforeEdit: function (index, row) {
+
+                row.editing = true;
+                $('#NotBoundTable').datagrid('refreshRow', index);
+            },
+            onAfterEdit: function (index, row) {
+
+                curRow = row;
+                RowIndex = index;
+                row.editing = false;
+                $('#NotBoundTable').datagrid('refreshRow', index);
+            },
+            onClickRow: onClickRowOne,
+            fitColumns: true,
+            pagination: true,
+            singleSelect: true,
+            rownumbers: true,
+            collapsible: true,
+            striped: true,
+            toolbar: '#tb12'
+        });
+    };
+
+    function endEditing() {
+        if (oneeditIndex == undefined) { return true }
+        if ($('#NotAddTable').datagrid('validateRow', oneeditIndex)) {
+            $('#NotAddTable').datagrid('endEdit', oneeditIndex);
+            var a = curRow.strGPSNumber;
+            var b = curRow.VINCODE;
+            var d = curRow.PRODUCTCODE;
+            var e = curRow.strSIMNumber;
+            if (a != "" && b != "" && d != "" && e != "") {
+                var myreg = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+                var regu = "^[0-9a-zA-Z]+$";
+                var re = new RegExp(regu);
+                if (myreg.test(e) && re.test(a)) {
+                    document.getElementById("statuone" + RowIndex).src = "/assets/themes/icons/ok.png";
+                    curRow.strState = "1";
+                    
+                } else {
+                    $.messager.alert('警告', '请输入有效的手机号码或者终端编号含有非法字符！', 'error');
+                    document.getElementById("statuone" + RowIndex).src = "/assets/themes/icons/no.png";
+                    curRow.strState = "0";
+                   
+                }
+               
+               
+            }
+            else {
+                document.getElementById("statuone" + RowIndex).src = "/assets/themes/icons/no.png";
+                curRow.strState = "0";
+            }
+            oneeditIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+  
+    function onClickRow(index) {
+  
+        if (oneeditIndex != index) {
+            if (endEditing()) {
+                $('#NotAddTable').datagrid('selectRow', index)
+                .datagrid('beginEdit', index);
+                oneeditIndex = index;
+            } else {
+                $('#NotAddTable').datagrid('selectRow', oneeditIndex);
+            }
+        }
+    }
+    function onClickRowOne(index) {
+        if (editIndex != index) {
+            if (endEditingOne()) {
+                $('#NotBoundTable').datagrid('selectRow', index)
+                .datagrid('beginEdit', index);
+                editIndex = index;
+            } else {
+                $('#NotBoundTable').datagrid('selectRow', editIndex);
+            }
+        }
+    }
+    function endEditingOne() {
+        if (editIndex == undefined) { return true }
+        if ($('#NotBoundTable').datagrid('validateRow', editIndex)) {
+            $('#NotBoundTable').datagrid('endEdit', editIndex);
+            var a = curRow.strGPSNumber;
+            var e = curRow.strSIMNumber;
+            if (a != "" && e != "") {
+                var myreg = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+                var regu = "^[0-9a-zA-Z]+$";
+                var re = new RegExp(regu);
+                if (myreg.test(e) && re.test(a)) {
+                    document.getElementById("statu" + RowIndex).src = "/assets/themes/icons/ok.png";
+                    curRow.strState = "1";
+
+                } else {
+                    $.messager.alert('警告', '请输入有效的手机号码或者终端编号含有非法字符！', 'error');
+                    document.getElementById("statu" + RowIndex).src = "/assets/themes/icons/no.png";
+                    curRow.strState = "0";
+
+                }
+            }
+            else {
+                document.getElementById("statu" + RowIndex).src = "/assets/themes/icons/no.png";
+                curRow.strState = "0";
+            }
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function loadtable1() {
+        var GPSNUMSTMP = "";
+        $('#carTable').height($(document.body).height() - $("#MyWizard").height() - 61);
+        var DataGPSAndMchineList = $('#carTable').datagrid({
+            loadMsg: "正在加载数据",
+            url: '@Url.Action("GPSAndMchineSelect", "Generation")',
+             queryParams: { "GPSNUM": GPSNUMSTMP },//查询参数
+            title: 'GPS信息',
+            singleSelect: true,
+            pagination: true,
+            pageList: [15, 30, 45],//分页
+            fitColumns: true,
+            sortName: "p.CREATETIME",                //排序字段设置
+            sortOrder: "asc",
+            columns: [[
+                { field: 'strMchineNumber', title: '车辆编号', width: 50, align: 'center', sortable: true },
+                { field: 'strGPSNumber', title: '终端编号', width: 50, align: 'center', sortable: true },
+                { field: 'strMchineClass', title: '类型', width: 50, align: 'center', sortable: true },
+                { field: 'strMchineType', title: '机型', width: 50, align: 'center' },
+                { field: 'strCreatTime', title: '生产时间', width: 50, align: 'center' },
+                { field: 'strSIMNumber', title: 'SIM卡号', width: 100, align: 'center' }
+            ]],
+            toolbar: [
+               {
+                   text: '修改',
+                   iconCls: 'icon-edit',
+                   handler: function () {
+                       var rows = DataGPSAndMchineList.datagrid('getSelected');
+                       if (rows.length <= 0) {
+                           $.messager.alert('警告', '请选择所需修改的数据！', 'error');
+                       }
+                       else {
+                           $.DialogOpen('@Url.Action("Edit", "Generation")?GPSNumber=' + rows.strGPSNumber + '&' + 'MchineNumber=' + rows.strMchineNumber, { title: "修改信息", width: 400, height: 300 });
+                       }
+                   }
+               }
+               @*,
+                {
+                    text: '删除',
+                    iconCls: 'icon-remove',
+                    handler: function () {
+                        var rows = DataGPSAndMchineList.datagrid('getSelections');
+                        if (rows.length <= 0) {
+                            $.messager.alert('警告', '请选中所需删除的数据', 'error');
+                        }
+                        else {
+                            $.messager.confirm('确定', '您确定要删除吗？', function (isDelete) {
+                                if (isDelete) {
+                                    $.ajax({
+                                        url: '@Url.Action("GPSAndMchineDelete", "Generation")',
+                                        data: rows[0],
+                                        dataType: 'json',
+
+                                        success: function (f) {
+                                            if (r == "SUCCEED") {
+                                                // DataGPSAndMchineList.datagrid('acceptChanges');
+                                                $.messager.show({ msg: r.msg, title: '取消成功！' });
+                                                //editRow = undefined;
+                                                DataGPSAndMchineList.datagrid('reload');
+                                            } else {
+                                                /*datagrid.datagrid('rejectChanges');*/
+                                                // DataGPSAndMchineList.datagrid('beginEdit', editRow);
+                                                $.messager.alert('发生错误', r.msg, 'error');
+                                            }
+                                            DataGPSAndMchineList.datagrid('unselectAll');
+                                        }
+                                    });
+                                }
+                            })
+                        }
+                    }
+                }*@
+                ,
+                {
+                    text: '终端编号：<input class="easyui-validatebox  easyui-textbox" id="userAccount"/>',
+                    //iconCls: 'con-search',
+                },
+                 {
+                     text: '查询',
+                     iconCls: 'icon-search',
+                     handler: function () {
+                         var GPSNUMSTMP = $("#userAccount").val();
+                         var param = { "GPSNUM": GPSNUMSTMP };
+                         $("#carTable").datagrid("load", param);
+                     }
+                 }
+            ]
+        });
+    };
+
+
+    function BoundCar() {
+        $('#CarDiv').addClass("hidden");
+        $('#BoundDiv').removeClass("hidden");
+        editIndex = undefined;
+        loadBoundCar();
+    }
+    function AddCar() {
+        $('#BoundDiv').addClass("hidden");
+        $('#CarDiv').removeClass("hidden");
+        loadtable();
+        $('#MchineClass').combobox({
+            url: '@Url.Action("GetMchineClassList", "Generation")',
+            valueField: 'VEHICLETYPECODER',
+            textField: 'DEVICETYPE',
+            onSelect: function (rec) {
+                loadmodel(rec.VEHICLETYPECODER)
+            }, onLoadSuccess: function () { //数据加载完毕事件
+                var data = $('#MchineClass').combobox('getData');
+                if (data.length > 0) {
+                    $("#MchineClass").combobox('select', data[data.length - 1].DEVICETYPE);
+                }
+            }
+
+        });
+
+
+    };
+    function loadmodel(VEHICLETYPECODER) {
+        
+        modellist = $('#ModelClass').combobox({
+            url: encodeURI('@Url.Action("GetMchineTypeList", "Generation")?MchineClassNumber=' + VEHICLETYPECODER),
+            valueField: 'MODELSCODE',
+            textField: 'MODELS',
+            onSelect: function (node) {
+                oneeditIndex = undefined;
+                loadtable(node.MODELSCODE);
+            }, onLoadSuccess: function () { //数据加载完毕事件
+                var data = $('#ModelClass').combobox('getData');
+                if (data.length > 0) {
+                    $("#ModelClass").combobox('select', data[0].MODELSCODE);
+                }
+            }
+        });
+        if (modellist = null) {
+            var MODELSCODE = ""
+            oneeditIndex = undefined;
+            loadtable(MODELSCODE);
+        }
+
+    }
+    //////手动绑定的添加
+    var currentIndex = 0;//退出递归的条件变量
+    var AddRows;
+    function addGPSAndMchine() {
+        AddRows = $('#NotAddTable').datagrid('getRows');
+        if (AddRows.length > 0) {
+            Add();
+        } else {
+            editIndex = undefined;
+            $.messager.alert('警告', '没有绑定车辆', 'info');
+        }
+
+
+    };
+    function Add() {
+        if (currentIndex >= AddRows.length) { //infos是存放主机名称的数组
+            if (info == "") {
+                $.messager.alert('提示', "请绑定正确信息", 'info');
+                currentIndex = 0;
+            } else {
+                $.messager.alert('提示', info, 'info');
+                currentIndex = 0;
+                info = "";
+                var MODELSCODE = "";
+                MODELSCODE = $('#ModelClass').combobox('getValue');
+                oneeditIndex = undefined;
+                loadtable(MODELSCODE);
+            }
+           
+            return;
+        } else {
+            if (AddRows[currentIndex].strState == "1") {
+                $.ajax({
+                    url: '@Url.Action("ProductionDevice", "Generation")',
+                    data: { VINCode: AddRows[currentIndex].VINCODE, PRODUCTCODE: AddRows[currentIndex].PRODUCTCODE, TerminalNum: AddRows[currentIndex].strGPSNumber, SIMNum: AddRows[currentIndex].strSIMNumber },
+                    type: "post",
+                    success: function (data) {
+                        info += AddRows[currentIndex].VINCODE + ':' + data + ';';
+                        currentIndex++;
+                        Add();
+                    }
+                });
+            } else {
+                currentIndex++;
+                Add();
+            }
+
+        }
+
+    }
+    //同步绑定的添加
+    var BroundIndex = 0;//退出递归的条件变量
+    var BroundRows;
+    function GPSAndMchine() {
+        //GPSList
+        BroundRows = $('#NotBoundTable').datagrid('getRows');
+        if (BroundRows.length > 0) {
+            BroundAdd();
+
+        } else {
+            editIndex = undefined;
+            $.messager.alert('警告', '没有绑定车辆', 'info');
+        }
+    };
+    function BroundAdd() {
+        if (BroundIndex >= BroundRows.length) { //infos是存放主机名称的数组
+            if (Broundinfo == "") {
+                $.messager.alert('提示', "请绑定正确信息", 'info');
+                BroundIndex = 0;
+            } else {
+                $.messager.alert('提示', Broundinfo, 'info');
+                BroundIndex = 0;
+                Broundinfo = "";
+                editIndex = undefined;
+                loadBoundCar();
+            }
+            return;
+        } else {
+            if (BroundRows[BroundIndex].strState == "1") {
+                $.ajax({
+                    url: '@Url.Action("BindGPSNum", "Generation")',
+                    data: { DeviceID: BroundRows[BroundIndex].DEVICEID, TerminalNum: BroundRows[BroundIndex].strGPSNumber, SIMNum: BroundRows[BroundIndex].strSIMNumber },
+                    type: "post",
+                    success: function (data) {
+                        Broundinfo += BroundRows[BroundIndex].VINCODE + ':' + data + ';';
+                        BroundIndex++;
+                        BroundAdd();
+                    }
+                });
+            } else {
+                BroundIndex++;
+                BroundAdd();
+            }
+
+        }
+    }
+    //手机号验证
+    function validatemobile(mobile) {
+        if (mobile.length == 0) {
+            alert('请输入手机号码！');
+           // document.form1.mobile.focus();
+            return false;
+        }
+        if (mobile.length != 11) {
+            alert('请输入有效的手机号码！');
+           // document.form1.mobile.focus();
+            return false;
+        }
+
+        var myreg = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+        if (!myreg.test(mobile)) {
+            alert('请输入有效的手机号码！');
+           // document.form1.mobile.focus();
+            return false;
+        }
+    }
+    //终端编号验证
+    function isNumberOrLetter(s) {//判断是否是数字或字母
+
+        var regu = "^[0-9a-zA-Z]+$";
+        var re = new RegExp(regu);
+        if (re.test(s)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function succeed() {
+        $(".dialog").dialog('close');
+        $.messager.alert('提示', '操作成功', 'info');
+        $('#carTable').datagrid('reload');
+    }
+    function error() {
+        $(".dialog").dialog('close');
+        $.messager.alert('提示', '操作失败', 'error');
+        $('#carTable').datagrid('reload');
+    }
+</script>

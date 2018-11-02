@@ -1,0 +1,170 @@
+﻿@model GModel.Location.TerData
+<table cellpadding="0" cellspacing="0" style="width:98%;margin:15px auto;">
+    <tr>
+        <td class="titletd">终端编号</td><td>@Model.TerNo</td>        
+        <td class="titletd">所属企业</td><td>@Model.Businessdivisionname</td>
+    </tr>
+    <tr>
+        <td class="titletd">工作时间</td><td>@Model.Totalworktime</td>
+        <td class="titletd">设备状态</td>
+        <td>
+            @{
+                if(Model.TerStatus == "1")
+                {<text>测试</text>}
+                else if (Model.TerStatus == "2")
+                {<text>待激活</text>}
+                else if(Model.TerStatus == "3")
+                {<text>已激活</text>}
+                else if(Model.TerStatus == "4")
+                {<text>已拆除</text>}
+                else if(Model.TerStatus == "5")
+                {<text>到期</text>}    
+                else if(Model.TerStatus == "6")
+                {<text>休眠</text>}                                
+                else{<text>其他</text>}
+            }
+        </td>
+    </tr>
+    <tr>
+       <td class="titletd">回传时间</td><td>@(Model.Rtime.ToString("yyyy-MM-dd HH:mm:ss") == "0001-01-01 00:00:00" ? "" : Model.Rtime.ToString("yyyy-MM-dd HH:mm:ss"))</td>     
+       <td class="titletd">入网时间</td><td>@(Model.Ter_Innettime.ToString("yyyy-MM-dd HH:mm:ss") == "0001-01-01 00:00:00" ? "" : Model.Ter_Innettime.ToString("yyyy-MM-dd HH:mm:ss"))</td>
+    </tr>
+    <tr><td class="titletd">地理位置</td><td colspan="3">@Model.Position</td></tr>
+    <tr>
+        <td class="titletd">SIM卡号</td>
+        <td>@Model.TerSimcard</td>  
+        <td class="titletd">定位时间</td>
+        <td>@(Model.Positioningtime.ToString("yyyy-MM-dd HH:mm:ss") == "0001-01-01 00:00:00" ? "" : Model.Positioningtime.ToString("yyyy-MM-dd HH:mm:ss"))</td>
+    </tr>
+    <tr>
+        <td class="titletd">纬度</td><td>@Model.Latitude</td>   
+        <td class="titletd">经度</td><td>@Model.Longitude</td>
+    </tr>
+    <tr>
+        <td class="titletd">设备定位信息</td>
+        <td>
+            @{
+                if (Model.Ifposition == "定位") 
+                {<text>GPS定位</text>}
+                else if (Model.Ifposition == "不定位")
+                {
+                    if (Model.ProName == "一代无线GPS" || Model.ProName == "二代无线GPS" || Model.ProName == "五代无线GPS")
+                    {
+                        <text>基站定位</text>
+                    }
+                    else {
+                        <text>暂无</text>
+                    }
+                }
+                else
+                {<text>其他</text>}  
+            }
+        </td>
+        <td class="titletd">设备软件版本</td>
+        <td>@Model.Programverson</td>
+    </tr>
+    <tr>
+        <td class="titletd">设备电池电压</td><td>@Model.TerVbatt</td>       
+        <td class="titletd">设备间隔时间</td><td>@Model.Ntervalltime</td>
+    </tr>
+    <tr>
+        <td class="titletd">蓝牙绑定</td>
+        <td>
+            @{
+                if (Model.Northorsouth == "1")
+                {
+                    <text>已绑蓝牙</text>
+                }
+                else
+                {
+                    <text></text>
+                }
+            }
+        </td>
+        <td class="titletd">蓝牙状态</td>
+        <td>@{
+                if(Model.Eastorwest=="1")
+                { 
+                    <text>正常</text>
+                }
+                else if (Model.Eastorwest == "0")
+                {
+                    if (Model.ProName == "一代无线GPS" || Model.ProName == "二代无线GPS" || Model.ProName == "五代无线GPS")
+                    {
+                        <text>有线蓝牙断开</text>
+                    }
+                    else
+                    {
+                        <text>蓝牙断开</text>
+                    }
+                }
+                else
+                {
+                    <text></text>
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td class="titletd">设备启动次数</td>
+        <td>@Model.TerStatrtimes</td> 
+        <td class="titletd">GSM信号强度</td>
+        <td>@Model.Gsmrssi</td>  
+    </tr>
+    <tr>
+        <td class="titletd">设备休眠时间</td><td>@Model.Sleeptime</td>  
+        <td class="titletd">GPS速度</td><td>@Model.Speed</td>
+    </tr>
+    <tr>
+        <td class="titletd">可视卫星颗数</td><td>@Model.Visualsatellite</td>
+        <td class="titletd">使用卫星颗数</td><td>@Model.Usesatellite</td>
+    </tr>
+    <tr>
+    <td class="titletd">设备工作模式</td>
+    <td>
+        @{
+            if(Model.TerModel=="1")
+            {<text>标准模式</text>}
+            else if (Model.TerModel == "2")
+            {<text>精准模式</text>}               
+            else if(Model.TerModel == "3")
+            {<text>追车模式</text>}
+            else {<text>其他</text>}
+        }
+        </td>    
+       <td class="titletd">GPS高度（海拔）</td>
+    <td>@Model.Height</td>
+    </tr>
+    <tr><td class="titletd">盲区数据标志</td>
+     <td>
+         @{
+             if (Model.Ifblinddata=="1")
+             {
+                 <text>盲区数据</text>
+             }
+             else 
+             {
+                 <text>正常数据</text>
+             }
+          }
+        
+     </td>   
+     <td class="titletd">GPS方向</td><td>@Model.Direction</td></tr>
+    <tr>
+      <td class="titletd">盲区数据数量</td><td>@Model.Blinddatanum</td> 
+      <td class="titletd">设备硬件版本</td><td>@Model.Gpsverson</td>
+    </tr>
+</table>
+<style type="text/css">
+    
+    table tr td {
+        height: 30px;
+        border: 1px solid #999999;
+    }
+    .titletd {
+        width:100px;
+        text-align:right;
+        padding-right:5px;
+        background-color:#e4e3e3;
+    }
+</style>

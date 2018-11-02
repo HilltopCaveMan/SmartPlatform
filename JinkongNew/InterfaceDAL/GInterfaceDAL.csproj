@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{780C9F49-F231-406C-8A6C-0FE0F6297042}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InterfaceDAL</RootNamespace>
+    <AssemblyName>InterfaceDAL</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="IBatisNet.Common, Version=1.6.2.0, Culture=neutral, PublicKeyToken=ed781d9fc396c6ca, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\IBatisNet.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Basic\IAppSettingDao.cs" />
+    <Compile Include="Basic\ILogInfoDao.cs" />
+    <Compile Include="Basic\IDeptInfoDao.cs" />
+    <Compile Include="Basic\IDeptInfoViewDao.cs" />
+    <Compile Include="Basic\IQuestionReplyDao.cs" />
+    <Compile Include="Basic\IUserDeptViewDao.cs" />
+    <Compile Include="Basic\IUserFieldsDao.cs" />
+    <Compile Include="Basic\IUserInfoDao.cs" />
+    <Compile Include="Basic\IUserRoleViewDao.cs" />
+    <Compile Include="Basic\IVersionInfoDao.cs" />
+    <Compile Include="Car\ICarInfoDao.cs" />
+    <Compile Include="Car\ICarReportDao.cs" />
+    <Compile Include="Car\ICarTypeDao.cs" />
+    <Compile Include="Car\IFieldValuesDao.cs" />
+    <Compile Include="Car\IMonitorViewDao.cs" />
+    <Compile Include="Car\IProductsInfoDao.cs" />
+    <Compile Include="Car\IRailPropertyDao.cs" />
+    <Compile Include="Car\IRegistrationInfoDao.cs" />
+    <Compile Include="Car\ISetAreaDao.cs" />
+    <Compile Include="Car\ITerminalInfoDao.cs" />
+    <Compile Include="Car\ITerminalInfoViewDao.cs" />
+    <Compile Include="IColligateQueryDao.cs" />
+    <Compile Include="InterFace\IOldterPostbacktimesDao.cs" />
+    <Compile Include="InterFace\IRawDataDao.cs" />
+    <Compile Include="InterFace\ISendcmdDao.cs" />
+    <Compile Include="InterFace\ISendinfoDao.cs" />
+    <Compile Include="InterFace\ISendinfoLastDao.cs" />
+    <Compile Include="InterFace\ISendinfoyxDao.cs" />
+    <Compile Include="InterFace\ISendinfoyxLastDao.cs" />
+    <Compile Include="Location\IHistoricalDataDao.cs" />
+    <Compile Include="Location\IRealtimeDataDao.cs" />
+    <Compile Include="Location\IRealtimeViewDao.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoleRight\IMenuInfoDao.cs" />
+    <Compile Include="RoleRight\IMenuViewDao.cs" />
+    <Compile Include="RoleRight\INotselMenuViewDao.cs" />
+    <Compile Include="RoleRight\IRoleInfoDao.cs" />
+    <Compile Include="RoleRight\IRoleManuDao.cs" />
+    <Compile Include="RoleRight\ISelMenuViewDao.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GModel\GModel.csproj">
+      <Project>{ffa72b5f-17d4-4451-9a2c-a87c72a149a3}</Project>
+      <Name>GModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,69 @@
+﻿
+<div class="tabcontant">
+    <form>
+        <table style="width:100%">
+            <tr>
+                <td  style="text-align:center;">
+                    <input id="hid_RoleID" type="hidden" value="@ViewBag.RoleID" />
+                    <b>角色名称：@ViewBag.RoleName</b>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <fieldset style="height:440px;">
+                        @*<legend>未选权限</legend>*@
+                        <div style="height:400px;overflow:auto">
+                            <ul id="RightTree"></ul>
+                        </div>
+                    </fieldset>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#RightTree").tree({
+            url: '/MenuInfo/GetMenuTree',
+            animate: true,
+            checkbox: true,
+            cascadeCheck: false,
+            queryParams: {UserRole:'@ViewBag.RoleID'},
+            onLoadSuccess: function () {},
+            onCheck: function (node, checked) {
+                if (checked == true) {
+                    $.ajax({
+                        url: "/MenuInfo/AddRight",
+                        data: { RoleId: '@ViewBag.RoleID',MenuId:node.id},
+                        type: "POST",                      
+                        success: function (data) {
+                            if (data == "true") {
+                            } else {
+                                alert("分配失败，" + data);                      
+                            }
+                        }, error: function (data) {
+                            alert("分配失败");
+                        }
+                    });
+                } else if (checked == false) {
+                    $.ajax({
+                        url: "/MenuInfo/CancelRight",
+                        data: { RoleId: '@ViewBag.RoleID', MenuId: node.id },
+                        type: "POST",
+                        dataType: "text",
+                        cache: false,
+                        success: function (data) {
+                            if (data >=0) {
+                            }else {
+                                alert("分配失败！");
+                            }
+                        }, error: function (data) {
+                            alert("分配失败");
+                        }
+                    });
+                }          
+            }
+        });
+    })
+</script>
+

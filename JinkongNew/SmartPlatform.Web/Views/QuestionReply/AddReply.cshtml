@@ -1,0 +1,127 @@
+﻿@model GModel.Basic.QuestionInfo
+
+@using (Ajax.BeginForm("AddReplyForm", "QuestionReply", new AjaxOptions(), null, new { @style = "overflow:auto;height:100%;" }))
+{
+    <div style="overflow:hidden;margin-bottom:50px;">
+        @Html.HiddenFor(m => m.QuestionId, new { @class = "", })
+        <table border="1" class="Qtable" style="margin-top:20px;">
+            <tr>
+                <td rowspan="2" align="center" style="width:120px;">
+                    <div>
+                        <img src="../Content/Images/largerguest.png" />
+                    </div>
+                    <div style="width:88px;text-align:center;">@Html.LabelFor(m => m.QuestionMan, @Model.QuestionMan)</div>
+                </td>
+                <td>
+                    <div>
+                        @Html.LabelFor(m => m.QuestionTitle, @Model.QuestionTitle, new { @style = "font-size:20px;color:#16a985; font-family: Regular;font-weight:400;" })
+                    </div>
+                    <div style="margin-top: 10px; white-space: normal; ">
+                        @Html.LabelFor(m => m.QuestionContent, @Model.QuestionContent)
+                    </div>
+                </td>
+                <td rowspan ="2">@Html.LabelFor(m => m.QuestionTime, @Model.QuestionTime.ToString("yyyy-MM-dd HH:mm:ss"))</td>
+            </tr>
+        </table>
+        <div id="replyinfo" style="border:1px solid #ccc;min-height:30px;width:900px;margin:30px;">
+        </div>
+        <div style="height:20px;"></div>
+        <div class="stdform">
+            <div style="width: 80px; margin-left: 30px;"><img src="../Content/Images/icon_fabiao.png" /><div style="float:right;">发表回复</div></div>
+            <div class="field">
+                <textarea id="ReplyContent" name="ReplyContent" style="width:900px;height:100px;"></textarea>
+            </div>
+        </div>
+        <div style="height: 30px;"></div>
+        <div class="formfooter">
+            <button class="stdbtn btn_blue" type="submit" onclick="return validate();">确定</button>
+            <button class="stdbtn btn_default" type="button" onclick="clearForm()">返回</button>
+        </div>
+    </div>
+}
+<style type="text/css">
+    .Qtable {
+        width: 100%;
+        TABLE-LAYOUT: fixed;
+    }
+    
+    .Qtable tr td {
+        /*border:1px solid red;*/
+    }
+
+    .stdform div.field
+    {margin-left:30px;}
+</style>
+<script type="text/javascript">
+    $(function () {
+        $("input, textarea, select").uniform();
+        InitReplayData();
+    });
+
+    function InitReplayData()
+    {
+        $.ajax({
+            url: '/QuestionReply/GetReplyList?questionid=@Model.QuestionId',
+            type: "post",
+            success: function (r) {
+                if (r != null && r != "[]") {
+                    var data = eval(r);
+                    $('#replyinfo').html("");
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].ReplyMan == "bcadmin") {
+                            $('#replyinfo').append("<table class='Qtable'><tr><td style='width:50px;'><img src='../Content/Images/smalladmin.png' /></td><td style='width:642px;word-wrap:break-word;word-break:break-all;white-space: pre-wrap; '><label style='color:#16a985;'>" + data[i].ReplyMan + "：</label>" + data[i].ReplyContent + "</td><td style='width:200px;'>" + data[i].ReplyTime + "</td></tr></table>");
+                        }
+                        else {
+                            $('#replyinfo').append("<table class='Qtable'><tr><td style='width:50px;'><img src='../Content/Images/smallguest.png' /></td><td style='width:642px;word-wrap:break-word;word-break:break-all;white-space: pre-wrap; '><label style='color:#16a985;'>" + data[i].ReplyMan + "：</label>" + data[i].ReplyContent + "</td><td>" + data[i].ReplyTime + "</td></tr></table>");
+                        }
+                    }
+                }
+                else {
+                    $('#replyinfo').append("<label style='color:#ccc;height:30px;line-height:30px;padding-left:5px;'>暂无回复...</label>");
+                }
+            }
+        });
+    }
+
+    function validate() {
+        var content = $('#ReplyContent').val();
+        if (content == null || content == "") {
+            window.parent.$.messager.alert('提示', '回复内容不能为空!', 'info');
+            return false;
+        }
+        else {
+            if (content.length > 200)
+            {
+                window.parent.$.messager.alert('提示', '回复内容不能过长!', 'info');
+                return false;
+            }
+        }
+    };
+
+    function clearForm() {
+        //window.parent.$(".dialog").dialog('close');
+        window.location.href = '/QuestionReply/QuestionReplyIndex';
+    };
+
+    function submitFormSucceed() {
+        //var ifr = window.parent.document.getElementById('/QuestionReply/QuestionReplyIndex');
+        //var win = ifr.window || ifr.contentWindow;
+        //win.$('#QuestionTable').datagrid('reload');
+        //window.parent.$(".dialog").dialog('close');
+        window.$.messager.show({
+            title: '提示',
+            msg: "回复成功！",
+            timeout: 2000,
+        });
+        $('#ReplyContent').val("");
+        InitReplayData();
+    };
+    function submitFormError() {
+        //window.parent.$(".dialog").dialog('close');
+        window.$.messager.show({
+            title: '提示',
+            msg: "回复失败！",
+            timeout: 2000,
+        });
+    };
+</script>

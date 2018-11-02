@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FFA72B5F-17D4-4451-9A2C-A87C72A149A3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GModel</RootNamespace>
+    <AssemblyName>GModel</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.0.0\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Basic\AppSetting.cs" />
+    <Compile Include="Basic\DeptInfo.cs" />
+    <Compile Include="Basic\DeptInfoView.cs" />
+    <Compile Include="Basic\LogInfo.cs" />
+    <Compile Include="Basic\QuestionInfo.cs" />
+    <Compile Include="Basic\ReplyInfo.cs" />
+    <Compile Include="Basic\UpLoadTerBind.cs" />
+    <Compile Include="Basic\UserDeptView.cs" />
+    <Compile Include="Basic\UserFields.cs" />
+    <Compile Include="Basic\UserInfo.cs" />
+    <Compile Include="Basic\UserRoleView.cs" />
+    <Compile Include="Basic\VersionInfo.cs" />
+    <Compile Include="Basic\WarnDept.cs" />
+    <Compile Include="Basic\WarnParam.cs" />
+    <Compile Include="Car\CarDetialInfo.cs" />
+    <Compile Include="Car\CarInfo.cs" />
+    <Compile Include="Car\CarReport_BJView.cs" />
+    <Compile Include="Car\CarReport_LCBBView.cs" />
+    <Compile Include="Car\CarReport_LCTJView.cs" />
+    <Compile Include="Car\CarReport_LXTJView.cs" />
+    <Compile Include="Car\CarReport_TerData.cs" />
+    <Compile Include="Car\CarReport_ZDTJView.cs" />
+    <Compile Include="Car\CarReport_ZXTJView.cs" />
+    <Compile Include="Car\CarType.cs" />
+    <Compile Include="Car\CarTypeList.cs" />
+    <Compile Include="Car\CarTypeView.cs" />
+    <Compile Include="Car\DetialCarInfo.cs" />
+    <Compile Include="Car\DetialPositionInfo.cs" />
+    <Compile Include="Car\FieldValues.cs" />
+    <Compile Include="Car\GetterpositionView.cs" />
+    <Compile Include="Car\MonitorView.cs" />
+    <Compile Include="Car\ProductsInfo.cs" />
+    <Compile Include="Car\RailProperty.cs" />
+    <Compile Include="Car\RegistrationInfo.cs" />
+    <Compile Include="Car\SetArea.cs" />
+    <Compile Include="Car\TerminalBind.cs" />
+    <Compile Include="Car\TerminalInfo.cs" />
+    <Compile Include="Car\TerminalInfoView.cs" />
+    <Compile Include="InterFace\HistoricalData.cs" />
+    <Compile Include="InterFace\OldterPostbacktimes.cs" />
+    <Compile Include="InterFace\RawData.cs" />
+    <Compile Include="InterFace\Sendcmd.cs" />
+    <Compile Include="InterFace\Sendinfo.cs" />
+    <Compile Include="InterFace\SendinfoLast.cs" />
+    <Compile Include="InterFace\Sendinfoyx.cs" />
+    <Compile Include="InterFace\SendinfoyxLast.cs" />
+    <Compile Include="Location\HistoricalData.cs" />
+    <Compile Include="Location\TercensusData.cs" />
+    <Compile Include="Location\TerData.cs" />
+    <Compile Include="Location\RealtimeData.cs" />
+    <Compile Include="Location\RealtimeView.cs" />
+    <Compile Include="Location\Selectcarmonitor.cs" />
+    <Compile Include="Location\YXHistoricalData.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultState.cs" />
+    <Compile Include="RoleRight\MenuInfo.cs" />
+    <Compile Include="RoleRight\MenuPower.cs" />
+    <Compile Include="RoleRight\MenuView.cs" />
+    <Compile Include="RoleRight\NotselMenuView.cs" />
+    <Compile Include="RoleRight\RoleInfo.cs" />
+    <Compile Include="RoleRight\RoleManu.cs" />
+    <Compile Include="RoleRight\RoleView.cs" />
+    <Compile Include="RoleRight\SelMenuView.cs" />
+    <Compile Include="TreeModeCheck.cs" />
+    <Compile Include="TreeMode.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

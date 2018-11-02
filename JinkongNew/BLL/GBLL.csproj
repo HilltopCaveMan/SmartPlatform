@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0ACAD972-E2BF-495C-9DF2-5970FD8A141E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GBLL</RootNamespace>
+    <AssemblyName>GBLL</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <SccProjectName>Svn</SccProjectName>
+    <SccLocalPath>Svn</SccLocalPath>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccProvider>SubversionScc</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="IBatisNet.Common, Version=1.6.2.0, Culture=neutral, PublicKeyToken=ed781d9fc396c6ca, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\IBatisNet.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Basic\AppSettingBLL.cs" />
+    <Compile Include="Basic\CacheHelper.cs" />
+    <Compile Include="Basic\DeptInfoBLL.cs" />
+    <Compile Include="Basic\DeptInfoViewBLL.cs" />
+    <Compile Include="Basic\LogInfoBLL.cs" />
+    <Compile Include="Basic\QuestionReplyBLL.cs" />
+    <Compile Include="Basic\UserDeptViewBLL.cs" />
+    <Compile Include="Basic\UserFieldsBLL.cs" />
+    <Compile Include="Basic\UserInfoBLL.cs" />
+    <Compile Include="Basic\UserRoleViewBLL.cs" />
+    <Compile Include="Basic\VersionInfoBLL.cs" />
+    <Compile Include="Car\CarInfoBLL.cs" />
+    <Compile Include="Car\CarReportBLL.cs" />
+    <Compile Include="Car\CarTypeBLL.cs" />
+    <Compile Include="Car\FieldValuesBLL.cs" />
+    <Compile Include="Car\MonitorViewBLL.cs" />
+    <Compile Include="Car\ProductsInfoBLL.cs" />
+    <Compile Include="Car\RailPropertyBLL.cs" />
+    <Compile Include="Car\RegistrationInfoBLL.cs" />
+    <Compile Include="Car\SetAreaBLL.cs" />
+    <Compile Include="Car\TerminalInfoBLL.cs" />
+    <Compile Include="Car\TerminalInfoViewBLL.cs" />
+    <Compile Include="ColligateQueryService.cs" />
+    <Compile Include="InterFace\OldterPostbacktimesBLL.cs" />
+    <Compile Include="InterFace\RawDataBLL.cs" />
+    <Compile Include="InterFace\SendcmdBLL.cs" />
+    <Compile Include="InterFace\SendinfoBLL.cs" />
+    <Compile Include="InterFace\SendinfoLastBLL.cs" />
+    <Compile Include="InterFace\SendinfoyxLastBLL.cs" />
+    <Compile Include="InterFace\SendinfoyxBLL.cs" />
+    <Compile Include="Location\HistoricalDataBLL.cs" />
+    <Compile Include="Location\RealtimeDataBLL.cs" />
+    <Compile Include="Location\RealtimeViewBLL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoleRight\MenuInfoBLL.cs" />
+    <Compile Include="RoleRight\MenuViewBLL.cs" />
+    <Compile Include="RoleRight\NotselMenuViewBLL.cs" />
+    <Compile Include="RoleRight\RoleInfoBLL.cs" />
+    <Compile Include="RoleRight\RoleManuBLL.cs" />
+    <Compile Include="RoleRight\SelMenuViewBLL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DAL\GDAL.csproj">
+      <Project>{d3d57c4b-818e-45a8-9e83-4352107321d1}</Project>
+      <Name>GDAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GModel\GModel.csproj">
+      <Project>{ffa72b5f-17d4-4451-9a2c-a87c72a149a3}</Project>
+      <Name>GModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InterfaceDAL\GInterfaceDAL.csproj">
+      <Project>{780c9f49-f231-406c-8a6c-0fe0f6297042}</Project>
+      <Name>GInterfaceDAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

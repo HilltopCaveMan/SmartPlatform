@@ -1,0 +1,184 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" line-height:26px; background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+
+                <td style="padding-left: 15px;">
+                    终端类型:
+                </td>
+                <td>
+                    <input id="TerTypeSel" name="TerTypeSel" type="text" class="easyui-combobox" style="width:150px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    所属企业:
+                </td>
+                <td>
+                    <input id="TerDeptSel" name="TerDeptSel" class="easyui-combobox" style="width:150px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    <input id="ChkShowChild" type="checkbox" name="ChkShowChild" title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" /><label title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" style="cursor:pointer;" for="ChkShowChild">包含子企业</label>
+                </td>
+
+            </tr>
+
+        </table>
+
+        <table style="margin-top:5px;">
+            <tr>
+                <td id="td_ksrq" style="padding-left: 15px;">
+                    开始时间:
+                </td>
+                <td>
+                    <input id="KSRQ" name="KSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                </td>
+
+                <td id="td_jsrq" style="padding-left: 15px;">
+                    结束时间:
+                </td>
+                <td>
+                    <input id="JSRQ" name="JSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    对象类型:
+                </td>
+                <td>
+                    <input id="ObjTypeSel" name="ObjTypeSel" type="text" class="easyui-combobox" style="width:100px; height:30px;" panelheight="110" />
+                </td>
+                <td style="padding-left: 15px;">
+                    关键字:
+                </td>
+                <td>
+                    <input id="SearchKey" name="SearchKey" type="text" style="width:120px; height:23px;" />
+                </td>
+
+                <td colspan="4">
+                    &nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="search" onclick="Btn_GetTerList()">查询</a>
+                    &nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="upLoad" onclick="Btn_LoadExcel()">数据导出</a>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+    <table id="LoadDataTable"></table>
+</div>
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script src="~/assets/javascripts/Report.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        //分辨率
+        InitFBL();
+
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 78,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+
+        $("input, textarea, select").uniform();
+
+        //日期段
+        $("#KSRQ").datebox("setValue", "@ViewBag.KSRQ");
+        $("#JSRQ").datebox("setValue", "@ViewBag.JSRQ");
+
+        //用户表格高度
+        $("#LoadDataTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+
+        //终端类型下拉框
+        InitTerTypeSel();
+
+        InitDeptSel();
+
+        InitCarTerTypeSel();
+
+        //设置部门默认值 
+        $('#TerDeptSel').combotree('setValue', '@ViewBag.DeptId');
+
+        //加载表格数据
+        InitLoadDataTable();
+
+        InitUISize();
+
+    });
+
+    var TerManager = [];
+
+    function InitLoadDataTable() {
+
+        $('#LoadDataTable').datagrid({
+
+            url: '@Url.Action("GetData_LCTJ", "CarReport")',
+
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 100, align: 'center' },
+                { field: 'CarNo', title: '车牌号', width: 100, align: 'center' },
+                { field: 'Rtime', title: '回传时间', width: 100, align: 'center' },
+                { field: 'Position', title: '回传位置', width: 150, align: 'center' },
+                { field: 'LCTJ', title: '里程数(km)', width: 100, align: 'center', formatter: function (value, row) { return '<a style="color:blue;cursor:pointer;" onmouseover="this.style.cssText=\'color:red;cursor:pointer;\'" onmouseout="this.style.cssText=\'color:black;\'">' + value + '</a>' } }
+            ]],
+
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+
+            pageList: [15, 30, 50],
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true,
+            toolbar: TerManager,
+            onClickCell: function (rowIndex, field, value) {
+                var rows = $('#LoadDataTable').datagrid('getRows');
+                var TerNo = rows[rowIndex]['TerNo'];
+                var CarNo = rows[rowIndex]['CarNo'];
+                var TerTypeid = rows[rowIndex]['TerTypeid'];
+                if (field == "LCTJ") {
+                    window.parent.$.DialogOpen('/CarReport/Index_LCBB?TerNo=' + TerNo + '&TerTypeid=' + TerTypeid, { title: '终端编号:' + unescape(TerNo) + '&nbsp;车牌号:' + unescape(CarNo), width: '80%', height: '90%', resizable: true, modal: true });
+                }
+            }
+        });
+    }
+
+    //加载数据
+    function Btn_GetTerList() {
+        $("#LoadDataTable").datagrid("load", GetArgs());
+    }
+
+    //导出excel
+    function Btn_LoadExcel() {
+        $.post("GetData_LCTJ_ToExcel",
+            GetArgs(),
+            function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.location.href = e;
+                }
+                else {
+                    alert("导出失败，请重新导出！");
+                }
+            }
+        );
+    }
+
+    window.onresize = function () {
+        InitUISize();
+    }
+
+</script>
+

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="RegistrationInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="RegistrationInfo" type="GModel.Car.RegistrationInfo" />
+</alias>
+<resultMaps>
+		<resultMap id="RegistrationInfoResult" class="RegistrationInfo">
+      <result property="RegId" column="RegId" type="string" dbType="varchar"/>
+      <result property="RegOwner" column="RegOwner" type="string" dbType="varchar"/>
+      <result property="OwnerAddress" column="OwnerAddress" type="string" dbType="varchar"/>
+      <result property="UseProperties" column="UseProperties" type="string" dbType="varchar"/>
+      <result property="CarModel" column="CarModel" type="string" dbType="varchar"/>
+      <result property="VehicleCode" column="VehicleCode" type="string" dbType="varchar"/>
+      <result property="ModifiedModel" column="ModifiedModel" type="string" dbType="varchar"/>
+      <result property="RegDate" column="RegDate" type="DateTime" dbType="DateTime"/>
+      <result property="CarNo" column="CarNo" type="string" dbType="varchar"/>
+      <result property="IssueDate" column="IssueDate" type="DateTime" dbType="DateTime"/>
+    </resultMap>
+</resultMaps>
+<statements>
+	
+<select id="SelectRegistrationInfo" parameterClass="string" resultMap="RegistrationInfoResult">
+  SELECT REG_ID AS RegId,REG_OWNER AS RegOwner,OWNER_ADDRESS AS OwnerAddress,USE_PROPERTIES AS UseProperties,CAR_MODEL AS CarModel,VEHICLE_CODE AS VehicleCode,MODIFIED_MODEL AS ModifiedModel,REG_DATE AS RegDate,Car_No AS CarNo,ISSUE_DATE AS IssueDate
+  FROM REGISTRATION_INFO WHERE Car_No=#value#
+</select>
+<select id="SelectRegistrationInfoCount" parameterClass="string" resultClass="int">
+SELECT count(*) 
+FROM REGISTRATION_INFO where  $value$ 
+</select>
+<insert id="InsertRegistrationInfo" parameterClass="RegistrationInfo">
+	INSERT INTO REGISTRATION_INFO 
+(REG_ID,REG_OWNER,OWNER_ADDRESS,USE_PROPERTIES,CAR_MODEL,VEHICLE_CODE,MODIFIED_MODEL,REG_DATE,CAR_NO,ISSUE_DATE) 
+	VALUES(#RegId#,#RegOwner#,#OwnerAddress#,#UseProperties#,#CarModel#,#VehicleCode#,#ModifiedModel#,#RegDate#,#CarNo#,#IssueDate#)
+</insert>
+<update id="UpdateRegistrationInfo" parameterClass="RegistrationInfo">
+UPDATE REGISTRATION_INFO 
+ SET REG_ID=#RegId#,REG_OWNER=#RegOwner#,OWNER_ADDRESS=#OwnerAddress#,USE_PROPERTIES=#UseProperties#,CAR_MODEL=#CarModel#,VEHICLE_CODE=#VehicleCode#,MODIFIED_MODEL=#ModifiedModel#,REG_DATE=#RegDate#,CAR_NO=#CarNo#,ISSUE_DATE=#IssueDate#
+WHERE REG_ID = #RegId#
+</update>
+<delete id="DeleteRegistrationInfo" parameterClass="string">
+DELETE FROM REGISTRATION_INFO 
+WHERE $value$ 
+</delete>
+</statements>
+</sqlMap>

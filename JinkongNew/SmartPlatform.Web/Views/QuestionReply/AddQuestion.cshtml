@@ -1,0 +1,96 @@
+﻿@model GModel.Basic.QuestionInfo
+@using (Ajax.BeginForm("AddQuestionForm", "QuestionReply", FormMethod.Post, new AjaxOptions(), new {style="height:93%;"}))
+{
+    <div style="height:30px;line-height:30px;">感谢您的宝贵意见和建议！我们将努力做得更好！</div>
+    <div style="border:1px solid #000;width:99%;height:100%;">
+        <div style="border-bottom:1px solid #ccc;height:30px;line-height:30px;width:960px;margin-left:30px;">
+            <label style="font-size:13px;">发布反馈信息</label>
+        </div>
+        <div class="stdform" style="margin-top:10px;">
+            <p>
+                <label>主题</label>
+                <div class="field">
+                    @Html.TextBoxFor(m => m.QuestionTitle, new { @class = "textbox", style = "width:900px;" })
+                </div>
+            </p>
+            <br />
+            <p>
+                <label>详情</label>
+                <div class="field">
+                    @Html.TextAreaFor(m => m.QuestionContent, 10, 50, new { style = "width:900px;height:180px;" })
+                </div>
+            </p>
+        </div>
+        <div style="text-align:right;position:absolute;bottom:30px;right:20px;" class="footer">
+            <button class="stdbtn btn_blue" type="submit" onclick="return validate();">确定</button>
+            <button class="stdbtn btn_default" type="button" onclick="clearForm()">返回</button>
+        </div>
+    </div>
+}
+
+<style type="text/css">
+    .stdform label{
+        width:60px;
+    }
+    .stdform div.field {
+        margin-left:60px;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        //$("input, textarea, select").uniform();
+    });
+
+    function validate() {
+        var title = $("#QuestionTitle").val();
+        var content = $("#QuestionContent").val();
+        if (title == null || title == "") {
+            window.parent.$.messager.alert('提示', '提问主题不能为空!', 'info');
+            return false;
+        }
+        else {
+            if (title.length > 50) {
+                window.parent.$.messager.alert('提示', '提问主题不能过长!', 'info');
+                return false;
+            }
+        }
+       if(content == null || content == "")
+        {
+            window.parent.$.messager.alert('提示', '提问内容不能为空!', 'info');
+            return false;
+        }
+        else {
+            if (content.length > 200) {
+                window.parent.$.messager.alert('提示', '提问内容不能过长!', 'info');
+                return false;
+            }
+        }
+    };
+
+    function clearForm() {
+        //window.parent.$(".dialog").dialog('close');
+        window.location.href = '/QuestionReply/QuestionReplyIndex';
+    };
+
+    function submitFormSucceed() {
+        //var ifr = window.parent.document.getElementById('/QuestionReply/QuestionReplyIndex');
+        //var win = ifr.window || ifr.contentWindow;
+        //win.$('#QuestionTable').datagrid('reload');
+        //window.parent.$(".dialog").dialog('close');
+        window.$.messager.show({
+            title: '提示',
+            msg: "提问成功！",
+            timeout: 2000,
+        });
+        $("#QuestionTitle").val("");
+        $("#QuestionContent").val("");
+    };
+    function submitFormError() {
+        //window.parent.$(".dialog").dialog('close');
+        window.$.messager.show({
+            title: '提示',
+            msg: "提问失败！",
+            timeout: 2000,
+        });
+    };
+</script>

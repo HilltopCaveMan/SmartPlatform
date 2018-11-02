@@ -1,0 +1,165 @@
+﻿@model GModel.Basic.UserInfo
+<div style="padding:10px 70px 20px 20px">
+    @using (Ajax.BeginForm("EditUserForm", "User", FormMethod.Post, new AjaxOptions(), new { @class = "" }))
+    {
+     @Html.HiddenFor(m => m.UserId, new { @class = "" })
+     <table class="tableForm1" id="endUser">
+        <tr>
+            <td class="field"><i>*</i>登录名:</td>
+            <td>
+                @*@Html.TextBoxFor(m => m.UserLname, new { @class = "easyui-combotree", panelheight = "150", @style = "width:180px;" })*@
+                @Html.TextBoxFor(m => m.UserLname, new { @class = "easyui-textbox", @style = "width:180px;", @readonly="true"})
+                @*<input id="MenuParentName" panelheight="140" value="@Model.MENUPARENT">*@
+                <input id="oldname" name="oldname" type="hidden" value="@Model.UserLname"/>
+            </td>
+            <td class="field"><i>*</i>用户名称:</td>
+            <td>
+                @Html.TextBoxFor(m => m.UserName, new { @class = "easyui-textbox", @style = "width:180px;" })
+                @*@Html.ValidationMessageFor(model => model.MENUNAME)*@
+            </td>
+        </tr>
+        <tr>
+            <td><i>*</i>用户角色:</td>
+            <td>
+                @Html.TextBoxFor(m => m.RoleId, new { @class = "easyui-combobox", panelheight = "95", @style = "width:180px;" })
+                @*<input id="MenuParentName" panelheight="140" value="@Model.MENUPARENT">*@
+                @*@Html.HiddenFor(m => m.MenuParent, new { id = "MENUPARENT", @class = "" })*@
+            </td>
+            <td><i>*</i>所属企业:</td>
+            <td id="TDDEPT">
+                @Html.TextBoxFor(m => m.EnterId, new { @class = "easyui-combotree", panelheight = "150", id = "EnterId", @style = "width:180px;" })
+                @*@Html.ValidationMessageFor(model => model.MenuUrl)*@
+            </td>
+        </tr>
+        <tr>
+            <td>移动电话:</td>
+            <td>
+                @Html.TextBoxFor(m => m.UserPhone, new { @class = "easyui-textbox", @style = "width:180px;" })
+                @*@Html.ValidationMessageFor(model => model.MenuIcon)*@
+            </td>
+            <td>邮箱:</td>
+            <td>
+                @Html.TextBoxFor(m => m.UserEmail, new { @class = "easyui-textbox", @style = "width:180px;" })
+                @*@Html.ValidationMessageFor(model => model.MenuIcon)*@
+            </td>
+        </tr>
+         <tr>
+             <td align="center">
+                 <input type="checkbox" id="UserFunct" name="UserFunct1" value="InstallCar" @(Model.UserFunct1 == "InstallCar" ? "checked=\"checked\"" : "")><label for="UserFunct">手机是否只限装车</label>
+             <td></td>
+             <td>
+                 <input type="checkbox" id="UserFunct" name="UserFunct2" value="SendCmd" @(Model.UserFunct2 == "SendCmd" ? "checked=\"checked\"" : "")><label for="UserFunct">手机限制发送指令</label>
+             </td>
+             <td></td>
+         </tr>
+    </table>
+        <div class="formfooter" style="margin-left:-20px;">
+            <button class="stdbtn btn_blue" type="submit" onclick="return validate()">确定</button>
+            <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+        </div>
+        <div>
+            @Html.ValidationSummary(true, "")
+        </div>
+    }
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<style type="text/css">
+    i {color:red;}
+</style>
+<script type="text/javascript">
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    }
+
+    function validate()
+    {
+        var msg = [];
+        var userlname = $("#UserLname").val();
+        if (userlname == "") {
+            msg.push("登录名不能为空！");
+        }
+        var username = $("#UserName").val();
+        if (username == "") {
+            msg.push("用户名称不能为空！");
+        }
+        var roleid = $('#RoleId').combobox('getValue');
+        if (roleid == "" || roleid == null) {
+            msg.push("用户角色不能为空！");
+        }
+        var enterid = $('#EnterId').combotree('getValue');
+        if (enterid == "" || enterid == null) {
+            msg.push("所属企业不能为空！");
+        }
+        if (msg.length > 0) {
+            window.parent.$.messager.alert("提示",msg.join("\r\n"),"info");
+            return false;
+        }
+    }
+
+    $(function () {
+        $("input, textarea, select").uniform();
+
+        $('#RoleId').combobox({
+            url: '/RoleInfo/GetRoleTree',
+            valueField: 'RoleId',
+            textField: 'RoleName',
+            editable: false,
+            onLoadSuccess: function () {
+                $('#RoleId').combobox('setValue', '@ViewBag.RoleId');
+            }
+        });
+
+        $("#EnterId").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            animate: true,
+            onLoadSuccess: function () {
+                $('#EnterId').combotree('setValue', '@ViewBag.EnterId');
+            }
+        });
+
+        BindSearchEvent($("#TDDEPT .textbox-text"), $('#EnterId'));
+        /*
+        $("#TDDEPT .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown",
+            function (e) {
+                if (e.keyCode == "13") {
+                    $('#EnterId').combotree('tree').tree("search", $(this).val());
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        $('#EnterId').combotree('tree').tree("collapseAll");
+                    }
+                }
+            }
+        );
+        */
+    });
+
+    function editFormSucceed() {
+        var ifr = window.parent.document.getElementById('/User/UserList');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#StaffTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改成功！",
+            timeout: 2000,
+        });
+    };
+    function editFormError(info) {
+        var errormsg = "";
+        if (info != "" && info != null) {
+            errormsg = info + ",修改失败！";
+        }
+        else {
+            errormsg = "修改失败！";
+        }
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: errormsg,
+            timeout: 2000,
+        });
+    };
+</script>
+

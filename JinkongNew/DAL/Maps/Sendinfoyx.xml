@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="Sendinfoyx" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="Sendinfoyx" type="GModel.InterFace.Sendinfoyx" />
+</alias>
+<resultMaps>
+		<resultMap id="SendinfoyxResult" class="Sendinfoyx">
+      <result property="Id" column="Id" type="string" dbType="varchar"/>
+      <result property="DeviceId" column="DeviceId" type="string" dbType="varchar"/>
+      <result property="CarinfoSim" column="CarinfoSim" type="string" dbType="varchar"/>
+      <result property="SendinfoCommand" column="SendinfoCommand" type="string" dbType="varchar"/>
+      <result property="Swiftnumber" column="Swiftnumber" type="double" dbType="Real"/>
+      <result property="SendinfoPtime" column="SendinfoPtime" type="DateTime" dbType="DateTime"/>
+      <result property="SendinfoStatus" column="SendinfoStatus" type="double" dbType="Real"/>
+      <result property="SendinfoUserid" column="SendinfoUserid" type="string" dbType="varchar"/>
+      <result property="SendinfoDescription" column="SendinfoDescription" type="string" dbType="varchar"/>
+      <result property="Sendmethod" column="Sendmethod" type="string" dbType="varchar"/>
+      <result property="Isonline" column="Isonline" type="double" dbType="Real"/>
+      <result property="Sendtotime" column="Sendtotime" type="DateTime" dbType="DateTime"/>
+      <result property="Sendtocmd" column="Sendtocmd" type="string" dbType="varchar"/>
+      <result property="ReceCmd" column="ReceCmd" type="string" dbType="varchar"/>
+      <result property="ReceTime" column="ReceTime" type="DateTime" dbType="DateTime"/>
+    </resultMap>
+
+  <resultMap id ="SendinfoyxNew" class="Sendinfoyx">
+    <result property="Id" column="Id" type="string" dbType="varchar"/>
+    <result property="DeviceId" column="DeviceId" type="string" dbType="varchar"/>
+    <result property="CarinfoSim" column="CarinfoSim" type="string" dbType="varchar"/>
+    <result property="SendinfoCommand" column="SendinfoCommand" type="string" dbType="varchar"/>
+    <result property="SendinfoPtime" column="SendinfoPtime" type="DateTime" dbType="DateTime"/>
+    <result property="SendinfoStatus" column="SendinfoStatus" type="double" dbType="Real"/>
+    <result property="SendinfoUserid" column="SendinfoUserid" type="string" dbType="varchar"/>
+    <result property="SendinfoDescription" column="SendinfoDescription" type="string" dbType="varchar"/>
+    <result property="Sendtotime" column="Sendtotime" type="DateTime" dbType="DateTime"/>
+  </resultMap>
+</resultMaps>
+<statements>
+	
+<select id="SelectSendinfoyx" parameterClass="string" resultMap="SendinfoyxResult">
+SELECT ID AS Id,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SWIFTNUMBER AS Swiftnumber,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,SENDMETHOD AS Sendmethod,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,RECE_CMD AS ReceCmd,RECE_TIME AS ReceTime
+FROM SENDINFOYX where  $value$ 
+</select>
+<select id="SelectSendinfoyxCount" parameterClass="string" resultClass="int">
+SELECT count(*) 
+FROM SENDINFOYX where  $value$ 
+</select>
+<insert id="InsertSendinfoyx" parameterClass="Sendinfoyx">
+  INSERT INTO SENDINFOYX
+  (ID,DEVICE_ID,CARINFO_SIM,SENDINFO_COMMAND,SWIFTNUMBER,SENDINFO_PTIME,SENDINFO_STATUS,SENDINFO_USERID,SENDINFO_DESCRIPTION,SENDMETHOD,ISONLINE,SENDTOTIME,SENDTOCMD,RECE_CMD,RECE_TIME)
+  VALUES(#Id#,#DeviceId#,#CarinfoSim#,#SendinfoCommand#,#Swiftnumber#,#SendinfoPtime:DateTime:1/1/0001 12:00:00 AM#,#SendinfoStatus#,#SendinfoUserid#,#SendinfoDescription#,#Sendmethod#,#Isonline#,#Sendtotime:DateTime:1/1/0001 12:00:00 AM#,#Sendtocmd#,#ReceCmd#,#ReceTime:DateTime:1/1/0001 12:00:00 AM#)
+</insert>
+<update id="UpdateSendinfoyx" parameterClass="Sendinfoyx">
+UPDATE SENDINFOYX 
+ SET ID=#Id#,DEVICE_ID=#DeviceId#,CARINFO_SIM=#CarinfoSim#,SENDINFO_COMMAND=#SendinfoCommand#,SWIFTNUMBER=#Swiftnumber#,SENDINFO_PTIME=#SendinfoPtime#,SENDINFO_STATUS=#SendinfoStatus#,SENDINFO_USERID=#SendinfoUserid#,SENDINFO_DESCRIPTION=#SendinfoDescription#,SENDMETHOD=#Sendmethod#,ISONLINE=#Isonline#,SENDTOTIME=#Sendtotime#,SENDTOCMD=#Sendtocmd#,RECE_CMD=#ReceCmd#,RECE_TIME=#ReceTime#
+WHERE ID = #Id#
+</update>
+<delete id="DeleteSendinfoyx" parameterClass="string">
+DELETE FROM SENDINFOYX 
+WHERE  $value$ 
+</delete>
+  <!--根据终端ID、命令内容和命令状态修改命令。-->
+  <update id="UpdateSendInfoyxCommand" parameterClass="Sendinfoyx">
+    UPDATE SENDINFOYX
+    SET SENDINFO_PTIME=#SendinfoPtime#
+    WHERE DEVICE_ID = #DeviceId# AND SENDINFO_STATUS=#SendinfoStatus# AND SENDINFO_COMMAND=#SendinfoCommand#
+  </update>
+
+  <!--根据终端ID、命令内容和命令状态查询命令。-->
+  <select id="SelectSendinfoyxExists" parameterClass="Sendinfoyx" resultMap="SendinfoyxResult">
+    SELECT ID AS Id,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SWIFTNUMBER AS Swiftnumber,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,SENDMETHOD AS Sendmethod,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,RECE_CMD AS ReceCmd,RECE_TIME AS ReceTime
+    FROM SENDINFOYX WHERE DEVICE_ID=#DeviceId# AND SENDINFO_STATUS=#SendinfoStatus# AND SENDINFO_COMMAND=#SendinfoCommand#
+  </select>
+
+  <select id="SelectSendinfoyxListByTerNo" parameterClass="Sendinfoyx" resultMap="SendinfoyxNew">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT SI.ID                   AS Id,
+    SI.DEVICE_ID            AS DeviceId,
+    SI.CARINFO_SIM          AS CarinfoSim,
+    SI.SENDINFO_COMMAND     AS SendinfoCommand,
+    SI.SENDINFO_PTIME       AS SendinfoPtime,
+    SI.SENDINFO_STATUS      AS SendinfoStatus,
+    SI.SENDINFO_DESCRIPTION AS SendinfoDescription,
+    SI.SENDTOTIME           AS Sendtotime,
+    UI.USER_NAME            AS SendinfoUserid
+    FROM SENDINFOYX SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID
+    AND SI.DEVICE_ID=#DeviceId#
+    ORDER BY SI.SENDINFO_PTIME DESC
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+
+  <select id="SelectSendinfoyxCountByTerNo" parameterClass="string" resultClass="int">
+    SELECT count(*)
+    FROM SENDINFOYX SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID AND SI.DEVICE_ID=#value#
+  </select>
+
+  
+
+
+</statements>
+</sqlMap>

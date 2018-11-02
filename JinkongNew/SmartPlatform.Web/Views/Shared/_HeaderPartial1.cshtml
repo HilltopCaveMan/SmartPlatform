@@ -1,0 +1,69 @@
+﻿<div class="topheader" style="height:55px;">
+    <div class="container">
+
+        <div class="headercontainer" style="float:left;">
+            <div class="headlogo" style="top:0px;">
+                <img src="~/Content/Images/carwebLogo.png" height="50" />
+            </div>
+        </div>
+        <div style="height:50px;width:1270px; text-align:right;">
+            <ul class="nav-right">
+                <li class="nav-li">欢迎您！</li>
+                <li class="nav-li">
+                    <div class="userinfo">
+                        <span class="username">@Session["UserName"]</span>
+                        <i class="arrow"></i>
+                        <div class="userinfodrop">
+                            <div class="avatar">
+                                <img src="~/Content/Images/userphoto.jpg" width="65" />
+                                <div class="changetheme">
+                                    <a class="default"></a>
+                                    <a class="blueline"></a>
+                                    <a class="greenline"></a>
+                                    <a class="contrast"></a>
+                                    <a class="custombg"></a>
+                                </div>
+                            </div><!--avatar-->
+                            <div class="userdata">
+                                <span id="CROLE" class="email">youremail@yourdomain.com</span>
+                                <ul>
+                                    <li><a id="editPWD" href="#">修改密码</a></li>
+                                    <li><a id="exit" href="#">退出</a></li>
+                                </ul>
+                            </div><!--userdata-->
+                        </div><!--userinfodrop-->
+                    </div>
+                </li>
+                <li class="nav-li"><a class="aexit" href="#" onclick="exit()">[&nbsp;退出&nbsp;]</a></li>
+                <li class="nav-li" style="border:0px;"><a style="color:white;" href="VersionInfo" target="_self" title="2016-5-20,平台版本升级公告">[&nbsp;<img width="18" height="12" src="/Content/Images/msg.gif" />&nbsp;<span style="color: white; font-weight:bold;">平台升级公告</span>&nbsp;]</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" language="javascript">
+    window.setInterval(function () {
+        $.ajax({
+            type: 'post',
+            url: '/Home/GetSession',
+            success: function (data) {
+                var sessionResult = data;
+                if (sessionResult == "登录失效") {
+                    $.messager.confirm('确定', '登录超时，请重新登录', function (t) {
+                        window.location.href = "/Account/Login";
+                    })
+                }
+            }
+        });
+    }, 30000);
+    function exit() {
+        $.ajax({
+            type: 'post',
+            url: '/Account/UserCance',
+            success: function (data) {
+                window.location.href = "/Account/Login";
+
+            }
+        });
+    }
+</script>

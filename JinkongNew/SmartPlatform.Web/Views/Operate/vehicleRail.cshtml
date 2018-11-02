@@ -1,0 +1,137 @@
+﻿
+<div class="tabcontant">
+    <div id="audit_polluteManager_list_searchPanel"
+         style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+         class="easyui-panel" iconcls="icon-search" title="检索车辆信息"
+         collapsible="true" minimizable="false" maximizable="false"
+         closable="false">
+        <form id="audit_polluteManager_list_searchForm" method="post">
+            <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        车辆编号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        经销商：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        市场部：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+
+                    <td style="padding-left:30px;" rowspan="2" align="center">
+                        <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                        <a class="easyui-linkbutton" icon="icon-search"
+                           href="#">查询</a> &nbsp;&nbsp;
+                    </td>
+                </tr>
+
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        机型：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+
+                    <td style="padding-left: 15px;">
+                        大区：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        经销商：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="vehicleTable" data-options="toolbar:toolbar" class="easyui-datagrid" style="height:auto"></table>
+</div>
+
+<div id="Vmap"></div>
+<script type="text/javascript">
+    var toolbar = [
+    {
+        text: '设置电子围栏',
+        iconCls: 'icon-save',
+        handler: function () { OpenvehMap() }
+    }];
+
+    function OpenvehMap() {
+        $('#Vmap').dialog({
+            title: '设置车辆电子围栏',
+            width: 1100,
+            height: 550,
+            closed: true,
+            cache: false,
+            href: '/Operate/vehicleMap',
+            modal: true
+        });
+        $('#Vmap').dialog('open');
+    }
+
+
+    $(function () {
+      var dg=  $('#vehicleTable').datagrid({
+            data: [
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' },
+                { f1: 'FTC003RFCDZ004311', f2: 'W303164344', f3: '张岩', f4: '绵阳市怡和机械设备有限公司', f5: '1', f6: '<a href="#">查看</a>' }
+            ],
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'f1', title: '车辆编号', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: 'GPS编号', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: '用户', width: 100, align: 'center', sortable: true },
+                { field: 'f3', title: '经销商', width: 100, align: 'center', sortable: true },
+                { field: 'f4', title: '车机状态', width: 100, align: 'center', sortable: true },
+                { field: 'f5', title: '当前电子围栏数', width: 100, align: 'center', sortable: true },
+                { field: 'f6', title: '查看当前电子围栏', width: 100, align: 'center', sortable: true },
+
+
+
+
+            ]],
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true
+        });
+      dg.datagrid('enableFilter', []);
+    });
+
+
+
+</script>
+
+

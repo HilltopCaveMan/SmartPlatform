@@ -1,0 +1,361 @@
+﻿@{
+    ViewBag.Title = "DevSendCMD";
+}
+
+    @using (Ajax.BeginForm("DevSendCMD", "SendCMD", null, new AjaxOptions()))
+{
+    <ul id="slidercontent">
+        <li>
+            <div class="slide_wrap">
+                <input type="hidden" id="veList" name="veList" value='@ViewData["Ter_ID"].ToString()' />
+                <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                    <colgroup>
+                        <col class="con0" width="20%" />
+                        <col class="con1" width="20%" />
+                        <col class="con0" width="20%" />
+                        <col class="con1" width="20%" />
+                        <col class="con0" width="20%" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">工作模式</th>
+                            <th class="head1">定时时间</th>
+                            <th class="head0">定位次数</th>
+                            @*<th class="head1">工作时间(分钟)</th>*@
+                            <th class="head0">间隔时间(分钟)</th>
+                            <th class="head0" style="display: none">IP</th>
+                            <th class="head1" style="display: none">端口号</th>
+                            <th class="head0" style="display: none">上传时间</th>
+                            @*<th class="head1">操作</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="center" style="border-top:none;">
+                                <select id="gzmss" name="gzmss" onchange="selectChange(this.options[this.options.selectedIndex].value)">
+                                    <option value="0">标准模式</option>
+                                    <option value="1">精准模式</option>
+                                    <option value="2">追车模式</option>
+                                </select>
+                            </td>
+                            <td class="center" style="border-top:none;">
+                                <select id="dssjs" name="dssjs">
+                                    <option value="0">不设置</option>
+                                    <option value="8">8:00</option>
+                                    <option value="9">9:00</option>
+                                    <option value="10">10:00</option>
+                                    <option value="11">11:00</option>
+                                    <option value="12">12:00</option>
+                                    <option value="13">13:00</option>
+                                    <option value="14">14:00</option>
+                                    <option value="15">15:00</option>
+                                    <option value="16">16:00</option>
+                                    <option value="17">17:00</option>
+                                    <option value="18">18:00</option>
+                                    <option value="19">19:00</option>
+                                    <option value="20">20:00</option>
+                                    <option value="21">21:00</option>
+                                    <option value="22">22:00</option>
+                                    <option value="23">23:00</option>
+                                    <option value="24">00:00</option>
+                                    <option value="1">1:00</option>
+                                    <option value="2">2:00</option>
+                                    <option value="3">3:00</option>
+                                    <option value="4">4:00</option>
+                                    <option value="5">5:00</option>
+                                    <option value="6">6:00</option>
+                                    <option value="7">7:00</option>
+                                </select>
+                            </td>
+                            <td class="center" style="border-top:none;">
+                                <input type="text" name="dwcs" id="dwcs" style="width: 60px" value="1" />
+                            </td>
+                            @*<td style="border-top:none;">
+                                <input type="text" name="gzsjs" id="gzsjs" style="width: 60px" value="2" disabled="disabled" />
+                            </td>*@
+
+                            <td class="center" style="border-top:none;">
+                                <input type="text" name="xmsjs" id="xmsjs" style="width: 60px" value="1440" disabled="disabled" />
+                            </td>
+                            <td style="display: none">
+                                <input type="text" name="ips" id="ips" value="0.0.0.0" style="width: 80px" />
+                            </td>
+
+                            <td style="display: none">
+                                <input type="text" name="ports" id="ports" value="0" style="width: 60px" />
+                            </td>
+                            <td style="display: none">
+                                <input type="text" name="scsjs" id="scsjs" value="0" style="width: 60px" disabled="disabled" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="height:50px;text-align:center;padding:5px;">
+                    <input type="button" value="已激活" class="" onclick="jihuo();" />
+                    <input type="button" value="设置" class="" onclick="submitTcp('1');" />
+                    <input type="button" value="刷新状态" class="" onclick="ReLoad();" />
+                </div>
+                <div class="notibar announcement">
+                    <p>
+                        1、设备出厂时，默认上传位置信息的频率为 1次/天。<br clear="all">
+                        2、在下次信息回传前，向设备发送多条命令信息，只有最后一条命令有效。<br clear="all">
+                        3、为延长设备的使用寿命：标准模式、精准模式设置次数不得超过 24次/天（1次/小时）；追车模式，设置次数不得超过144次/天（1次/10分钟）。<br clear="all">
+                    </p>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="slide_wrap">
+                <table id="SendCMDListTable"></table>
+            </div>
+        </li>
+    </ul>
+        //查询此设备已发送命令列表
+        @*<table id="TerminalTable"></table>*@
+    }
+    
+    <script>
+
+        var TerminalData;
+    $(function () {
+        $("input, textarea, select").uniform();
+        //content slider
+        jQuery('#slidercontent').bxSlider({
+            prevText: '',
+            nextText: '',
+            buildPager: function (slideIndex) {
+                switch (slideIndex) {
+                    case 0:
+                        return '命令配置';
+                    case 1:
+                        loadSendListTable();
+                        return '已发命令';
+                }
+            }
+        });
+        $("#dwcs").change(function () {
+            ss = $("#dwcs").val().toString();
+            if (isNaN(ss) == true) {
+                window.parent.$.messager.alert('提示', '请设置回传次数范围为大于0的整数次！', 'error');
+                return false;
+            }
+            else if ($("#gzmss").val() == 2) {
+                if (parseInt($("#dwcs").val()) <= 144 && parseInt($("#dwcs").val()) > 0) {
+                    var vTime = 24 * 60;
+                    $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                } else {
+                    window.parent.$.messager.alert('提示', '追车模式，回传次数范围为1-144次！', 'error');
+                    return;
+                }
+            } else {
+                if (parseInt($("#dwcs").val()) <= 24 && parseInt($("#dwcs").val()) > 0) {
+                    var vTime = 24 * 60;
+                    $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                } else {
+                    window.parent.$.messager.alert('提示', '回传次数范围为1-24次！', 'error');
+                    return;
+                }
+            }
+        });
+    });
+
+    function loadSendListTable() {
+        TerminalData = $('#SendCMDListTable').datagrid({
+            url: '@Url.Action("GetSendCMDList", "SendCMD")',
+            height: 380,
+                columns: [[
+                    //{ field: 'TerGuid', title: '', width: 0, hidden: true },
+                    { field: 'DeviceId', title: '终端编号', width: 80, align: 'center' },
+                    //{ field: 'DeptId', title: '', width: 0, hidden: true },
+                    { field: 'SendinfoDescription', title: '命令信息', width: 530, align: 'center' },
+                    {
+                        field: 'SendinfoStatus', title: '执行状态', width: 140, align: 'center', formatter: function (value, row) {
+                            switch (value) {
+                                case 0.0:
+                                    return "待发送";
+                                case 1.0:
+                                    return "待定";
+                                case 2.0:
+                                    return "已发送，未执行";
+                                case 3.0:
+                                    return "发送成功，命令执行成功";
+                                case 6.0:
+                                    return "命令失效";
+                                case 9.0:
+                                    return "执行失败";
+                                default:
+                                    return "";
+                            }
+                        }
+                    },
+                    { field: 'SendinfoUserid', title: '操作人员', width: 80, align: 'center' },
+                     {
+                         field: 'SendinfoPtime', title: '设置时间', width: 150, align: 'center', formatter: function (value, row) {
+                             switch (value) {
+
+                                 case "0001-01-01 00:00:00":
+                                     return "";
+                                 default:
+                                     return value;
+                             }
+                         }
+                     },
+                      {
+                          field: 'ReceiptTime', title: '执行成功时间', width: 150, align: 'center', formatter: function (value, row) {
+                              switch (value) {
+
+                                  case "0001-01-01 00:00:00":
+                                      return "";
+                                  default:
+                                      return value;
+                              }
+                          }
+                      }
+                ]],
+                //fitColumns: true,
+                striped: true,
+                rownumbers: true, //是否加行号
+                pagination: true, //是否显式分页
+                pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+                pageNumber: 1, //默认显示第几页
+                //sortName: 'USERNAME',
+                //sortOrder: 'asc',//desc,asc
+                //分页中下拉选项的数值
+                pageList: [15, 30, 45],
+                queryParams: { "DeviceId": '@ViewData["Ter_ID"]' },//查询参数
+                //detailFormatter: function (index, row) {
+                //    return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                //    $('#ddv-' + index).append(nav);
+                //    $('#dg').datagrid('fixDetailRowHeight', index);
+                //},
+                pagination: true
+                //,
+                //singleSelect: true,
+                //toolbar: TerManager
+            });
+        }
+        //发送命令方法
+        function submitTcp(sens) {
+
+            ///--------判断模式
+            if (sens == '1') {
+                ss = $("#dwcs").val().toString();
+                if (isNaN(ss) == true) {
+                    window.parent.$.messager.alert('提示', '追车模式，回传次数范围为大于0的整数次！', 'error');
+                    //$.ligerDialog.alert('追车模式，回传次数范围为大于0的整数次！', '设置无效', 'warn');
+                    return false;
+                }
+                else if ($("#gzmss").val() == 2) {
+                    if (parseInt($("#dwcs").val()) > 0) {
+                        var vTime = 24 * 60;
+                        $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                    } else {
+                        window.parent.$.messager.alert('提示', '追车模式，回传次数范围为大于0的整数次！', 'error');
+                        //$.ligerDialog.alert('追车模式，回传次数范围为大于0的整数次！', '设置无效', 'warn');
+                        return;
+                    }
+                } else {
+                    if (parseInt($("#dwcs").val()) > 0) {
+                        var vTime = 24 * 60;
+                        $("#xmsjs").attr("value", parseInt(vTime / $("#dwcs").val()));
+                    } else {
+                        window.parent.$.messager.alert('提示', '回传次数范围为大于0的整数次！', 'error');
+                        //$.ligerDialog.alert('回传次数范围为大于0的整数次！', '设置无效', 'warn');
+                        return;
+                    }
+                }
+            }
+            // $(":button").attr("disabled", "disabled"); //设置所有的button不可用
+            var devid = $("#veList").val();
+            var ips = $("#ips").val();
+            var ports = $("#ports").val();
+            var gzmss = $("#gzmss").val();
+            var gzsjs = $("#gzsjs").val();
+            var dssjs = $("#dssjs").val() * 60;
+            var xmsjs = $("#xmsjs").val();
+            var scsjs = $("#scsjs").val();
+            var dwcs = $("#dwcs").val();
+            var sendtime = ""
+            @*//获取发送时间
+            $.ajax({
+                url: '@Url.Content("~/SendCMD/getSendCMDTime")',
+                type: 'POST',
+                dataType: 'json',
+                async: false,
+                data: "{'devid':'" + devid + "'}",
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data.toString() != "") {
+                        sendtime = data[0]["SendTime"];
+                    }
+                },
+                error: function (data) {
+                }
+            });*@
+        var str = "确定发送命令吗？"
+        //if (sendtime != "" && sendtime != null && sendtime != undefined) {
+        //    str = "命令预计执行时间为：" + sendtime + "<br/> " + str;
+        //}
+        if (parseInt($("#dwcs").val()) <= 144 && parseInt($("#dwcs").val()) > 0) {
+
+            window.parent.$.messager.confirm('确定', str, function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '@Url.Content("~/SendCMD/DevSendCMD")',
+                        type: 'POST',
+                        //dataType: 'json',
+                        data: "{'devid':'" + devid + "','ips':'" + ips + "','ports':'" + ports + "','gzmss':'" + gzmss + "','gzsjs':'" + gzsjs + "','dssjs':'" + dssjs + "','xmsjs':'" + xmsjs + "','scsjs':'" + scsjs + "','sends':'" + sens + "','dwcs':'" + dwcs + "','CmandType':'" + sens + "'}",
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+                            if (data.toString() == "true") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "命令发送成功",
+                                    timeout: 2000,
+                                });
+                                //$.ligerDialog.alert('命令发送成功！', '提示', 'success');
+                                //grid.loadData();
+                            }
+                            else {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "命令发送失败",
+                                    timeout: 2000,
+                                });
+                            }
+                        },
+                        error: function (data) {
+       
+                            window.parent.$.messager.alert('提示', '系统错误！', 'error');
+                        }
+                    });
+                }
+            })
+        } else {
+            window.parent.$.messager.alert('提示', '回传次数范围为1-24次！', 'error');
+            //$.ligerDialog.alert('回传次数范围为1-24次！', '设置无效', 'warn');
+            return;
+        }
+    }
+    //刷新表格
+    function ReLoad() {
+        //刷新表格代码
+    }
+    function selectChange(index) {
+        
+        switch (index) {
+            case "0":
+                $("#gzsjs").attr("value", '2'); //填充内容
+                break;
+            case "1":
+                $("#gzsjs").attr("value", '2'); //填充内容
+                break;
+            case "2":
+                $("#gzsjs").attr("value", '2'); //填充内容
+                break;
+            default:
+                $("#gzsjs").attr("value", '2');
+                //填充内容
+        }
+    }
+    </script>

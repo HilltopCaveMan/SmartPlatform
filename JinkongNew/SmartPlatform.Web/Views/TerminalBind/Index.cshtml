@@ -1,0 +1,457 @@
+﻿
+<div class="tabcontant">
+    <div id="MyWizard" class="wizard">
+        <ul class="steps">
+            <li data-target="#step2" id="steps2" class="active"><span class="badge badge-info" onclick="setStep(2)">绑定终端</span></li>
+            <li data-target="#step3" id="steps3"><span class="badge" onclick="setStep(3)">信息展示</span></li>
+        </ul>
+    </div>
+    <div class="step-content">
+        <div class="step-pane active" id="step2">
+            <div id="CarDiv">
+                <table id="NotAddTable"></table>
+                <div id="tb11" style="padding:2px 5px;">
+                    <input type="text" class="easyui-combotree" id="DeptSel" panelheight="400" style="width:300px;height:30px" />
+                    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="addGPSAndMchine()">确定添加</a>
+                    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" id="upLoad">导入</a>
+                    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" id="DownLoadTer">下载终端导入模板</a>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="step-pane" id="step3">
+            <div style="height:45px;line-height:45px;">
+                车牌号: <input id="CarNoSel" class="easyui-textbox" style="width:100px; height:30px;" />&nbsp;&nbsp;
+                所属企业:<input id="TerBindDeptSel" class="easyui-combobox" style="width:160px; height:30px;" />
+                终端编号:<input id="TerNoSel" class="easyui-textbox" style="width:100px; height:30px;" />&nbsp;&nbsp;
+                终端类型:<input id="TerTypeSel" type="text" class="easyui-combobox" style="width:160px; height:30px;" />&nbsp;&nbsp;
+                <a href="#" onclick="GetTerminalBindByParamBtn()" class="easyui-linkbutton" iconcls="icon-search">查找</a>
+            </div>
+            <table id="carTable"></table>
+        </div>
+    </div>
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    var editIndex = undefined;
+    var curRow = null;
+    var RowIndex;
+    var strMchineClassName;
+    var strModelsCode;
+    var modellist;
+    var table = null;
+    var messageONE = "";
+    var messageTWO = "";
+    var info = "";
+    var Broundinfo = "";
+    window.onresize = function () {
+        $('#NotAddTable').datagrid('resize', {
+            width: function () { return document.body.clientWidth - 20; },
+            height: $(document.body).height() - $("#MyWizard").height() - 61
+        });
+        $('#carTable').datagrid('resize', {
+            width: function () { return document.body.clientWidth - 20; },
+            height: $(document.body).height() - $("#MyWizard").height() - 130
+        });
+    }
+    $(function () {
+        $("input, textarea, select").uniform();
+        loadtable();
+
+        //终端类型下拉框
+        $('#TerTypeSel').combobox({
+            url: '/TerType/GetTerTypeList?TypeMode=true',
+            valueField: 'ProId',
+            textField: 'ProName'
+        });
+
+        //车辆类型下拉框
+        $('#CarTypeSel').combobox({
+            url: '/CarType/GetCarTypeList?TypeMode=true',
+            valueField: 'TypeId',
+            textField: 'TypeName'
+        });
+
+        //单位部门绑定
+        //+++++++++++++++++++++++++++++++++++++
+        $("#DeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            queryParams: { isTree: "true" },
+            editable: true,
+            animate: true,
+            lines: true,
+            onClick: function (node) {
+                if (node.id != "") {
+                    editIndex = undefined;
+                    var param = { DeptId: node.id };
+                    $("#NotAddTable").datagrid({
+                        url: '/Terminal/GetNotBindTerList',
+                        queryParams: param
+                    });
+                }
+            },
+            onLoadSuccess: function () {
+                $('#DeptSel').combotree('setValue', '@ViewBag.Deptid');
+
+                $("#NotAddTable").datagrid({
+                    url: '/Terminal/GetNotBindTerList',
+                    queryParams: { DeptId: '@ViewBag.Deptid' }
+                });
+            }
+        });
+        
+        BindSearchEvent($(" .textbox-text"), $('#DeptSel'));
+        
+        $("#TerBindDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" },
+            onLoadSuccess: function () {
+                $('#TerBindDeptSel').combotree('setValue', '@ViewBag.Deptid');
+            }
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerBindDeptSel'));
+        //+++++++++++++++++++++++++++++++++++++
+
+        $("#upLoad").click(function () {
+            window.parent.$.DialogOpen('/TerminalBind/UpLoad', { title: "导入终端", width: 450, height: 400 })
+        });
+
+        $("#DownLoadTer").click(function (e) {
+            window.location.href = "../../Files/TerImpMould.xls";
+        });
+    })
+
+    function setStep(i) {
+        switch (i) {
+            case 2:
+                $("#steps2").addClass('active');
+                $("#step2").addClass('active');
+                $("#steps3").removeClass('active');
+                $("#step3").removeClass('active');
+                editIndex = undefined;
+                loadtable();
+                break;
+            case 3:
+                $("#steps3").addClass('active');
+                $("#step3").addClass('active');
+                $("#steps2").removeClass('active');
+                $("#step2").removeClass('active');
+                editIndex = undefined;
+                loadtable1();
+                break;
+        }
+    }
+
+    //手动添加车辆表
+    function loadtable() {
+        $('#NotAddTable').height($(document.body).height() - $("#MyWizard").height() - 61);
+        $('#NotAddTable').datagrid({
+            loadMsg: "正在加载数据",
+            //url: '/Terminal/GetNotBindTerList',
+            url:'',
+            method: "post",
+            singleSelect: true,
+            // queryParams: { "GPSNUMBER": GPSNUMBERPARAM },//查询参数
+            pagination: true, //分页
+            fitColumns: true,
+            sortName: "",//排序字段设置
+            sortOrder: "asc",
+            remoteSort: false, //排序必须有
+            columns:
+                [[
+                    {
+                        field: 'TerGuid', width: 60,hidden:true
+                    },
+                {
+                    field: 'CarNo', title: '车牌号', width: 60, align: 'center', editor: 'text'
+                },
+                 {
+                     field: 'TypeId', title: '车辆类型', width: 40, align: 'center', formatter: function (value, row) {
+                         if (row.TypeName == "--选择车辆类型--" || row.TypeName == "") {
+                             return "";
+                         } else { return row.TypeName; }
+                     },
+                     editor: {
+                         type: 'combobox',
+                         options: {
+                             //url: '/CarType/GetCarTypeList?TypeMode=true&DeptId=' + $('#DeptSel').combotree('getValue'),
+                             valueField: 'TypeId',
+                             textField: 'TypeName',
+                             filter: function (q, row) {
+                                 var opts = $(this).combobox('options');
+                                 return row[opts.textField].indexOf(q) == 0;
+                             }
+                         }
+                     }
+                 },
+                 {
+                     field: 'TerNo', title: '终端编号', width: 60, align: 'center'
+                 },
+
+                {
+                    field: 'TerSimcard', title: 'SIM卡号', width: 60, align: 'center'
+                },
+                {
+                    field: 'ProName', title: '终端类型', width: 60, align: 'center'
+                },
+
+                {
+                    field: 'strState', title: '状态', width: 40, align: 'center', formatter: function (value, rec, index) {
+                        return '<img id="statuone' + index + '" src="/assets/themes/icons/no.png ">';
+                    }
+                }
+                ]],
+            onBeforeEdit: function (index, row) {
+                row.editing = true;
+                $('#NotAddTable').datagrid('refreshRow', index);
+            },
+            onAfterEdit: function (index, row, changes) {
+                curRow = row;
+                RowIndex = index;
+                row.editing = false;
+                $('#NotAddTable').datagrid('refreshRow', index);
+            },
+            onClickRow: onClickRow,
+            fitColumns: true,
+            pagination: true,
+            singleSelect: true,
+            //rownumbers: true,
+            collapsible: true,
+            striped: true,
+            toolbar: '#tb11'
+        });
+    }
+    function onClickRow(index) {
+        if (editIndex != index) {
+            if (endEditing()) {
+                var nid = $('#DeptSel').combotree('getValue');
+                $('#NotAddTable').datagrid('selectRow', index).datagrid('beginEdit', index);
+                editIndex = index;
+                var ed = $('#NotAddTable').datagrid('getEditor', { index: index, field: 'TypeId' });
+                $(ed.target).combobox('reload', '/CarType/GetCarTypeList?TypeMode=true&DeptId='+ nid);
+               
+            } else {
+                $('#NotAddTable').datagrid('selectRow', editIndex);
+            }
+        }
+    }
+    function endEditing() {
+        if (editIndex == undefined) { return true }
+        if ($('#NotAddTable').datagrid('validateRow', editIndex)) {
+            var ed = $('#NotAddTable').datagrid('getEditor', { index: editIndex, field: 'TypeId' });
+            var TypeName = $(ed.target).combobox('getText');
+            $('#NotAddTable').datagrid('getRows')[editIndex]['TypeName'] = TypeName;
+            //var we = $('#NotAddTable').datagrid('getEditor', { index: editIndex, field: 'TerTypeid' });
+            //var ProModel = $(we.target).combobox('getText');
+            //$('#NotAddTable').datagrid('getRows')[editIndex]['ProModel'] = ProModel;
+            $('#NotAddTable').datagrid('endEdit', editIndex);
+            var a = curRow.TerNo;
+            var b = curRow.CarNo;
+            var d = curRow.TypeName;
+            var e = curRow.TerSimcard;
+            // var f = curRow.CREATETIME;
+            var g = curRow.ProModel;
+            if (a != "" && b != "" && d != "" && e != "" && g != "") {
+                var myreg = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$|^\d{13}$/;
+               
+                var regu = "^[0-9a-zA-Z]+$";
+                var re = new RegExp(regu);
+                if (myreg.test(e) && re.test(a)) {
+                    document.getElementById("statuone" + RowIndex).src = "/assets/themes/icons/ok.png";
+                    curRow.strState = "1";
+
+                } else {
+                    window.parent.$.messager.alert('警告', '请输入有效的手机号码或者终端编号含有非法字符！', 'error');
+                    document.getElementById("statuone" + RowIndex).src = "/assets/themes/icons/no.png";
+                    curRow.strState = "0";
+                }
+            }
+            else {
+                document.getElementById("statuone" + RowIndex).src = "/assets/themes/icons/no.png";
+                curRow.strState = "0";
+            }
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //信息展示
+    var VINCODE = "";
+    var VEHICLETYPECODE = "";
+    var MODELSCODE = "";
+    var PRODUCTCODE = "";
+    var SIMNUM = "";
+    var beginTime = "";
+    var endTime = "";
+
+    function loadtable1() {
+        $('#carTable').height($(document.body).height() - $("#MyWizard").height() - 130);
+        var DataGPSAndMchineList = $('#carTable').datagrid({
+            loadMsg: "正在加载数据",
+            url: '@Url.Action("GetTerBindList", "TerminalBind")',
+            //singleSelect: true,
+            pagination: true,
+            pageList: [15, 30, 45],//分页
+            fitColumns: true,
+            sortName: "p.CREATETIME,p.VINCODE",//排序字段设置
+            sortOrder: "asc",
+            striped: true,
+            columns: [[
+                 { field: 'TerGuid', hidden:true },
+                 { field: 'CarNo', title: '车牌号', width: 60, align: 'center', editor: 'text'},
+                 { field: 'TypeName', title: '车辆类型', width: 40, align: 'center' },
+                 { field: 'Businessdivisionname', title: '所属企业', width: 80, align: 'center' },
+                 { field: 'TerNo', title: '终端编号', width: 60, align: 'center' },
+                 { field: 'TerSimcard', title: 'SIM卡号', width: 60, align: 'center' },
+                 { field: 'ProName', title: '终端类型', width: 60, align: 'center' },
+            ]],
+            toolbar: [
+               {
+                   text: '解除绑定',
+                   iconCls: 'icon-edit',
+                   handler: function () {
+                       var rows = $("#carTable").datagrid('getSelections');
+                       if (rows.length <= 0) {
+                           window.parent.$.messager.alert('警告', '请选择所需修改的数据！', 'error');
+                       }
+                       else {
+                           var id = "";
+                           for (var i = 0; i < rows.length; i++) {
+                               id += rows[i].TerGuid + ",";
+                           }
+                           window.parent.$.messager.confirm('确定', '您确定要解除绑定吗', function (t) {
+                               if (t) {
+                                   $.ajax({
+                                       url: '/Terminal/RemoveBind?TerGuids=' + id,
+                                       type: "post",
+                                       success: function (r) {
+                                           if (r == "true") {
+                                               window.parent.$.messager.show({
+                                                   title: '提示',
+                                                   msg: "解除绑定成功！",
+                                                   timeout: 2000
+                                               });
+                                               $('#carTable').datagrid('reload');
+                                           } else {
+                                               window.parent.$.messager.show({
+                                                   title: '提示',
+                                                   msg: "解除绑定失败！",
+                                                   timeout: 2000
+                                               });
+                                           }
+                                       }
+                                   });
+                               }
+                           })
+                       }
+                   }
+               }
+               @*,
+                {
+                    text: '删除',
+                    iconCls: 'icon-remove',
+                    handler: function () {
+                        var rows = DataGPSAndMchineList.datagrid('getSelections');
+
+                        if (rows.length <= 0) {
+                            $.messager.alert('警告', '请选中所需删除的数据', 'error');
+                        }
+                        else {
+                            $.messager.confirm('确定', '您确定要删除吗？', function (isDelete) {
+                                if (isDelete) {
+                                    $.ajax({
+                                        url: '@Url.Action("GPSAndMchineDelete", "Generation")',
+                                        data: { "DeviceID": rows[0].DEVICEID, "TerminalNum": rows[0].strGPSNumber, "simNum": rows[0].strSIMNumber },
+                                        success: function (f) {
+                                            if (f == "SUCCEED") {
+                                                $.messager.alert('提示', '删除成功', 'info');
+                                                $('#carTable').datagrid('reload');
+                                            } else if (f == "error") {
+                                                $.messager.alert('提示', '删除失败', 'info');
+
+                                            }
+                                            DataGPSAndMchineList.datagrid('unselectAll');
+                                        },
+                                        error: function (er) { $.messager.alert('提示', "发生错误", 'error'); }
+                                    });
+                                }
+                            })
+                        }
+                    }
+                }*@
+            ]
+        });
+    }
+    function GetTerminalBindByParamBtn() {
+        var param = { CarNo: $("#CarNoSel").val(), DeptId: $('#TerBindDeptSel').combotree('getValue'), TerNo: $("#TerNoSel").val(), TerTypeid: $("#TerTypeSel").combobox('getValue') };
+        $("#carTable").datagrid("load", param);
+    }
+    //////手动绑定的添加
+    var currentIndex = 0;//退出递归的条件变量
+    var AddRows;
+    function addGPSAndMchine() {
+        AddRows = $('#NotAddTable').datagrid('getRows');
+        if (AddRows.length > 0) {
+            Add();
+        } else {
+            editIndex = undefined;
+            window.parent.$.messager.alert('警告', '没有绑定车辆', 'info');
+        }
+    };
+    function Add() {
+        if (currentIndex >= AddRows.length) { //infos是存放主机名称的数组
+            if (info == "") {
+                window.parent.$.messager.alert('提示', "请绑定正确信息", 'info');
+                currentIndex = 0;
+            } else {
+                window.parent.$.messager.alert('提示', info, 'info');
+                currentIndex = 0;
+                info = "";
+                editIndex = undefined;
+                loadtable();
+                $("#steps3").addClass('active');
+                $("#step3").addClass('active');
+                $("#steps2").removeClass('active');
+                $("#step2").removeClass('active');
+                loadtable1();
+            }
+            return;
+        } else {
+            if (AddRows[currentIndex].strState == "1") {
+                console.info(AddRows[currentIndex].TypeName);
+                console.info(AddRows[currentIndex].TypeId);
+                $.ajax({
+                    url: '@Url.Action("AddCarAndTer", "TerminalBind")',
+                    data: { CarNo: AddRows[currentIndex].CarNo, DeptId: $('#DeptSel').combotree('getValue'), TypeId: AddRows[currentIndex].TypeId, TerGuid: AddRows[currentIndex].TerGuid },
+                    type: "post",
+                    success: function (data) {
+                        var result = data == "true" ? '绑定成功' : '绑定失败';
+                        info += AddRows[currentIndex].TerNo + ':' + result+';';
+                        currentIndex++;
+                        Add();
+                    }
+                });
+            } else {
+                currentIndex++;
+                Add();
+            }
+        }
+    }
+
+    //function upLoad()
+    //{
+    //    alert("uumm");
+    //    $.post("ReadExcel", {}, function (e) {
+    //    })
+    //}
+
+    function upLoad() {
+        $("#BtnAddCarType").click(function () {
+            window.parent.$.DialogOpen('/CarType/AddCarType', { title: "添加车辆类型", width: 450, height: 400 })
+        });
+    }
+</script>

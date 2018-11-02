@@ -1,0 +1,876 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_511.cshtml";
+}
+
+@Html.Partial("_HeaderPartial_511")
+
+@model System.Collections.Generic.IList<GModel.RoleRight.MenuInfo>
+
+<div class="moitorContent" id="moitorContent">
+
+    <div id="contentwrapper11" class="contentwrapper withrightpanel">
+        <div id="subcontent" class="subcontent chatcontent">
+
+            <div id="MapContainer">
+                <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+                <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+            </div>
+
+            <div id="chatmessage" class="chatmessage radius2" style="padding:5px;">
+
+                <div id="map" style="height:100%;width:100%;"></div><!--chatmessageinner-->
+                <div class="full" id="fullscreen">全屏</div>
+
+                @*<div class="Location" id="Location">测距</div>*@
+
+                <div class="Location"><input type="checkbox" name="check1" id="Location" />测距</div>
+
+                <div class="mappanel-btn">
+                    <input id="mointerCar" type="checkbox" name="check1" />实时监控
+                </div>
+                
+                <div class="btn_carlist_clc" onclick="G_ShowCarOrTerList_Clctj();" id="btn_carlist_clc">超里程车辆</div>
+
+                <div class="timeout" id="timeReturn"></div>
+
+                <div class="panelWrap" id="panelWrap">
+                    <div style="width:20px;height:200px;margin:-100px 0 0 -10px;color:#999;position:absolute;opacity:0.5;top:50%;left:50%;" id="showOverlayInfo">此处用于展示报警车辆信息</div>
+                    <div id="panel" style="position:absolute;"></div>
+                </div>
+
+                @*<a class="intoList down" href="#"></a>*@
+
+            </div><!--chatmessage-->
+        </div><!--subcontent-->
+    </div><!--contentwrapper-->
+    
+    <div class="leftpanel" id="rightpanel">
+        <nav class="headernav headerborder" id="header">
+            <div class="headerleft">
+                <ul id="CUL" class="profile_summary">
+                    <li id="CCLJK">
+                    <a href="/CarMonitor/MonitorIndex_511" class="active" style="font-size:14px; background:#dddddd;">车辆监控</a>
+                    </li>
+                    <li id="CTJBB">
+                    <a href="/CarReport/Index" style="font-size:14px;">统计报表</a>
+                    </li>
+                    @{
+                        if (ViewBag.Deptcode!=null)
+                        {
+                            <li id="CXTGLAN">
+                            <a href="/Home/Index" style="font-size:14px;">系统管理</a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </nav>
+        <div class="rightpanelinner">
+            <div class="widgetbox uncollapsible">
+                <div class="widgetoptions">
+                    <input type="text" class="easyui-combotree" id="DeptSel" panelheight="400" style="width:100%;height:30px" />
+                </div>
+                <div class="widgetcontent userlistwidget nopadding">
+                    <div class="widgetcheck" style="height:21px;">
+                        <input id="ChkShowAllCar" type="checkbox" name="ChkShowAllCar" title="勾选后列表展示全部数据，默认显示前50条。" /><label title="勾选后列表展示全部数据，默认显示前50条。" style="cursor:pointer;" for="ChkShowAllCar">展示全部</label>
+                        <input id="ChkShowChild" type="checkbox" name="ChkShowChild" title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" /><label title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" style="cursor:pointer;" for="ChkShowChild">包含子企业</label>
+                    </div>
+                    <div style="height:30px;width:100%;">
+                        <ul class="BumenTab">
+                            <li><a onclick="showzs()">直属车辆</a></li>
+                            <li><a onclick="showjq()">结清车辆</a></li>
+                        </ul>
+                    </div>
+                    <div class="easyui-tabs" id="CarStatu">
+                        <div title="全部">
+                            <div class="box-scroll" id="box-scroll">
+                                <ul id="MonitorList" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="在线">
+                            <div class="box-scroll" id="box-scroll1">
+                                <ul id="MonitorList1" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="离线">
+                            <div class="box-scroll" id="box-scroll2">
+                                <ul id="MonitorList2" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="断电报警">
+                            <div class="box-scroll" id="box-scroll3">
+                                <ul id="MonitorList3" class="contactlist"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="CarStatu2" style="border:height:100%;overflow-y:auto;">
+                        <div style="text-align:right;margin-top:3px;">
+                            <a class="easyui-linkbutton" icon="icon-edit" id="btn_mod" onclick="btn_mod_click()">编辑</a>
+                            <a class="easyui-linkbutton" icon="icon-add" id="btn_add" onclick="btn_add_click()">添加</a>
+                        </div>
+                        <ul id="GroupEnterTree" style="margin-top:10px"></ul>
+                    </div>
+                    <div id="car_note" style="height:30px;line-height:30px;">
+                        <img src="../Content/Images/lan.png"   width="12" height="12" style="padding:2px;" /><span>在线</span>
+                        <img src="../Content/Images/cheng.png" width="12" height="12" style="padding:2px;" /><span>报警</span>
+                        <img src="../Content/Images/hui.png"   width="12" height="12" style="padding:2px;" /><span>离线</span>
+                        <img src="../Content/Images/lv.png"    width="12" height="12" style="padding:2px;" /><span>库存</span>
+                        <img src="../Content/Images/zi.png"    width="12" height="12" style="padding:2px;" /><span>到期</span>
+                        <img src="../Content/Images/xm.png"    width="12" height="12" style="padding:2px;" /><span>休眠</span>
+                    </div>                                                                           
+                    <div id="car_count" class="more" style="height:auto;"></div>
+                    </div><!--widgetcontent-->
+            </div><!--widgetbox-->
+        </div><!--rightpanelinner-->
+    </div><!--rightpanel-->
+</div>
+
+<div id="DivCarList" class="dialog" style="display:none;">
+    <div id="contentwrapper" class="contentwrapper">
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">回传时间</th>
+                    <th class="head1">车牌号</th>
+                    <th class="head0">终端编号</th>
+                    <th class="head1">终端状态</th>
+                    <th class="head0">蓝牙绑定</th>
+                    <th class="head1">蓝牙状态</th>
+                    <th class="head0">实际定位</th>
+                    <th class="head1">当前位置</th>
+                    <th class="head0">SIM卡号</th>
+                    <th class="head1">所属组织</th>
+                    <th class="head0">回传次数</th>
+                    <th class="head1">车主电话</th>
+                    <th class="head0">安装位置</th>
+                    <th class="head1">安装时间</th>
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+</div>
+
+<!--超里程统计-->
+<div id="DivCarList_Clctj" class="dialog" style="display:none;">
+    <div id="contentwrapper0" class="contentwrapper">
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="CarListTable_Clctj">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">回传时间</th>
+                    <th class="head1">车牌号</th>
+                    <th class="head0">终端编号</th>
+                    <th class="head1">里程数(公里)</th>
+                    <th class="head1">当前位置</th>
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="target"></div>
+
+<div id="WarningType" style="display:none;">
+    <div>断电报警</div>
+    <div>拆除报警</div>
+    <div>区域报警</div>
+    <div>超速报警</div>
+    @*<div>蓝牙报警</div>*@
+</div>
+
+<div class="contextMenu" id="GroupMenu">
+    <ul id="GroupDept">
+    </ul>
+</div>
+
+@Html.Partial("_FooterPartial")
+
+<script src="http://maps.google.cn/maps/api/js?sensor=false&language=zh-CN&libraries=drawing"></script>
+<script src="~/assets/javascripts/markerclusterer.js"></script>
+<script src="~/assets/javascripts/NameOverlay.js"></script>
+<script src="~/assets/javascripts/Index.js"></script>
+<script src="~/assets/javascripts/jquery.contextmenu.r2.js"></script>
+<script type="text/javascript">
+
+    G_Index.G_BaiduOrGoogle = "Google";
+
+    var RowNumber = 1;
+    var SearchFlag = 0;
+
+    var SearchValue = "";
+    var SearchName = "";
+
+    var CKXQ = '@ViewBag.CKXQ';
+    var CKGJ = '@ViewBag.CKGJ';
+    var FSML = '@ViewBag.FSML';
+    var DZWL = '@ViewBag.DZWL';
+    var CheckTerids = [];
+
+    //当前页面类型（AllCar:实时车辆监控,CXWarning:拆卸报警,DDWarning:断电报警）
+    var MapType = "AllCar";
+
+    TimeOutGoogle();
+
+    function TimeOutGoogle() {
+        try {
+            if (google) {
+
+            }
+        }
+        catch (Exception) {
+            if (window.parent.$.messager.confirm("确定", "谷歌地图连接超时,是否跳转到百度地图?", function (t) {
+                if (t) {
+                    window.location.href = "/CarMonitor/BDMonitorIndex_511";
+                    $("#BaiDuMap").css({ "background": "#0094ff", "color": "#ffffff" });
+                    $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+                }
+            }));
+        }
+    }
+
+    var lineSymbol = {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 5,
+        strokeColor: '#5A5AAD'
+    };
+
+    var countdown;
+    var count;
+
+    //车辆监控
+    @*var CLJK= '@ViewBag.CLJK';*@
+
+    //终端监控
+    var ZDJK = '@ViewBag.ZDJK';
+
+    //统计报表
+    @*var TJBB= '@ViewBag.TJBB';*@
+
+    //系统管理按钮
+    @*var XTGLAN= '@ViewBag.XTGLAN';*@
+
+    var MonitorMap = {};
+    //车辆监控data和markers
+    MonitorMap.pics = null;
+    MonitorMap.markers = [];
+
+    //车辆报警data和markers
+    MonitorMap.WarningData = null;
+    MonitorMap.WarningMarkers = [];
+    MonitorMap.map = null;
+    MonitorMap.markerClusterer = null;
+    MonitorMap.infoWindow = null;
+
+    //测距
+    MonitorMap.polyline;
+    MonitorMap.polylinesArray = [];
+    MonitorMap.lenArray = [];
+    MonitorMap.Overlay = [];
+
+    var polymarker;
+    var divLay;
+    var number = 0;
+
+    var data = null;
+    var t;
+    var CarTable;
+    var isPanelShow = false;
+    var target = $('#target');
+
+    //==================================================
+    // 地图刷新列表
+    //==================================================
+    //地图区域变动后，调整同步右侧车辆面板列表
+    //function BaiduGoogleMap_BoundsChanged(e) {
+    //    BaiduGoogleMap_BoundsChanged_Load(e);
+    //}
+
+    //function BaiduGoogleMap_BoundsChanged_Load(e) {
+    //    //绑定车辆列表
+    //    BindCarListUI();
+    //    //更新车辆统计数量
+    //    BindCarOrTerCountUI();
+    //}
+
+
+
+
+    //更新车辆统计数量
+    function BindCarOrTerCountUI() {
+
+        //统计视口内终端数量
+        var bounds = MonitorMap.map.getBounds();
+        if (bounds == undefined) return;
+
+        G_CarOrTerCount.TerDivCnt = G_CarOrTerCount.Count;
+
+        var markers = MonitorMap.markers;
+
+        var mks = new Array();
+        var carterlist = new Array();
+        if (markers != null
+            && markers.length > 0) {
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i].GoogleLatitude == 0 && markers[i].GoogleLongitude == 0) {
+                    carterlist.push(markers[i]);
+                }
+                else {
+                    if (bounds.contains(
+                            new google.maps.LatLng(
+                                                markers[i].GoogleLatitude,
+                                                markers[i].GoogleLongitude)) == true) {
+                        mks.push(markers[i]);
+                    }
+                }
+            }
+        }
+
+        //if (!G_Index.G_ChkShowAllCar) {
+        //    G_CarOrTerCount.TerDivCnt = (mks.length + carterlist.length > G_Index.TabsPanelRowsCnt ? G_Index.TabsPanelRowsCnt : mks.length + carterlist.length);
+        //}
+
+        //G_CarOrTerCount.TerMapCnt = mks.length;
+
+        //更新列表底部终端数量统计
+        //UpdateCarOrTerCount();
+    }
+
+    //绑定车辆列表
+    function BindCarListUI() {
+
+        //var bounds = MonitorMap.map.getBounds();
+        //if (bounds == undefined) return;
+
+        var markers = MonitorMap.markers;
+
+        var mks = new Array();
+
+        if (G_Index.G_ChkShowAllCar) {
+            if (markers != null
+            && markers.length > 0) {
+                for (var i = 0; i < markers.length; i++) {
+                    mks.push(markers[i]);
+                }
+            }
+        }
+        else {
+            var count = markers.length > 50 ? 50 : markers.length;
+            if (markers != null
+                && markers.length > 0) {
+                for (var i = 0; i < count; i++) {
+                    //if (bounds.contains(
+                    //        new google.maps.LatLng(
+                    //                            markers[i].GoogleLatitude,
+                    //                            markers[i].GoogleLongitude)) == true || (markers[i].GoogleLatitude == 0 && markers[i].GoogleLongitude == 0)) {
+                        mks.push(markers[i]);
+                    //}
+                }
+            }
+        }
+
+        G_RefreshCarListUI(mks);
+    }
+
+    //地图刷新车辆列表
+    function G_RefreshCarListUI(markers) {
+
+        var panel = G_GetPanelByCurMapType();
+        if (panel == null) return;
+
+        var G_Marker_Cnt = 0;
+
+        for (var i = 0; i < markers.length; i++) {
+            var obj_marker = markers[i];
+            //if (obj_marker.GoogleLatitude != 0
+            //    && obj_marker.GoogleLongitude != 0) {
+
+            //G_Marker_Cnt++;
+
+            //if (G_Marker_Cnt <= G_Index.TabsPanelRowsCnt) {
+
+            CreateUILiFromMarker(i, panel, obj_marker, null);
+
+            //}
+            //else {
+            //    break;
+            //}
+            //};
+        }
+    }
+
+    //地图聚合点单击事件：加载显示当前被单击聚合Marker对象
+    function G_ShowCurMarkerClusterer(markers) {
+
+        //是否启用当前处理过程
+        if (G_Index.G_ChkShowAllCar) return;
+
+        //G_RefreshCarListUI(markers);
+    }
+    //==================================================
+    // 地图刷新列表
+    //==================================================
+
+    //创建 marker
+    function CreateMarker(obj_marker) {
+
+        var pt = new google.maps.LatLng(obj_marker.GoogleLatitude, obj_marker.GoogleLongitude);
+
+        var marker = new google.maps.Marker({
+
+            'position': pt,
+            'icon': lineSymbol,
+            'CarNo': obj_marker.CarNo,
+            'TerNo': obj_marker.TerNo,
+
+            'TerStatus': obj_marker.TerStatus,
+            'Positioningtime': obj_marker.Positioningtime,
+            'CarPosition': obj_marker.Position,
+            'Speed': obj_marker.Speed,
+            'StateName':obj_marker.StateName
+        });
+
+        marker.ObjectId = obj_marker.id;
+
+        return marker;
+    }
+
+    //绑定 marker 事件
+    function addClickHandler(sContent, marker) {
+
+        google.maps.event.addListener(
+            marker,
+            'click',
+            function (e) {
+                openInfo(sContent, e)
+            }
+        );
+    };
+
+    //信息窗口
+    function openInfo(sContent, e) {
+
+        var point = new google.maps.LatLng(e.latLng.lat(), e.latLng.lng());
+
+        OpenMapInfoWin(point, sContent);
+    };
+
+    //打开信息窗口
+    function OpenMapInfoWin(point, sContent) {
+
+        MonitorMap.map.setCenter(point);
+        MonitorMap.map.setZoom(15);
+
+        MonitorMap.infoWindow.setContent(sContent);
+
+        MonitorMap.infoWindow.setPosition(point);
+
+        MonitorMap.infoWindow.open(MonitorMap.map);
+    }
+
+    //点击列表显示信息窗口
+    function SelectCarInfoForId(e) {
+
+        var eventSrc = $("[data-id='on" + e + "']");
+
+        var TerNo = eventSrc.attr("data_TerNo");//获取终端编号
+
+        if (MonitorMap.markers != null
+            && MonitorMap.markers.length > 0) {
+
+            for (var i = 0; i < MonitorMap.markers.length; i++) {
+
+                var obj_marker = MonitorMap.markers[i];
+
+                if (TerNo == obj_marker.TerNo) {
+
+                    if (obj_marker.GoogleLatitude != 0
+                        && obj_marker.GoogleLongitude != 0) {
+
+                        var infoHtml = CreateMarkerPopContent(obj_marker);
+
+                        var point = new google.maps.LatLng(
+                                            obj_marker.GoogleLatitude,
+                                            obj_marker.GoogleLongitude);
+
+                        OpenMapInfoWin(point, infoHtml);
+
+                        break;
+                    }
+                    else {
+                        window.parent.$.messager.alert('提示', '该设备无经纬度信息,不能定位!', 'info');
+                    }
+                }
+            }
+        }
+    }
+
+    MonitorMap.markerclick = function (k) {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }
+    }
+
+    //关闭标记
+    MonitorMap.markerOutFunction = function () {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            MonitorMap.infoWindow.close();
+        }
+    }
+
+    //清除地图标记
+    MonitorMap.clear = function () {
+        for (var i = 0, marker; marker = MonitorMap.markers[i]; i++) {
+            marker.setMap(null);
+        }
+    };
+
+    //清除地图标记 重新加载地图数据
+    MonitorMap.change = function () {
+        MonitorMap.clear();
+        MonitorMap.showMarkers();
+    };
+
+    //设置菜单列表
+    function setScroll() {
+        $("#box-scroll").slimScroll({
+            height: '20px',
+            position: 'right',
+            alwaysVisible: true
+        });
+    }
+
+    //测距显示图标
+    function SetIcon() {
+        var icons = MonitorMap.polyline.get('icons');
+        icons[0].offset = '100%';
+        MonitorMap.polyline.set('icons', icons);
+    }
+
+    //添加新标记
+    function addMarker(location) {
+
+        var path = MonitorMap.polyline.getPath();
+        path.push(location);
+
+        SetIcon();
+
+        var icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            strokeColor: "#ff0000 ",
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 3
+        };
+
+        var myOptions = {
+            position: location,
+            draggable: true,
+            map: MonitorMap.map,
+            icon: icon
+        };
+
+        polymarker = new google.maps.Marker(myOptions);
+
+        MonitorMap.lenArray.push(polymarker);
+
+        var dis = (MonitorMap.polyline.getLength() / 1000).toFixed(3);
+
+        if (MonitorMap.lenArray.length == 0) {
+            divLay = new NameOverlay(location, "0公里");
+            MonitorMap.Overlay.push(divLay);
+            divLay.setMap(MonitorMap.map);
+        }
+        else {
+            divLay = new NameOverlay(location, dis + "公里");
+            MonitorMap.Overlay.push(divLay);
+            divLay.setMap(MonitorMap.map);
+        }
+    }
+
+    //测距功能  开启测距
+    function GetDistance() {
+
+        if (number == 0) {
+            google.maps.event.addListener(MonitorMap.map, "click", function (event) {
+                addMarker(event.latLng);
+            });
+            google.maps.event.addListener(MonitorMap.map, "dblclick", function (event) {
+                addMarker(event.latLng);
+            });
+        }
+        else if (number == 1) {
+            myDis.open();  //开启鼠标测距
+        }
+    }
+
+    //清除测距/新标记
+    function DisClear() {
+
+        if (number == 0) {
+            for (var i = 0; i < MonitorMap.lenArray.length; i++) {
+                MonitorMap.lenArray[i].setMap(null);
+            }
+            MonitorMap.lenArray = [];
+            for (var k = 0; k < MonitorMap.Overlay.length; k++) {
+                MonitorMap.Overlay[k].setMap(null);
+            }
+            MonitorMap.Overlay = [];
+            MonitorMap.polyline.setPath([]);
+            google.maps.event.clearListeners(MonitorMap.map);
+        }
+    }
+
+    //距离算法
+    google.maps.LatLng.prototype.distanceFrom = function (latlng) {
+        var lat = [this.lat(), latlng.lat()]
+        var lng = [this.lng(), latlng.lng()] //var R = 6371; // km (change this constant to get miles)
+        var R = 6378137; // In meters
+        var dLat = (lat[1] - lat[0]) * Math.PI / 180;
+        var dLng = (lng[1] - lng[0]) * Math.PI / 180;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat[0] * Math.PI / 180) * Math.cos(lat[1] * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return Math.round(d);
+    }
+
+    google.maps.Marker.prototype.distanceFrom = function (marker) {
+        return this.getPosition().distanceFrom(marker.getPosition());
+    }
+
+    google.maps.Polyline.prototype.getLength = function () {
+        var d = 0;
+        var path = this.getPath();
+        var latlng;
+        for (var i = 0; i < path.getLength() - 1; i++) {
+            latlng = [path.getAt(i), path.getAt(i + 1)];
+            d += latlng[0].distanceFrom(latlng[1]);
+        }
+        return d;
+    }
+
+    $(function () {
+
+        InitInnerHeight();
+
+        InitUISize(innerHeight);
+
+        $("input, textarea, select").uniform();
+
+        initmap();
+
+        if ($.browser.msie) {
+            $('input:checkbox').click(function () {
+                this.blur();
+                this.focus();
+            });
+        };
+
+        //实时监控
+        BindRealTimeReLoad();
+
+        //全屏、返回
+        BindQuanPing();
+
+        //初始化部门树控件
+        InitDeptTree('@ViewBag.Deptid');
+
+        //显示子企业的车辆
+        BindChkShowChild();
+        BindChkShowAllCar();
+
+        BindSearchEvent($(".textbox-text"), $('#DeptSel'));
+
+        //绑定车辆列表下载 Excel
+        //BindLoadDataTableToExcel();
+
+        //绑定测距功能
+        BindDistance();
+
+        //初始化车辆终端
+        InitCarMonitor("@ViewBag.Deptid");
+
+        //如果存在，则直接弹出列表窗口
+        if ("@ViewBag.Vis_Carlist_clc" == "false") {
+            $("#btn_carlist_clc").css("display", "none");
+        }
+
+        $("#CarStatu").show();
+        $("#CarStatu2").hide();
+
+
+        //屏蔽右键
+        $(document).bind('contextmenu', function (e) {
+            return false;
+        });
+
+        //填充结清部门树和菜单
+        LoadGroupDepartTree();
+        LoadGroupDeptMenu();
+    });
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++
+    // 私有函数
+    //=================================================
+    //初始化谷歌地图
+    function initmap() {
+
+        var latlng = new google.maps.LatLng(39.920532, 103.504355);
+
+        var options = {
+            'zoom': 4,
+            'center': latlng,
+            'mapTypeId': google.maps.MapTypeId.ROADMAP,
+            'minZoom': 0
+        };
+
+        MonitorMap.map = new google.maps.Map(document.getElementById('map'), options);
+
+        //google.maps.event.addListener(MonitorMap.map, 'bounds_changed', BaiduGoogleMap_BoundsChanged);
+        //google.maps.event.addListener(MonitorMap.map, 'idle', BaiduGoogleMap_BoundsChanged);
+
+        MonitorMap.infoWindow = new google.maps.InfoWindow();
+
+        var lineSymbol = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 5,
+            strokeColor: '#c0392b'
+        };
+
+        var lineSymbol1 = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 2
+        };
+
+        MonitorMap.polyline = new google.maps.Polyline({
+            path: [],
+            icons: [{
+                icon: lineSymbol,
+                offset: '0%'
+            }, {
+                icon: lineSymbol1,
+                offset: '100%',
+            }],
+            map: MonitorMap.map
+        });
+    }
+
+    //清空聚合
+    function ClearOverlays() {
+        if (MonitorMap.markerClusterer) {
+            MonitorMap.markerClusterer.clearMarkers();
+        }
+    }
+
+    //聚合
+    function GoogleMarkerClusterer(markers) {
+        var options = {
+            gridSize: 40,
+            minimumClusterSize: 2,
+            maxZoom: 21
+        };
+        if (MonitorMap.markers.length > 0) {
+            MonitorMap.markerClusterer = new MarkerClusterer(
+                                                    MonitorMap.map,
+                                                    markers,
+                                                    options,
+                                                    MonitorMap.infoWindow);
+        }
+    }
+
+</script>
+
+<style type="text/css">
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 13px;
+        right: 200px;
+        border: 1px solid #999;
+    }
+
+    #MapContainer div {
+        width: 75px;
+        float: left;
+        text-align: center;
+    }
+
+    #BaiDuMap {
+        background: #ffffff;
+        color: #797070;
+        cursor: pointer;
+    }
+
+    #GoogleMap {
+        color: #fff;
+        cursor: pointer;
+        background: #0094ff;
+    }
+
+    .infotable {
+        width: 100%;
+    }
+    .infotd {
+        width: 80px;
+        text-align:right;
+    }
+    .stdbtn {
+        font-size:12px;
+        padding:3px;
+        font-weight:normal;
+    }
+
+
+
+    .BumenTab li {
+        width: 130px;
+        float: left;
+    }
+    .BumenTab li a {
+        cursor:pointer;
+        text-align: center;
+        width: 130px;
+        display: block;
+        font-size: 14px;
+        border: 1px solid #797070;
+    }
+    .BumenTab li a:hover {
+        background-color: #dddddd;
+    }
+</style>

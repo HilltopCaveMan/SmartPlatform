@@ -1,0 +1,340 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" line-height:26px; background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+
+                <td style="padding-left: 15px;">
+                    终端型号:
+                </td>
+                <td>
+                    <input id="TerTypeSel" name="TerTypeSel" type="text" class="easyui-combobox" style="width:150px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    所属企业:
+                </td>
+                <td>
+                    <input id="TerDeptSel" name="TerDeptSel" class="easyui-combobox" style="width:150px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    <input id="ChkShowChild" type="checkbox" name="ChkShowChild" title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" /><label title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" style="cursor:pointer;" for="ChkShowChild">包含子企业</label>
+                </td>
+                <td style="padding-left: 15px;">
+                    报警类型：
+                </td>
+                <td>
+                    <input id="WarnTypeSel" name="WarnTypeSel" type="text" class="easyui-combobox" style="width:100px; height:30px;" panelheight="110" />
+                </td>
+            </tr>
+        </table>
+        <table style="margin-top:5px;">
+            <tr>
+                <!--
+                    <td id="td_ksrq" style="padding-left: 15px;">
+                        开始时间:
+                    </td>
+                    <td>
+                        <input id="KSRQ" name="KSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                    </td>
+
+                    <td id="td_jsrq" style="padding-left: 15px;">
+                        结束时间:
+                    </td>
+                    <td>
+                        <input id="JSRQ" name="JSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                    </td>
+                -->
+                <td style="padding-left: 15px;">
+                    对象类型:
+                </td>
+                <td>
+                    <input id="ObjTypeSel" name="ObjTypeSel" type="text" class="easyui-combobox" style="width:150px; height:30px;" panelheight="110" />
+                </td>
+                <td style="padding-left: 18px;">
+                    关&nbsp;键&nbsp;字:
+                </td>
+                <td>
+                    <input id="SearchKey" name="SearchKey" type="text" style="width:145px; height:23px;" />
+                </td>
+
+                <td colspan="4">
+                    &nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="search" onclick="Btn_GetTerList()">查询</a>
+                    &nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="upLoad" onclick="Btn_LoadExcel()">数据导出</a>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+    <table id="LoadDataTable"></table>
+</div>
+<script src="~/assets/javascripts/echarts.js"></script>
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script src="~/assets/javascripts/Report.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 85,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+
+        $("input, textarea, select").uniform();
+
+        //日期段
+        //$("#KSRQ").datebox("setValue", "@ViewBag.KSRQ");
+        //$("#JSRQ").datebox("setValue", "@ViewBag.JSRQ");
+
+        //用户表格高度
+        $("#LoadDataTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+
+        //终端类型下拉框
+        InitTerTypeSel();
+        //所属企业
+        InitDeptSel();
+        //报警类型
+        InitWarnTypeSel();
+        //对象类型
+        InitCarTerTypeSel();
+
+        $('#TerDeptSel').combotree('setValue', '@ViewBag.DeptId');//= 301 区域
+
+        //加载表格数据
+        InitLoadDataTable();
+
+        //加载图表
+        InitPieChart();
+
+        InitUISize();
+
+    });
+
+    //报警类型
+    function InitWarnTypeSel()
+    {
+        var data = [
+            { "id": "qb", "text": "全部" },
+            { "id": "ddbj", "text": "断电报警" },
+            { "id": "ccbj", "text": "拆除报警" },
+            { "id": "csbj", "text": "超速报警" },
+            { "id": "qybj", "text": "区域报警" },
+            { "id": "ddyj", "text": "低电预警" },
+            { "id": "ysdl", "text": "疑似掉落" },
+            { "id": "yscc", "text": "疑似拆除" }
+        ];
+
+        $('#WarnTypeSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#WarnTypeSel').combobox('setValue','qb');
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //提取参数
+    function GetArgs() {
+
+        //部门单位
+        var DeptId = $('#TerDeptSel').combotree('getValue');
+        var ShowChild = "false";
+        if ($("#ChkShowChild").is(':checked') == true) {
+            ShowChild = "true";
+        }
+        //报警状态
+        var WarnType = $('#WarnTypeSel').combotree('getValue');
+        //终端型号
+        var TerTypeNo = $('#TerTypeSel').combotree('getValue');
+
+        //时间段
+        var RQ_KS = null; //$("#KSRQ").datebox('getValue');
+        var RQ_JS = null; //$("#JSRQ").datebox('getValue');
+
+        //关键字
+        var ObjTypeNo = $('#ObjTypeSel').combotree('getValue');
+        var KeyText = $("#SearchKey").val();
+
+        var param = {
+
+            WarningType: WarnType,
+
+            DeptId: DeptId,
+            ShowChild: ShowChild,
+
+            TerTypeNo: TerTypeNo,
+
+            //关键字
+            ObjTypeNo: ObjTypeNo,
+            KeyText: KeyText,
+
+            //时间段
+            KSRQ: RQ_KS,
+            JSRQ: RQ_JS
+        };
+        return param;
+    }
+
+    //加载图表
+    function InitPieChart() {
+        var now = new Date();
+        var month = now.getMonth() + 1;
+        if (month < 10) {
+            month = '0' + month;
+        }
+        var FormatNow = now.getFullYear() + '-' + month;
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '报警状态统计',
+                subtext: '日期:' + FormatNow
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{b} : {c} ({d}%)"
+            },
+            legend: {
+                right: 20,
+                bottom: 0,
+                orient: 'vertical',
+                selectedMode:false,
+                data: [
+                    { name: '断电报警' },
+                    { name: '拆除报警' },
+                    { name: '超速报警' },
+                    { name: '区域报警' },
+                    { name: '低电预警' },
+                    { name: '疑似掉落' },
+                    { name: '疑似拆除' }
+                ]
+            },
+            series: [{
+                type: 'pie',
+                radius:['30%','85%'],
+                label: {
+                    normal: {
+                        show: false
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: false
+                    }
+                },
+                data:[]
+            }]
+        };
+
+        //加载数据
+        $.ajax({
+            url: "/CarReport/GetWarnCharData",
+            data: GetArgs(),
+            success: function (data) {
+                if (eval(data)[0].value == "0" && eval(data)[1].value == "0" && eval(data)[2].value == "0" && eval(data)[3].value == "0" && eval(data)[4].value == "0"
+                    && eval(data)[5].value == "0" && eval(data)[6].value == "0")
+                {
+                    var brr = [];
+                    option.legend.data = [{ name: '无数据' }];
+                    option.series[0].radius = ['85%'];
+                    brr.push({ id: 'ccbj', value: '0', name: '无数据', itemStyle: { normal: { color: 'green', borderColor:'black',borderWidth: 1 } } });
+                    option.series[0].data = brr;
+                }
+                else {
+                    option.series[0].data = eval(data);
+                }
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            }
+        });
+        myChart.on('click', GetDataList);
+
+        function GetDataList(param) {
+            $('#WarnTypeSel').combobox('setValue', param.data.id);
+            $("#LoadDataTable").datagrid("load", GetArgs());
+        }
+    }
+
+    function InitLoadDataTable() {
+        //报警状态
+        var WarnType = $('#WarnTypeSel').combotree('getValue');
+
+        $('#LoadDataTable').datagrid({
+
+            url: '@Url.Action("GetData_BJTJ", "CarReport")?WarningType=' + WarnType,
+
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center' },
+                { field: 'CarNo', title: '车牌号', width: 90, align: 'center' },
+                { field: 'TerStatus', title: '设备状态', width: 90, align: 'center' },
+                { field: 'ReplyDataName', title: '报警状态', width: 90, align: 'center' },
+                { field: 'HCSJ', title: '回传时间', width: 120, align: 'center' },
+                { field: 'Postbacktimes', title: '回传次数', width: 90, align: 'center' },
+                { field: 'Position', title: '回传位置', width: 300, align: 'left' }
+            ]],
+
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+
+            pageList: [15, 30, 50],
+
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+
+            pagination: true,
+
+            toolbar: '<div id="main" style="height:200px;"></div>'
+        });
+    }
+
+    //加载数据
+    function Btn_GetTerList() {
+        InitPieChart();
+        $("#LoadDataTable").datagrid("load", GetArgs());
+    }
+
+    //导出excel
+    function Btn_LoadExcel() {
+        $.post("GetData_BJTJ_ToExcel",
+            GetArgs(),
+            function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.location.href = e;
+                }
+                else {
+                    window.parent.$.messager.alert('提示', "导出失败，请重新导出！", 'info');
+                }
+            }
+        );
+    }
+
+    window.onresize = function () {
+        InitUISize();
+    }
+
+</script>
+
+

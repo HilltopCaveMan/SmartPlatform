@@ -1,0 +1,68 @@
+﻿@model GModel.Car.CarType
+    @using (Html.BeginForm("CarTypeForm", "CarType", FormMethod.Post, new { @class = "", enctype = "multipart/form-data" }))
+{
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        <p>
+            <label><i>*</i>车辆类型</label>
+            <div class="field">
+                    @Html.TextBoxFor(model => model.TypeName, new { @class = "textbox" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.TypeName)
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>所属企业</label>
+            <div class="field">
+                <input name="DeptId" id="CarTypeDept" class="textbox" type="text" style="height:30px;" panelheight="200" />
+                <b>
+
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>选择图片</label>@*<i>*</i>*@
+            <div class="field">
+                <input id="up_img" name="file" type="file" />
+                <b>
+                    
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>预览</label>
+            <div class="field">
+                <div class="photopreview" id="imgdiv" style="height:100px;">
+                    <a href="#"><img id="imgShow" alt="" height="100" /></a>
+                </div>
+            </div>
+        </p>
+    </div>
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" type="submit">确定</button>
+        <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+    </div>
+}
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+        $("input, textarea, select").uniform();
+        new uploadPreview({ UpBtn: "up_img", DivShow: "imgdiv", ImgShow: "imgShow" });
+        $("#CarTypeDept").combotree({
+            url: '/Dept/GetOrgNode',
+            onLoadSuccess: function () {
+                //$('#CarTypeDept').combotree('setValue', '@ViewBag.DeptId');
+            }
+        });
+    })
+
+    BindSearchEvent($(" .textbox-text"), $("#CarTypeDept"));
+    
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    };
+</script>
+

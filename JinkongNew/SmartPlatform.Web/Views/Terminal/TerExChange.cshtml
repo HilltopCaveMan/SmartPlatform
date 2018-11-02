@@ -1,0 +1,74 @@
+﻿@*@using (Ajax.BeginForm("TerExChangeForm", "Terminal", FormMethod.Post, new AjaxOptions()))
+    {*@
+<form>
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        <p>
+            <label><i>*</i>流转到企业</label>
+            <div class="field">
+                <input name="ExChangeDeptId" id="ExChangeDeptId" class="textbox" type="text" style="height:30px;" />
+                <b>
+                </b>
+            </div>
+        </p>
+    </div>
+
+    <div class="formfooter">
+        @*<button class="stdbtn btn_blue" type="button">确定</button>*@
+        <button class="stdbtn btn_blue" type="button" id="search" onclick="ExChange()">确定</button>
+        @*<button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>*@
+    </div>
+</form>
+@*}*@
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script type="text/javascript" language="javascript">
+    $(function () {
+        $("input, textarea, select").uniform();
+        $("#ExChangeDeptId").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#ExChangeDeptId'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown",
+            function (e) {
+                if (e.keyCode == "13") {
+                    $('#ExChangeDeptId').combotree('tree').tree("search", $(this).val());
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        $('#ExChangeDeptId').combotree('tree').tree("collapseAll");
+                    }
+                }
+            }
+        );
+        */
+    })
+
+    function ExChange() {
+        var DeptId = $("#ExChangeDeptId").combotree('getValue');
+        var TerNoss = '@ViewBag.TerGuid';
+        $.post("/Terminal/TerExChangeForm", { DeptId: DeptId, TerGuid: TerNoss }, function (e) {
+            if (e > 0) {
+                var ifr = window.parent.document.getElementById('/Terminal/TerminalIndex');
+                var win = ifr.window || ifr.contentWindow;
+                win.$('#TerminalTable').datagrid('reload');
+                window.parent.$(".dialog").dialog('close');
+                window.parent.$.messager.show({
+                    title: '提示',
+                    msg: "流转成功！",
+                    timeout: 2000
+                });
+            } else {
+                window.parent.$.messager.show({
+                    title: '提示',
+                    msg: "流转失败！",
+                    timeout: 2000
+                })
+            }
+        })
+    }
+
+</script>

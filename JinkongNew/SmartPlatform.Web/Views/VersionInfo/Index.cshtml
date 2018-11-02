@@ -1,0 +1,132 @@
+﻿
+<div class="tabcontant">
+    <table id="VerInfoTable"></table>
+</div>
+
+<script type="text/javascript">
+
+    var VersionManager = [];
+
+    var AddVersionVal = 'true';
+    var EditVersionVal = 'true';
+    var DelVersionVal = 'true';
+
+    if (AddVersionVal == "true") {
+        var AddVersionBtn = {
+            text: '添加',
+            iconCls: 'icon-add',
+            handler: function () {
+                window.parent.$.DialogOpen('/VersionInfo/Add', { title: "添加版本", width: 450, height: 430 });
+            }
+        };
+        VersionManager.push(AddVersionBtn);
+    }
+
+    if (EditVersionVal == "true") {
+        var EditVersionBtn = {
+            text: '修改',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = $('#VerInfoTable').datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                }
+                else {
+                    var id = rows[0].VerId;
+                    window.parent.$.DialogOpen('/VersionInfo/Edit?VerId=' + id, { title: "修改版本", width: 450, height: 430 });
+                }
+            }
+        };
+        VersionManager.push(EditVersionBtn);
+    }
+
+    if (DelVersionVal == "true") {
+        var DelVersionBtn = {
+            text: '删除',
+            iconCls: 'icon-remove',
+            handler: function () {
+                var rows = $('#VerInfoTable').datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                }
+                else {
+                    var id = rows[0].VerId;
+                    window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+
+                        if (t) {
+                            $.ajax({
+                                url: '/VersionInfo/Delete?VerId=' + id,
+                                type: "post",
+                                //dataType: 'json',
+                                success: function (r) {
+                                    if (r == "删除成功！") {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除成功！",
+                                            timeout: 2000,
+                                        });
+                                        $('#VerInfoTable').datagrid('reload');
+                                    } else {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除失败！",
+                                            timeout: 2000,
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+        };
+        VersionManager.push(DelVersionBtn);
+    }
+
+    $(function () {
+
+        $('#VerInfoTable').height($(document.body).height() - 20);
+
+        var jsVerInfoTable = $('#VerInfoTable').datagrid({
+
+            url: '@Url.Action("GetList", "VersionInfo")',
+
+            columns: [[
+                  { field: 'VerId', title: '', width: 0, align: 'center', hidden: true },
+                  { field: 'VerName', title: '版本名称', width: 100, align: 'center' },
+                  { field: 'VerNumber', title: '版本号', width: 80, align: 'center' },
+                  {
+                      field: 'AppType',
+                      title: 'APP类型',
+                      width: 80,
+                      align: 'center',
+                      formatter: function (value, row, index) {
+                          if (value.toLowerCase() == "android") {
+                              return "Android";
+                          }
+                          else {
+                              return "IOS";
+                          }
+                      }
+                  },
+                  { field: 'AppUrl', title: '下载地址', width: 200, align: 'center' },
+                  { field: 'Publisher', title: '发布人', width: 100, align: 'center' },
+                  { field: 'PublishDate', title: '发布时间', width: 130, align: 'center' },
+                  { field: 'Description', title: '备注', width: 300, align: 'center' }
+            ]],
+
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            pageList: [15, 30, 45],
+            fitColumns: true,
+            pagination: true,
+            singleSelect: true,
+            toolbar: VersionManager
+        });
+    });
+
+</script>
+

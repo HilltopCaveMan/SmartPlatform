@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="ProductsInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="ProductsInfo" type="GModel.Car.ProductsInfo" />
+</alias>
+<resultMaps>
+	<resultMap id="ProductsInfoResult" class="ProductsInfo">
+		<result property="ProId" column="ProId" type="string" dbType="varchar"/>
+		<result property="ProName" column="ProName" type="string" dbType="varchar"/>
+		<result property="ProModel" column="ProModel" type="string" dbType="varchar"/>
+		<result property="ProVersion" column="ProVersion" type="string" dbType="varchar"/>
+		<result property="ProDesc" column="ProDesc" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectProductsInfo" parameterClass="string" resultMap="ProductsInfoResult">
+		SELECT PRO_ID AS ProId,PRO_NAME AS ProName,PRO_MODEL AS ProModel,PRO_VERSION AS ProVersion,PRO_DESC AS ProDesc
+		FROM PRODUCTS_INFO 
+	</select>
+	<select id="SelectProductsInfoPage" parameterClass="ProductsInfo" resultMap="ProductsInfoResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT PRO_ID AS ProId,PRO_NAME AS ProName,PRO_MODEL AS ProModel,PRO_VERSION AS ProVersion,PRO_DESC AS ProDesc
+    FROM PRODUCTS_INFO order by PRO_DESC
+    <isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectProductsInfoCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM PRODUCTS_INFO   
+	</select>
+	<insert id="InsertProductsInfo" parameterClass="ProductsInfo">
+		INSERT INTO PRODUCTS_INFO 
+		(PRO_ID,PRO_NAME,PRO_MODEL,PRO_VERSION,PRO_DESC) 
+		VALUES(#ProId#,#ProName#,#ProModel#,#ProVersion#,#ProDesc#)
+	</insert>
+	<update id="UpdateProductsInfo" parameterClass="ProductsInfo">
+    UPDATE PRODUCTS_INFO
+    SET PRO_NAME=#ProName#,PRO_MODEL=#ProModel#,PRO_VERSION=#ProVersion#,PRO_DESC=#ProDesc# WHERE PRO_ID=#ProId#
+  </update>
+	<delete id="DeleteProductsInfo" parameterClass="string">
+		DELETE FROM PRODUCTS_INFO 
+		WHERE $value$ 
+	</delete>
+</statements>
+</sqlMap>

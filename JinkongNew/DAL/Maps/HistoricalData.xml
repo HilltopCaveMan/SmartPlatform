@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="HistoricalData" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="HistoricalData" type="GModel.Location.HistoricalData" />
+  <typeAlias alias="YXHistoricalData" type="GModel.Location.YXHistoricalData"/>
+</alias>
+<resultMaps>
+	<resultMap id="HistoricalDataResult" class="HistoricalData">
+    <result property="Id" column="Id" type="string" dbType="varchar"/>
+    <result property="Rawdataid" column="Rawdataid" type="string" dbType="varchar"/>
+    <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+    <result property="GenerationNum" column="GenerationNum" type="string" dbType="varchar"/>
+    <result property="Factorynum" column="Factorynum" type="string" dbType="varchar"/>
+    <result property="Rtime" column="Rtime" type="DateTime" dbType="DateTime"/>
+    <result property="Protocolversion" column="Protocolversion" type="string" dbType="varchar"/>
+    <result property="Programverson" column="Programverson" type="string" dbType="varchar"/>
+    <result property="Gpsverson" column="Gpsverson" type="string" dbType="varchar"/>
+    <result property="Positioningtime" column="Positioningtime" type="DateTime" dbType="DateTime"/>
+    <result property="TerStatus" column="TerStatus" type="string" dbType="varchar"/>
+    <result property="TerModel" column="TerModel" type="string" dbType="varchar"/>
+    <result property="Worktime" column="Worktime" type="double" dbType="Real"/>
+    <result property="Sleeptime" column="Sleeptime" type="string" dbType="varchar"/>
+    <result property="Ntervalltime" column="Ntervalltime" type="string" dbType="varchar"/>
+    <result property="TerVbatt" column="TerVbatt" type="string" dbType="varchar"/>
+    <result property="Totalworktime" column="Totalworktime" type="double" dbType="Real"/>
+    <result property="Blinddatanum" column="Blinddatanum" type="string" dbType="varchar"/>
+    <result property="TerStatrtimes" column="TerStatrtimes" type="string" dbType="varchar"/>
+    <result property="Ifblinddata" column="Ifblinddata" type="string" dbType="varchar"/>
+    <result property="Ifposition" column="Ifposition" type="string" dbType="varchar"/>
+    <result property="Northorsouth" column="Northorsouth" type="string" dbType="varchar"/>
+    <result property="Eastorwest" column="Eastorwest" type="string" dbType="varchar"/>
+    <result property="Latitude" column="Latitude" type="double" dbType="Real"/>
+    <result property="Longitude" column="Longitude" type="double" dbType="Real"/>
+    <result property="BaiduLatitude" column="BaiduLatitude" type="double" dbType="Real"/>
+    <result property="BaiduLongitude" column="BaiduLongitude" type="double" dbType="Real"/>
+    <result property="GoogleLatitude" column="GoogleLatitude" type="double" dbType="Real"/>
+    <result property="GoogleLongitude" column="GoogleLongitude" type="double" dbType="Real"/>
+    <result property="Position" column="Position" type="string" dbType="varchar"/>
+    <result property="Speed" column="Speed" type="string" dbType="varchar"/>
+    <result property="Direction" column="Direction" type="string" dbType="varchar"/>
+    <result property="Height" column="Height" type="string" dbType="varchar"/>
+    <result property="Gpsant" column="Gpsant" type="string" dbType="varchar"/>
+    <result property="Usesatellite" column="Usesatellite" type="double" dbType="Real"/>
+    <result property="Visualsatellite" column="Visualsatellite" type="double" dbType="Real"/>
+    <result property="Gpsrssi" column="Gpsrssi" type="string" dbType="varchar"/>
+    <result property="Gsmrssi" column="Gsmrssi" type="string" dbType="varchar"/>
+    <result property="Lca" column="Lca" type="string" dbType="varchar"/>
+    <result property="Cell" column="Cell" type="string" dbType="varchar"/>
+    <result property="Gsmrssi1" column="Gsmrssi1" type="string" dbType="varchar"/>
+    <result property="Lca1" column="Lca1" type="string" dbType="varchar"/>
+    <result property="Cell1" column="Cell1" type="string" dbType="varchar"/>
+    <result property="Gsmrssi2" column="Gsmrssi2" type="string" dbType="varchar"/>
+    <result property="Lca2" column="Lca2" type="string" dbType="varchar"/>
+    <result property="Cell2" column="Cell2" type="string" dbType="varchar"/>
+    <result property="Gsmrssi3" column="Gsmrssi3" type="string" dbType="varchar"/>
+    <result property="Lca3" column="Lca3" type="string" dbType="varchar"/>
+    <result property="Cell3" column="Cell3" type="string" dbType="varchar"/>
+    <result property="Province" column="Province" type="string" dbType="varchar"/>
+    <result property="City" column="City" type="string" dbType="varchar"/>
+    <result property="County" column="County" type="string" dbType="varchar"/>
+    <result property="Workstate" column="Workstate" type="string" dbType="varchar"/>
+    <result property="Postbacktimes" column="Postbacktimes" type="double" dbType="Real"/>
+    <result property="Gsmrssi6" column="Gsmrssi6" type="string" dbType="varchar"/>
+    <result property="Lca6" column="Lca6" type="string" dbType="varchar"/>
+    <result property="Cell6" column="Cell6" type="string" dbType="varchar"/>
+    <result property="Gsmrssi5" column="Gsmrssi5" type="string" dbType="varchar"/>
+    <result property="Lca5" column="Lca5" type="string" dbType="varchar"/>
+    <result property="Cell5" column="Cell5" type="string" dbType="varchar"/>
+    <result property="Gsmrssi4" column="Gsmrssi4" type="string" dbType="varchar"/>
+    <result property="Lca4" column="Lca4" type="string" dbType="varchar"/>
+    <result property="Cell4" column="Cell4" type="string" dbType="varchar"/>
+    <result property="Accstate" column="Accstate" type="string" dbType="varchar"/>
+    <result property="Lat" column="Lat" type="string" dbType="varchar"/>
+    <result property="Lng" column="Lng" type="string" dbType="varchar"/>
+    <result property="Carworkvmp" column="Carworkvmp" type="double" dbType="Real"/>
+    <result property="Carworktemp" column="Carworktemp" type="double" dbType="Real"/>
+    <result property="RemainlPct" column="RemainlPct" type="string" dbType="varchar"/>
+    <result property="AddupDist" column="AddupDist" type="double" dbType="Real"/>
+	</resultMap>
+  <resultMap id="YXHistoricalDataResult" class="YXHistoricalData">
+    <result property="Id" column="Id" type="string" dbType="varchar"/>
+    <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+    <result property="Rtime" column="Rtime" type="DateTime" dbType="DateTime"/>
+    <result property="ReplydataCode" column="ReplydataCode" type="string" dbType="varchar"/>
+    <result property="ReplydataName" column="ReplydataName" type="string" dbType="varchar"/>
+    <result property="Ifposition" column="Ifposition" type="string" dbType="varchar"/>
+    <result property="AccState" column="AccState" type="string" dbType="varchar"/>
+    <result property="Northorsouth" column="Northorsouth" type="string" dbType="varchar"/>
+    <result property="Eastorwest" column="Eastorwest" type="string" dbType="varchar"/>
+    <result property="Latitude" column="Latitude" type="string" dbType="varchar"/>
+    <result property="Longitude" column="Longitude" type="string" dbType="varchar"/>
+    <result property="BaiduLatitude" column="BaiduLatitude" type="string" dbType="varchar"/>
+    <result property="BaiduLongitude" column="BaiduLongitude" type="string" dbType="varchar"/>
+    <result property="GoogleLatitude" column="GoogleLatitude" type="string" dbType="varchar"/>
+    <result property="GoogleLongitude" column="GoogleLongitude" type="string" dbType="varchar"/>
+    <result property="Position" column="Position" type="string" dbType="varchar"/>
+    <result property="Speed" column="Speed" type="string" dbType="varchar"/>
+    <result property="Direction" column="Direction" type="string" dbType="varchar"/>
+    <result property="TerVbatt" column="TerVbatt" type="string" dbType="varchar"/>
+    <result property="Gsmrssi" column="Gsmrssi" type="string" dbType="varchar"/>
+    <result property="Protocolversion" column="Protocolversion" type="string" dbType="varchar"/>
+    <result property="Programverson" column="Programverson" type="string" dbType="varchar"/>
+    <result property="Gpsverson" column="Gpsverson" type="string" dbType="varchar"/>
+    <result property="TerSimcard" column="TerSimcard" type="string" dbType="varchar"/>
+    <result property="Ter_Innettime" column="Ter_Innettime" type="DateTime" dbType="DateTime"/>
+  </resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectHistoricalData" parameterClass="string" resultMap="HistoricalDataResult">
+    SELECT ID AS Id,RAWDATAID AS Rawdataid,TER_NO AS TerNo,GENERATION_NUM AS GenerationNum,FACTORYNUM AS Factorynum,RTIME AS Rtime,
+    PROTOCOLVERSION AS Protocolversion,PROGRAMVERSON AS Programverson,GPSVERSON AS Gpsverson,POSITIONINGTIME AS Positioningtime,
+    TER_STATUS AS TerStatus,TER_MODEL AS TerModel,WORKTIME AS Worktime,SLEEPTIME AS Sleeptime,NTERVALLTIME AS Ntervalltime,
+    TER_VBATT AS TerVbatt,TOTALWORKTIME AS Totalworktime,BLINDDATANUM AS Blinddatanum,TER_STATRTIMES AS TerStatrtimes,
+    IFBLINDDATA AS Ifblinddata,IFPOSITION AS Ifposition,NORTHORSOUTH AS Northorsouth,EASTORWEST AS Eastorwest,LATITUDE AS Latitude,
+    LONGITUDE AS Longitude,BAIDU_LATITUDE AS BaiduLatitude,BAIDU_LONGITUDE AS BaiduLongitude,GOOGLE_LATITUDE AS GoogleLatitude,
+    GOOGLE_LONGITUDE AS GoogleLongitude,POSITION AS Position,SPEED AS Speed,DIRECTION AS Direction,HEIGHT AS Height,GPSANT AS Gpsant,
+    USESATELLITE AS Usesatellite,VISUALSATELLITE AS Visualsatellite,GPSRSSI AS Gpsrssi,GSMRSSI AS Gsmrssi,LCA AS Lca,CELL AS Cell,
+    GSMRSSI1 AS Gsmrssi1,LCA1 AS Lca1,CELL1 AS Cell1,GSMRSSI2 AS Gsmrssi2,LCA2 AS Lca2,CELL2 AS Cell2,GSMRSSI3 AS Gsmrssi3,LCA3 AS Lca3,
+    CELL3 AS Cell3,PROVINCE AS Province,CITY AS City,COUNTY AS County,WORKSTATE AS Workstate,POSTBACKTIMES AS Postbacktimes,GSMRSSI6 AS Gsmrssi6,
+    LCA6 AS Lca6,CELL6 AS Cell6,GSMRSSI5 AS Gsmrssi5,LCA5 AS Lca5,CELL5 AS Cell5,GSMRSSI4 AS Gsmrssi4,LCA4 AS Lca4,CELL4 AS Cell4,
+    ACCSTATE AS Accstate,
+    LAT_ AS Lat,
+    LNG_ AS Lng,
+    CARWORKVMP AS Carworkvmp,
+    CARWORKTEMP AS Carworktemp,
+    REMAINL_PCT AS RemainlPct,
+    ADDUP_DIST AS AddupDist
+    FROM HISTORICAL_DATA 
+  </select>
+	<select id="SelectHistoricalDataPage" parameterClass="map" resultClass="HistoricalData">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT ID AS Id,RAWDATAID AS Rawdataid,TER_NO AS TerNo,GENERATION_NUM AS GenerationNum,FACTORYNUM AS Factorynum,RTIME AS Rtime,
+    PROTOCOLVERSION AS Protocolversion,PROGRAMVERSON AS Programverson,GPSVERSON AS Gpsverson,POSITIONINGTIME AS Positioningtime,
+    TER_STATUS AS TerStatus,TER_MODEL AS TerModel,WORKTIME AS Worktime,SLEEPTIME AS Sleeptime,NTERVALLTIME AS Ntervalltime,TER_VBATT AS TerVbatt,
+    TOTALWORKTIME AS Totalworktime,BLINDDATANUM AS Blinddatanum,TER_STATRTIMES AS TerStatrtimes,IFBLINDDATA AS Ifblinddata,
+    IFPOSITION AS Ifposition,
+    NORTHORSOUTH AS Northorsouth,EASTORWEST AS Eastorwest,LATITUDE AS Latitude,LONGITUDE AS Longitude,BAIDU_LATITUDE AS BaiduLatitude,BAIDU_LONGITUDE AS BaiduLongitude,
+    GOOGLE_LATITUDE AS GoogleLatitude,GOOGLE_LONGITUDE AS GoogleLongitude,POSITION AS Position,SPEED AS Speed,DIRECTION AS Direction,HEIGHT AS Height,GPSANT AS Gpsant,
+    USESATELLITE AS Usesatellite,VISUALSATELLITE AS Visualsatellite,GPSRSSI AS Gpsrssi,GSMRSSI AS Gsmrssi,LCA AS Lca,CELL AS Cell,GSMRSSI1 AS Gsmrssi1,LCA1 AS Lca1,
+    CELL1 AS Cell1,GSMRSSI2 AS Gsmrssi2,LCA2 AS Lca2,CELL2 AS Cell2,GSMRSSI3 AS Gsmrssi3,LCA3 AS Lca3,CELL3 AS Cell3,PROVINCE AS Province,CITY AS City,COUNTY AS County,
+    WORKSTATE AS Workstate,POSTBACKTIMES AS Postbacktimes,GSMRSSI6 AS Gsmrssi6,LCA6 AS Lca6,CELL6 AS Cell6,GSMRSSI5 AS Gsmrssi5,LCA5 AS Lca5,CELL5 AS Cell5,GSMRSSI4 AS Gsmrssi4,LCA4 AS Lca4,CELL4 AS Cell4
+    ACCSTATE AS Accstate,
+    LAT_ AS Lat,
+    LNG_ AS Lng,
+    CARWORKVMP AS Carworkvmp,
+    CARWORKTEMP AS Carworktemp,
+    REMAINL_PCT AS RemainlPct,
+    ADDUP_DIST AS AddupDist
+    FROM HISTORICAL_DATA where  TER_NO=#TerNo# AND RTIME BETWEEN #st# and #ed# ORDER BY POSITIONINGTIME DESC
+    <isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectHistoricalDataCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM HISTORICAL_DATA  
+	</select>
+
+  <select id="SelectYXHistoricalDataPage" parameterClass="map" resultClass="YXHistoricalData">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    select ZTK.ID AS Id,ZTK.RTIME AS Rtime,nvl(ZTK.POSITION,'设备周边无地理信息描述') AS Position,ZTK.TER_NO AS TerNo,ZTK.REPLYDATACODE as ReplydataCode,ZTK.REPLYDATANAME as ReplydataName,case ZTK.IFPOSITION when '定位' then '精准' when '不定位' then '标准' else '其他' end AS Ifposition,
+    ZTK.NORTHORSOUTH AS Northorsouth,ZTK.EASTORWEST AS Eastorwest,ZTK.SPEED AS Speed,ZTK.DIRECTION AS Direction,ZTK.TER_VBATT AS TerVbatt,ZTK.GSMRSSI AS Gsmrssi,ZTK.PROGRAMVERSON AS Programverson,ZTK.GPSVERSON AS Gpsverson,ZTK.PROTOCOLVERSION AS Protocolversion,ZTK.ACCSTATE AS AccState,
+    ZTK.LATITUDE AS Latitude,ZTK.LONGITUDE AS Longitude,ZTK.BAIDU_LATITUDE AS BaiduLatitude,ZTK.BAIDU_LONGITUDE AS BaiduLongitude,ZTK.GOOGLE_LATITUDE AS GoogleLatitude,ZTK.GOOGLE_LONGITUDE AS GoogleLongitude,TI.TER_SIMCARD AS TerSimcard,TI.TER_INNETTIME AS Ter_Innettime from ZTRACK20160128 ZTK JOIN TERMINAL_INFO TI ON ZTK.TER_NO=TI.TER_NO where 1=1
+    <dynamic prepend="AND">
+      <isNotEmpty prepend="AND" property="TerNo">
+        ZTK.TER_NO=#TerNo#
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="DeptId">
+        TI.DEPT_ID = #DeptId#
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="st">
+        ZTK.RTIME &gt;= to_date(#st#,'yyyy-mm-dd hh24:mi:ss')
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="ed">
+        ZTK.RTIME &lt;= to_date(#ed#,'yyyy-mm-dd hh24:mi:ss')
+      </isNotEmpty>
+    </dynamic>
+      ORDER BY ZTK.Rtime DESC
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+
+  <select id="GetYXHistoricalDataCount" parameterClass="map" resultClass="int">
+    select count(*) from ZTRACK20160128 ZTK JOIN TERMINAL_INFO TI ON ZTK.TER_NO=TI.TER_NO where 1=1
+    <dynamic prepend="AND">
+      <isNotEmpty prepend="AND" property="TerNo">
+        ZTK.TER_NO = #TerNo#
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="DeptId">
+        TI.DEPT_ID = #DeptId#
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="st">
+        ZTK.RTIME &gt;= to_date(#st#,'yyyy-mm-dd hh24:mi:ss')
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="ed">
+        ZTK.RTIME &lt;= to_date(#ed#,'yyyy-mm-dd hh24:mi:ss')
+      </isNotEmpty>
+    </dynamic>
+  </select>
+  
+  
+	<insert id="InsertHistoricalData" parameterClass="HistoricalData">
+    INSERT INTO HISTORICAL_DATA
+    (ID,RAWDATAID,TER_NO,GENERATION_NUM,FACTORYNUM,RTIME,PROTOCOLVERSION,PROGRAMVERSON,GPSVERSON,POSITIONINGTIME,TER_STATUS,TER_MODEL,WORKTIME,SLEEPTIME,NTERVALLTIME,TER_VBATT,TOTALWORKTIME,BLINDDATANUM,TER_STATRTIMES,IFBLINDDATA,IFPOSITION,NORTHORSOUTH,EASTORWEST,LATITUDE,LONGITUDE,BAIDU_LATITUDE,BAIDU_LONGITUDE,GOOGLE_LATITUDE,GOOGLE_LONGITUDE,POSITION,SPEED,DIRECTION,HEIGHT,GPSANT,USESATELLITE,VISUALSATELLITE,GPSRSSI,GSMRSSI,LCA,CELL,GSMRSSI1,LCA1,CELL1,GSMRSSI2,LCA2,CELL2,GSMRSSI3,LCA3,CELL3,PROVINCE,CITY,COUNTY,WORKSTATE,POSTBACKTIMES,GSMRSSI6,LCA6,CELL6,GSMRSSI5,LCA5,CELL5,GSMRSSI4,LCA4,CELL4,ACCSTATE,LAT_,LNG_,CARWORKVMP,CARWORKTEMP,REMAINL_PCT,ADDUP_DIST,REPLYDATACODE,REPLYDATANAME)
+    VALUES(#Id#,#Rawdataid#,#TerNo#,#GenerationNum#,#Factorynum#,#Rtime:DateTime:1/1/0001 12:00:00 AM#,#Protocolversion#,#Programverson#,#Gpsverson#,#Positioningtime:DateTime:1/1/0001 12:00:00 AM#,#TerStatus#,#TerModel#,#Worktime#,#Sleeptime#,#Ntervalltime#,#TerVbatt#,#Totalworktime#,#Blinddatanum#,#TerStatrtimes#,#Ifblinddata#,#Ifposition#,#Northorsouth#,#Eastorwest#,#Latitude#,#Longitude#,#BaiduLatitude#,#BaiduLongitude#,#GoogleLatitude#,#GoogleLongitude#,#Position#,#Speed#,#Direction#,#Height#,#Gpsant#,#Usesatellite#,#Visualsatellite#,#Gpsrssi#,#Gsmrssi#,#Lca#,#Cell#,#Gsmrssi1#,#Lca1#,#Cell1#,#Gsmrssi2#,#Lca2#,#Cell2#,#Gsmrssi3#,#Lca3#,#Cell3#,#Province#,#City#,#County#,#Workstate#,#Postbacktimes#,#Gsmrssi6#,#Lca6#,#Cell6#,#Gsmrssi5#,#Lca5#,#Cell5#,#Gsmrssi4#,#Accstate#,#Lca4#,#Cell4#,#Lat#,#Lng#,#Carworkvmp#,#Carworktemp#,#RemainlPct#,#AddupDist#,#ReplydataCode#,#ReplydataName#)
+  </insert>
+	<update id="UpdateHistoricalData" parameterClass="HistoricalData">
+		UPDATE HISTORICAL_DATA 
+ 		SET RAWDATAID=#Rawdataid#,TER_NO=#TerNo#,GENERATION_NUM=#GenerationNum#,FACTORYNUM=#Factorynum#,RTIME=#Rtime#,PROTOCOLVERSION=#Protocolversion#,PROGRAMVERSON=#Programverson#,GPSVERSON=#Gpsverson#,POSITIONINGTIME=#Positioningtime#,TER_STATUS=#TerStatus#,TER_MODEL=#TerModel#,WORKTIME=#Worktime#,SLEEPTIME=#Sleeptime#,NTERVALLTIME=#Ntervalltime#,TER_VBATT=#TerVbatt#,TOTALWORKTIME=#Totalworktime#,BLINDDATANUM=#Blinddatanum#,TER_STATRTIMES=#TerStatrtimes#,IFBLINDDATA=#Ifblinddata#,IFPOSITION=#Ifposition#,NORTHORSOUTH=#Northorsouth#,EASTORWEST=#Eastorwest#,LATITUDE=#Latitude#,LONGITUDE=#Longitude#,BAIDU_LATITUDE=#BaiduLatitude#,BAIDU_LONGITUDE=#BaiduLongitude#,GOOGLE_LATITUDE=#GoogleLatitude#,GOOGLE_LONGITUDE=#GoogleLongitude#,SPEED=#Speed#,DIRECTION=#Direction#,HEIGHT=#Height#,GPSANT=#Gpsant#,USESATELLITE=#Usesatellite#,VISUALSATELLITE=#Visualsatellite#,GSMRSSI=#Gsmrssi#,LCA=#Lca#,CELL=#Cell#,LCA1=#Lca1#,CELL1=#Cell1#,LCA2=#Lca2#,CELL2=#Cell2#,LCA3=#Lca3#,CELL3=#Cell3#,POSITION=#Position#
+		WHERE ID = #Id#
+	</update>
+	<delete id="DeleteHistoricalData" parameterClass="string">
+		DELETE FROM HISTORICAL_DATA 
+		WHERE $value$ 
+	</delete>
+
+  <select id="SelectHistorical" parameterClass="map" resultMap="HistoricalDataResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT ID AS Id,RAWDATAID AS Rawdataid,TER_NO AS TerNo,GENERATION_NUM AS GenerationNum,FACTORYNUM AS Factorynum,RTIME AS Rtime,
+    PROTOCOLVERSION AS Protocolversion,PROGRAMVERSON AS Programverson,GPSVERSON AS Gpsverson,POSITIONINGTIME AS Positioningtime,
+    TER_STATUS AS TerStatus,TER_MODEL AS TerModel,WORKTIME AS Worktime,SLEEPTIME AS Sleeptime,NTERVALLTIME AS Ntervalltime,TER_VBATT AS TerVbatt,
+    TOTALWORKTIME AS Totalworktime,BLINDDATANUM AS Blinddatanum,TER_STATRTIMES AS TerStatrtimes,IFBLINDDATA AS Ifblinddata,
+    case IFPOSITION when '定位' then '精准' when '不定位' then '标准' else '其他' end AS Ifposition,
+    NORTHORSOUTH AS Northorsouth,EASTORWEST AS Eastorwest,LATITUDE AS Latitude,LONGITUDE AS Longitude,BAIDU_LATITUDE AS BaiduLatitude,BAIDU_LONGITUDE AS BaiduLongitude,
+    GOOGLE_LATITUDE AS GoogleLatitude,GOOGLE_LONGITUDE AS GoogleLongitude,nvl(POSITION,'设备周边无地理信息描述') AS Position,SPEED AS Speed,DIRECTION AS Direction,HEIGHT AS Height,GPSANT AS Gpsant,
+    USESATELLITE AS Usesatellite,VISUALSATELLITE AS Visualsatellite,GPSRSSI AS Gpsrssi,GSMRSSI AS Gsmrssi,LCA AS Lca,CELL AS Cell,GSMRSSI1 AS Gsmrssi1,
+    LCA1 AS Lca1,CELL1 AS Cell1,GSMRSSI2 AS Gsmrssi2,LCA2 AS Lca2,CELL2 AS Cell2,GSMRSSI3 AS Gsmrssi3,LCA3 AS Lca3,CELL3 AS Cell3,PROVINCE AS Province,
+    CITY AS City,COUNTY AS County,WORKSTATE AS Workstate,POSTBACKTIMES AS Postbacktimes,GSMRSSI6 AS Gsmrssi6,LCA6 AS Lca6,CELL6 AS Cell6,GSMRSSI5 AS Gsmrssi5,
+    LCA5 AS Lca5,CELL5 AS Cell5,GSMRSSI4 AS Gsmrssi4,LCA4 AS Lca4,CELL4 AS Cell4,
+    ACCSTATE AS Accstate,
+    LAT_ AS Lat,
+    LNG_ AS Lng,
+    CARWORKVMP AS Carworkvmp,
+    CARWORKTEMP AS Carworktemp,
+    REMAINL_PCT AS RemainlPct,
+    ADDUP_DIST AS AddupDist
+    FROM HISTORICAL_DATA where (GOOGLE_LATITUDE &gt; 15 and GOOGLE_LATITUDE &lt; 55) and (GOOGLE_LONGITUDE &gt; 70 and GOOGLE_LONGITUDE &lt; 140) and IFBLINDDATA!=1 and TER_NO=#TerNo#
+    <dynamic prepend="AND">
+      <isNotEmpty prepend="AND" property="st">
+        RTIME BETWEEN to_date(#st#,'yyyy-mm-dd hh24:mi:ss') and to_date(#ed#,'yyyy-mm-dd hh24:mi:ss')
+      </isNotEmpty>
+    </dynamic>
+    ORDER BY RTIME DESC
+    <isGreaterThan property="EndData" compareValue="0">
+    ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+  </isGreaterThan>
+  </select>
+
+  <select id="SelectRealData" parameterClass="string" resultMap="HistoricalDataResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT ID AS Id,RAWDATAID AS Rawdataid,TER_NO AS TerNo,GENERATION_NUM AS GenerationNum,FACTORYNUM AS Factorynum,RTIME AS Rtime,PROTOCOLVERSION AS Protocolversion,PROGRAMVERSON AS Programverson,GPSVERSON AS Gpsverson,POSITIONINGTIME AS Positioningtime,TER_STATUS AS TerStatus,TER_MODEL AS TerModel,WORKTIME AS Worktime,SLEEPTIME AS Sleeptime,NTERVALLTIME AS Ntervalltime,TER_VBATT AS TerVbatt,TOTALWORKTIME AS Totalworktime,BLINDDATANUM AS Blinddatanum,TER_STATRTIMES AS TerStatrtimes,IFBLINDDATA AS Ifblinddata,IFPOSITION AS Ifposition,NORTHORSOUTH AS Northorsouth,EASTORWEST AS Eastorwest,LATITUDE AS Latitude,LONGITUDE AS Longitude,BAIDU_LATITUDE AS BaiduLatitude,BAIDU_LONGITUDE AS BaiduLongitude,GOOGLE_LATITUDE AS GoogleLatitude,GOOGLE_LONGITUDE AS GoogleLongitude,POSITION AS Position,SPEED AS Speed,DIRECTION AS Direction,HEIGHT AS Height,GPSANT AS Gpsant,USESATELLITE AS Usesatellite,VISUALSATELLITE AS Visualsatellite,GPSRSSI AS Gpsrssi,GSMRSSI AS Gsmrssi,LCA AS Lca,CELL AS Cell,GSMRSSI1 AS Gsmrssi1,LCA1 AS Lca1,CELL1 AS Cell1,GSMRSSI2 AS Gsmrssi2,LCA2 AS Lca2,CELL2 AS Cell2,GSMRSSI3 AS Gsmrssi3,LCA3 AS Lca3,CELL3 AS Cell3,PROVINCE AS Province,CITY AS City,COUNTY AS County,WORKSTATE AS Workstate,POSTBACKTIMES AS Postbacktimes,GSMRSSI6 AS Gsmrssi6,LCA6 AS Lca6,CELL6 AS Cell6,GSMRSSI5 AS Gsmrssi5,LCA5 AS Lca5,CELL5 AS Cell5,GSMRSSI4 AS Gsmrssi4,LCA4 AS Lca4,CELL4 AS Cell4,
+    ACCSTATE AS Accstate,
+    LAT_ AS Lat,
+    LNG_ AS Lng,
+    CARWORKVMP AS Carworkvmp,
+    CARWORKTEMP AS Carworktemp,
+    REMAINL_PCT AS RemainlPct,
+    ADDUP_DIST AS AddupDist
+    FROM REALTIME_DATA WHERE TER_NO=#value#
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+
+  
+  
+</statements>
+</sqlMap>

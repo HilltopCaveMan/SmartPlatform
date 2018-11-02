@@ -1,0 +1,203 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    主题：
+                </td>
+                <td>
+                    <input id="questiontitle" type="text" style="width: 100px;height:20px">
+                </td>
+                @if(@ViewBag.IsAdmin=="true")
+                {
+                <td style="padding-left: 15px;">
+                    提问人：
+                </td>
+                <td>
+                    <input id="questionman" type="text" style="width:100px; height:20px;" />
+                </td>
+                }
+                <td style="padding-left: 15px;">
+                    开始时间:
+                </td>
+                <td>
+                    <input id="begintime" type="text" class="easyui-datetimebox" style="width:140px; height:30px;"/>
+                </td>
+                <td style="padding-left: 15px;">
+                    结束时间:
+                </td>
+                <td>
+                    <input id="endtime" class="easyui-datetimebox" style="width:140px; height:30px"/>
+                </td>
+                <td colspan="2">
+                    &nbsp; &nbsp;<a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetQuestionList()">查询</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="QuestionTable"></table>
+</div>
+
+<script type="text/javascript">
+    var BtnManager = [];
+    //var LookQuestion = {
+    //    text: '查看',
+    //    iconCls: 'icon-search',
+    //    handler: function () {
+    //        var rows = $('#QuestionTable').datagrid('getSelections');
+    //        if (rows.length <= 0) {
+    //            window.parent.$.messager.alert('警告', '请选中所要查看的问题！', 'error');
+    //        } else {
+    //            var id = rows[0].QuestionId;
+    //            window.parent.$.DialogOpen('/QuestionReply/LookQuestion?questionid='+id, { title: "用户反馈", width: 450, height: 350 });
+    //        }
+    //    }
+    //};
+    //BtnManager.push(LookQuestion);
+
+    if('@ViewBag.IsAdmin'=="false")
+    {
+        var AddQuestion = {
+            text: '提问',
+            iconCls: 'icon-add',
+            handler: function () {
+                //window.parent.$.DialogOpen('/QuestionReply/AddQuestion', { title: "用户反馈", width: 450, height: 350 });
+                window.location.href = '/QuestionReply/AddQuestion';
+            }
+        };
+        BtnManager.push(AddQuestion);
+    }
+    //var EditQuestion = {
+    //    text: '修改',
+    //    iconCls: 'icon-edit',
+    //    handler: function () {
+    //        var rows = $('#QuestionTable').datagrid('getSelections');
+    //        if (rows.length <= 0) {
+    //            window.parent.$.messager.alert('警告', '请选中所要修改的问题！', 'error');
+    //        } else {
+    //            var id = rows[0].QuestionId;
+    //            window.parent.$.DialogOpen('/QuestionReply/EditQuestion?questionid='+id, { title: "用户反馈", width: 450, height: 350 });
+    //        }
+    //    }
+    //};
+    //BtnManager.push(EditQuestion);
+
+    //var DelQuestion = {
+    //    text: '删除',
+    //    iconCls: 'icon-remove',
+    //    handler: function () {
+    //        var rows = $('#QuestionTable').datagrid('getSelections');
+    //        if (rows.length <= 0) {
+    //            window.parent.$.messager.alert('警告', '请选中所要删除的问题！', 'error');
+    //        } else {
+    //            var id = rows[0].QuestionId;
+    //            window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+    //                if (t) {
+    //                    $.ajax({
+    //                        url: '/QuestionReply/DelQuestion?questionid=' + id,
+    //                        type: "post",
+    //                        success: function (r) {
+    //                            if (r == "true") {
+    //                                window.parent.$.messager.show({
+    //                                    title: '提示',
+    //                                    msg: "删除成功！",
+    //                                    timeout: 2000,
+    //                                });
+    //                                QuestionData.datagrid('reload');
+    //                            } else {
+    //                                window.parent.$.messager.show({
+    //                                    title: '提示',
+    //                                    msg: "删除失败！",
+    //                                    timeout: 2000,
+    //                                });
+    //                            }
+    //                        }
+    //                    });
+    //                }
+    //            });
+    //        }
+    //    }
+    //};
+    //BtnManager.push(DelQuestion);
+
+    //var ReplyQuestion = {
+    //    text: '回复',
+    //    iconCls: 'icon-add',
+    //    handler: function () {
+    //        var rows = $('#QuestionTable').datagrid('getSelections');
+    //        if (rows.length <= 0) {
+    //            window.parent.$.messager.alert('警告', '请选中所要回复的问题！', 'error');
+    //        } else {
+    //            var id = rows[0].QuestionId;
+    //            window.parent.$.DialogOpen('/QuestionReply/AddReply?questionid=' + id, { title: "用户反馈", width: 450, height: 350 });
+    //        }
+    //    }
+    //};
+    //BtnManager.push(ReplyQuestion);
+
+    $(function () {
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 45,
+            noheader: true,
+            style: {}
+        });
+        $("input, textarea, select").uniform();
+        //终端用户表格高度
+        $("#QuestionTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+        loadQuestionTable();
+    });
+
+    function loadQuestionTable()
+    {
+        QuestionData = $('#QuestionTable').datagrid({
+            url: '@Url.Action("GetQuestionList", "QuestionReply")',
+            columns: [[
+                { field: 'QuestionId', title: '', width: 0, hidden: true },
+                { field: 'QuestionTitle', title: '主题', width: 90, align: 'center' },
+                { field: 'QuestionMan', title: '提问人', width: 90, align: 'center' },
+                { field: 'QuestionTime', title: '提问时间', width: 90, align: 'center' }
+            ]],
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [30, 50, 100],
+            //queryParams: { "LOGINNAME": loginname, "USERNAME": UserName, "DEALERID": DealerID },//查询参数
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true,
+            singleSelect: true,
+            onSelect: function (rowIndex, rowData) {
+                var id = rowData.QuestionId;
+                //window.parent.$.DialogOpen('/QuestionReply/AddReply?questionid=' + id, { title: "用户反馈", width: 450, height: 350 });
+                window.location.href = "/QuestionReply/AddReply?questionid="+id;
+            },
+            toolbar: BtnManager
+        });
+    }
+
+    function GetQuestionList()
+    {
+        var questiontitle = $("#questiontitle").val();
+        var questionman = $("#questionman").val();
+        var begintime = $("#begintime").datetimebox("getValue");
+        var endtime = $("#endtime").datetimebox("getValue");
+        var param = {
+            QuestionTitle: questiontitle,
+            QuestionMan: questionman,
+            BeginTime: begintime,
+            EndTime: endtime
+        };
+        $("#QuestionTable").datagrid("load", param);
+    }
+</script>
+

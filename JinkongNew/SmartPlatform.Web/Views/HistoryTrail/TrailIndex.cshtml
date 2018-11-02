@@ -1,0 +1,97 @@
+﻿<div id="div_Trail" class="easyui-panel" style="width:100%;height:600px;">
+    <div class="easyui-layout" data-options="fit:true" style=" height:100%; width:100%">
+
+        <div data-options="region:'west',split:true,border:false" style="width:300px">
+            <table id="RailList"></table>
+        </div>
+        <div data-options="region:'center',border:false" id="map-Trail" style=" height:600px">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" language="javascript">
+    var TrailMap;
+    var poly;
+    var TrailWindow;
+    //function initialize() {
+    //    var mapOptions = {
+    //        center: new google.maps.LatLng(39.917, 116.397),
+    //        zoom: 14
+    //    };
+    //    TrailMap = new google.maps.Map(document.getElementById('map-Trail'), mapOptions);
+    //    var polyOptions = {
+    //        strokeColor: '#ff0000',
+    //        strokeOpacity: 1.0,
+    //        strokeWeight: 3
+    //    };
+    //    poly = new google.maps.Polyline(polyOptions);
+    //    poly.setMap(TrailMap);
+    //    TrailWindow = new google.maps.InfoWindow();
+    //}
+
+    function addLatLng(hrdata) {
+
+        var path = poly.getPath();
+
+        if (hrdata != null && hrdata.length>0) {
+            for (var i = hrdata.length-1; i >=0; i--) {
+                var latLng = new google.maps.LatLng(hrdata[i].Latitude, hrdata[i].Longitude);
+                path.push(latLng);
+                if (i == (hrdata.length - 1)) {
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        title: '#' + path.getLength(),
+                        'icon': '../Content/Icon/start.png',
+                         map: TrailMap
+                    });
+                    var fn = TrailMarkerClickFun(hrdata[i].Id, latLng);
+                    google.maps.event.addListener(marker, 'click', fn);
+                } else if (i == 0) {
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        title: '#' + path.getLength(),
+                        'icon': '../Content/Icon/Finish.png',
+                        map: TrailMap
+                    });
+                    var fn = TrailMarkerClickFun(hrdata[i].Id, latLng);
+                    google.maps.event.addListener(marker, 'click', fn);
+                } else {
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        title: '#' + path.getLength(),
+                        'icon': '../Content/Icon/11.png',
+                        map: TrailMap
+                    });
+                    var fn = TrailMarkerClickFun(hrdata[i].Id, latLng);
+                    google.maps.event.addListener(marker, 'click', fn);
+                }
+            }
+            setAutoZoom(path);
+        }
+    }
+
+    var TrailMarkerClickFun = function (TerNo, latLng) {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            var TrailHtml = "<div style='width:50px; height:50px'><H3>" + TerNo + "</div></H3>";
+            TrailWindow.setContent(TrailHtml);
+            TrailWindow.setPosition(latLng);
+            TrailWindow.open(TrailMap);
+        };
+    }
+
+    $(function () {
+        initialize();
+        $.post("/HistoryTrail/GetTrailList", {}, function (e) {
+            if (e != null && e != "[]") {
+                var k = eval(e);
+                addLatLng(k);
+            }
+        })
+    })
+</script>

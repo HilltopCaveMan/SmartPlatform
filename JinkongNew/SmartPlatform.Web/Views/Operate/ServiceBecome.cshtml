@@ -1,0 +1,118 @@
+﻿<div class="tabcontant">
+<div id="audit_polluteManager_list_searchPanel"
+     style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+     class="easyui-panel" iconcls="icon-search" title="近期服务到期车辆"
+     collapsible="true" minimizable="false" maximizable="false"
+     closable="false">
+    <form id="audit_polluteManager_list_searchForm" method="post">
+        <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+            <tr style="height:25px;">
+                <td style="padding-left: 15px;">
+                    车辆编号：
+                </td>
+                <td>
+                    <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                           style="width:150px;height:20px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    机型：
+                </td>
+                <td>
+                    <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                           style="width:150px;height:20px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    GPS编号：
+                </td>
+                <td>
+                    <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                           style="width:150px;height:20px;" />
+                </td>
+                <td style="padding-left:30px;" rowspan="2" align="center">
+                    <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                    <a class="easyui-linkbutton" icon="icon-search"
+                       href="#">查询</a> &nbsp;&nbsp;
+                </td>
+            </tr>
+            <tr style="height:25px;">
+                <td style="padding-left: 15px;">
+                    经销商：
+                </td>
+                <td>
+                    <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                           style="width:150px;height:20px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    SIM卡号：
+                </td>
+                <td>
+                    <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                           style="width:150px;height:20px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    设定期限（天）：
+                </td>
+                <td>
+                    <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                           style="width:150px;height:20px;" />
+                </td>
+            </tr>
+
+        </table>
+    </form>
+</div>
+    <table id="ServiceBecomeTable" data-options="rownumbers:true,singleSelect:true,toolbar:toolbar" class="easyui-datagrid" style="height:auto"></table>
+</div>
+
+<div id="dd"></div>
+<script type="text/javascript">
+    var toolbar = [
+    {
+        text: '导出Excel表',
+        iconCls: 'icon-save',
+        handler: function () { alert('cut') }
+    }];
+
+
+    $(function () {
+      var dg=  $('#ServiceBecomeTable').datagrid({
+            data: [
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337'},
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337' },
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337' },
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337' },
+                { f0: 'FTC003RFCDZ004311', f1: 'W303137485', f2: '销售', f3: '绵阳市怡和机械设备有限公司', f4: '吴远明', f5: '2011-12-09 14:15:15.337', f6: '2014-12-09 14:15:15.337' }
+            ],                                                                                                                
+            columns: [[
+                //{ field: 'ck', checkbox: true },
+                { field: 'f0', title: '车辆编号', width: 100, align: 'center', sortable: true },
+                { field: 'f1', title: 'GPS编号', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: '当前状态', width: 100, align: 'center', sortable: true },
+                { field: 'f3', title: '经销商', width: 100, align: 'center', sortable: true },
+                { field: 'f4', title: '用户', width: 60, align: 'center' },
+                { field: 'f5', title: '服务开始时间', width: 80, align: 'center' },
+                { field: 'f6', title: '服务结束时间', width: 100, align: 'center' },
+    
+            ]],
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true
+        });
+      dg.datagrid('enableFilter', []);
+    });
+
+
+
+</script>

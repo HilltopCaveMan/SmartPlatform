@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="UserRoleView" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="UserRoleView" type="GModel.Basic.UserRoleView" />
+</alias>
+<resultMaps>
+	<resultMap id="UserRoleViewResult" class="UserRoleView">
+		<result property="UserId" column="UserId" type="string" dbType="varchar"/>
+		<result property="UserName" column="UserName" type="string" dbType="varchar"/>
+		<result property="UserLname" column="UserLname" type="string" dbType="varchar"/>
+		<result property="UserPasswrd" column="UserPasswrd" type="string" dbType="varchar"/>
+		<result property="UserPhone" column="UserPhone" type="string" dbType="varchar"/>
+		<result property="UserEmail" column="UserEmail" type="string" dbType="varchar"/>
+		<result property="UserDate" column="UserDate" type="DateTime" dbType="DateTime"/>
+		<result property="RoleId" column="RoleId" type="string" dbType="varchar"/>
+		<result property="RoleName" column="RoleName" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectUserRoleView" parameterClass="string" resultMap="UserRoleViewResult">
+		SELECT USER_ID AS UserId,USER_NAME AS UserName,USER_LNAME AS UserLname,USER_PASSWRD AS UserPasswrd,USER_PHONE AS UserPhone,USER_EMAIL AS UserEmail,USER_DATE AS UserDate,ROLE_ID AS RoleId,ROLE_NAME AS RoleName
+		FROM USER_ROLE_VIEW 
+	</select>
+	<select id="SelectUserRoleViewPage" parameterClass="map" resultMap="UserRoleViewResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+			SELECT USER_ID AS UserId,USER_NAME AS UserName,USER_LNAME AS UserLname,USER_PASSWRD AS UserPasswrd,USER_PHONE AS UserPhone,USER_EMAIL AS UserEmail,USER_DATE AS UserDate,ROLE_ID AS RoleId,ROLE_NAME AS RoleName
+			FROM USER_ROLE_VIEW  
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectUserRoleViewCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM USER_ROLE_VIEW  
+	</select>
+</statements>
+</sqlMap>

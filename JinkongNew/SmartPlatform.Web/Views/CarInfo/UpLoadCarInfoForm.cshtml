@@ -1,0 +1,67 @@
+﻿<script type="text/javascript" language="javascript">
+    var result = "@ViewBag.ReturnVal";
+    if (result == "false") {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "导入失败！",
+            timeout: 2000
+        });
+    } else if (result == "true") {
+        var ifr = window.parent.document.getElementById('/CarInfo/CarInfoIndex');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#CarOrgTable').datagrid('reload');
+        win.GetCarCount();
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "导入成功！",
+            timeout: 2000
+        });
+    }
+    else if (result != "") {
+        
+        var terNos = result.split(',');
+        var tmp_msg = "";
+        var rowCnt = 0;
+
+        if (terNos.length > 0)
+        {
+            for(var i = 1;i <= terNos.length ; i++ )
+            {
+                tmp_msg += "," + terNos[i-1];
+                if(i%3==0)
+                {
+                    tmp_msg += "<br />";
+                    rowCnt++;
+                }
+            }
+            if(tmp_msg.length>0)
+            {
+                tmp_msg = tmp_msg.substring(1);
+            }
+        }
+
+        var msg_height = (90 + (rowCnt + 2) * 21);
+
+        var ifr = window.parent.document.getElementById('/CarInfo/CarInfoIndex');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#CarOrgTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "数据已处理,终端号:" + tmp_msg + "<br />有问题未绑定！",
+            timeout: 2000,
+            width  : 300,
+            height : msg_height
+        });
+    }
+    else {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: result,
+            timeout: 2000
+        });
+    }
+</script>

@@ -1,0 +1,255 @@
+﻿@model GModel.Car.CarDetialInfo
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<ul id="slidercontent">
+    <li>
+        <div class="slide_wrap">
+            <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                <colgroup>
+                    <col class="con0" width="20%" />
+                    <col class="con1" width="20%" />
+                    <col class="con0" width="20%" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td rowspan="3">
+                            <img src="~/Content/Images/3143623_160727326957_2.jpg" width="142" />
+                        </td>
+                        <td>
+                            车牌号
+                        </td>
+                        <td>@(Model.CarInfoData==null ? "" : Model.CarInfoData.CarNo)</td>
+                    </tr>
+                    <tr>
+                        <td style="border-left:none">
+                            车架号
+                        </td>
+                        <td>@(Model.CarInfoData==null ? "" : Model.CarInfoData.CarFrame)</td>
+                    </tr>
+                    <tr>
+                        <td style="border-left:none">
+                            车辆类型
+                        </td>
+                        <td>@(Model.CarInfoData==null ? "" : Model.CarInfoData.TypeId)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br clear="all" />
+            <input id="carid" type="hidden" value="@(Model.CarInfoData == null ? "" : Model.CarInfoData.CarId)" />
+            <a href="#" class="easyui-linkbutton" onclick="EditCar()" iconcls="icon-edit" plain="true" style="margin-left:300px;">修改</a>
+        </div>
+    </li>
+    <li>
+        <div class="slide_wrap">
+            <div style="height:330px;overflow:auto;">
+                @if (Model.terminalInfo != null && Model.terminalInfo.Count > 0)
+                {
+                    for (int i = 0; i < Model.terminalInfo.Count; i++)
+                    {
+                        <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                            <colgroup>
+                                <col class="con1" width="20%" />
+                                <col class="con0" width="20%" />
+                                <col class="con1" width="20%" />
+                                <col class="con0" width="20%" />
+                                <col class="con1" width="20%" />
+                                <col class="con0" width="20%" />
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        终端编号
+                                    </td>
+                                    <td>@Model.terminalInfo[i].TerNo</td>
+                                    <td>SIM卡号</td>
+                                    <td colspan="3">@Model.terminalInfo[i].TerSimcard</td>
+                                </tr>
+                                <tr>
+                                    <td>终端类型</td>
+                                    <td>@Model.terminalInfo[i].ProName</td>
+                                    <td>
+                                        所属企业
+                                    </td>
+                                    <td colspan="3">@Model.terminalInfo[i].Businessdivisionname</td>
+                                </tr>
+                                <tr>
+                                    <td>定位时间</td>
+                                    <td>@Model.terminalInfo[i].Positioningtime</td>
+                                    <td>回传时间</td>
+                                    <td colspan="3">@Model.terminalInfo[i].Rtime</td>
+                                </tr>
+                                <tr>
+                                    <td>地理位置</td>
+                                    <td colspan="5">@Model.terminalInfo[i].Position</td>
+                                </tr>
+                                <tr>
+                                    <td>工作状态</td>
+                                    <td>@Model.terminalInfo[i].Workstate</td>
+                                    <td>设备状态</td>
+                                    <td colspan="3">
+                                        @{
+                                            var status = "";
+                                        }
+                                        @switch (Model.terminalInfo[i].TerStatus)
+                                        {
+                                            case "1":
+                                                status = "测试";
+                                                break;
+                                            case "2":
+                                                status = "待激活";
+                                                break;
+                                            case "3":
+                                                status = "已激活";
+                                                break;
+                                            case "4":
+                                                status = "已拆除";
+                                                break;
+                                            case "5":
+                                                status = "到期";
+                                                break;
+                                            case "6":
+                                                status = "休眠";
+                                                break;
+                                            default:
+                                                status = "";
+                                                break;
+                                        }
+                                        @status
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>启动次数</td>
+                                    <td>@Model.terminalInfo[i].TerStatrtimes</td>
+                                    <td>累计工时</td>
+                                    <td colspan="3">@Model.terminalInfo[i].Totalworktime</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <input id="terid" type="hidden" value="@Model.terminalInfo[i].TerGuid" />
+                        <input id="terno" type="hidden" value="@Model.terminalInfo[i].TerNo" />
+                    }
+                }
+                @*<a href="#" class="easyui-linkbutton" onclick="EditTer()" iconcls="icon-edit" plain="true" style="margin-left:300px;margin-top:20px;">修改</a>*@
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="slide_wrap">
+            <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                <colgroup>
+                    <col class="con1" width="20%" />
+                    <col class="con0" width="20%" />
+                    <col class="con1" width="20%" />
+                    <col class="con0" width="20%" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td>安装人</td>
+                        <td>@Model.CarInfoData.InstallName</td>
+                        <td>安装人联系电话</td>
+                        <td class="center">@Model.CarInfoData.InstallPhone</td>
+                    </tr>
+                    <tr>
+                        <td>安装时间</td>
+                        <td>@Model.CarInfoData.InstallTime</td>
+                        <td>安装地点</td>
+                        <td class="center">@Model.CarInfoData.InstallPlace</td>
+                    </tr>
+                    <tr>
+                        <td>录入人</td>
+                        <td class="center">@Model.CarInfoData.EntryName</td>
+                        <td>录入人联系电话</td>
+                        <td class="center">@Model.CarInfoData.EntryPhone</td>
+                    </tr>
+                    <tr>
+                        <td>安装位置</td>
+                        <td colspan="3">@Model.CarInfoData.InstallAddress</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </li>
+    <li>
+        <div class="slide_wrap">
+            <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                <colgroup>
+                    <col class="con1" width="20%" />
+                    <col class="con0" width="20%" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td>保险单号</td>
+                        <td>@Model.CarInfoData.SafeOrder</td>
+                        <td>融资金额</td>
+                        <td class="center">@Model.CarInfoData.LoanMoney</td>
+                    </tr>
+                    <tr>
+                        <td>贷款年限</td>
+                        <td colspan="3">@Model.CarInfoData.LoanYear</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </li>
+    <li>
+        <div class="slide_wrap">
+            <table cellpadding="0" cellspacing="0" border="0" class="stdtable overviewtable">
+                <colgroup>
+                    <col class="con1" width="20%" />
+                    <col class="con0" width="20%" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td>联系方式</td>
+                        <td>@Model.CarInfoData.OwerPhone</td>
+                        <td>身份证号</td>
+                        <td class="center">@Model.CarInfoData.CarAdminCardid</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </li>
+</ul>
+
+<script type="text/javascript">
+    //content slider
+    jQuery('#slidercontent').bxSlider({
+        prevText: '',
+        nextText: '',
+        buildPager: function (slideIndex) {
+            switch (slideIndex) {
+                case 0:
+                    return '车辆信息';
+                case 1:
+                    return '设备信息';
+                case 2:
+                    return '安装信息';
+                case 3:
+                    return '信贷信息';
+                case 4:
+                    return '车主信息';
+            }
+        }
+    });
+
+    function EditCar()
+    {
+        var carid = $('#carid').val();
+        var terno = $('#terno').val();
+        if (carid == null || carid=="")
+        {
+            window.parent.$.messager.alert('警告', '该终端没有绑定车辆！', 'error');
+        }
+        else
+        {
+            window.parent.$.DialogOpen('/CarInfo/EditCarInfo?flag=1&CarId=' + carid + '&TerNo=' + terno, { title: "编辑车辆信息", width: 500, height: 450 });
+        }
+    }
+
+    function EditTer() {
+        var terid = $('#terid').val();
+        window.parent.$.DialogOpen('/Terminal/EditTerminal?flag=1&TerGuid=' + terid, { title: "修改终端信息", width: 450, height: 350 });
+    }
+</script>

@@ -1,0 +1,176 @@
+﻿<div class="tabcontant" style="height:540px;overflow-y:scroll">
+    <div id="SearchBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr style="height:25px;">
+                <td style="padding-left: 15px;">
+                    <input id="SelectType" class="easyui-combobox" style="width:80px; height:23px;" />
+                </td>
+                <td>
+                    <input id="NoValue" class="easyui-textbox" style="width:150px;" />
+                </td>
+                @*<td style="padding-left: 15px;">
+                    车牌号：
+                </td>
+                <td>
+                    <input id="CarNoSel" class="easyui-textbox" style="width:150px;" />
+                </td>*@
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input type="text" class="easyui-combotree" id="DeptSel" panelheight="400" style="width:200px;height:30px" />
+                </td>
+                <td style="padding-left:15px;">
+                    <input type="checkbox" id="ChildDeptSel" name="check2"/>&nbsp;&nbsp;<label for="ChildDeptSel">查询子企业 </label>
+                </td>
+                <td style="padding-left:15px;">
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="addParam()">查询</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="vehicleTable"></table>
+    <div style="text-align:center;padding:15px">
+        <input class="btn" type="button" value="确定" onclick="OnSubmit()" />
+        <input class="btn" type="button" value="取消" onclick="clearForm()" />
+    </div>
+</div>
+<script type="text/javascript">
+    var vehicleTable;
+    var TerNo = "";
+    var CarNo = "";
+    var DeptSelId = "";
+    var Children = "";
+    var SelectTerNoStr = "";
+    var rows;
+    $(function () {
+        $("#SelectType").combobox({
+            data: [{ "id": "0", "text": "终端号" }, { "id": "1", "text": "车牌号" }],
+            editable: true,
+            panelHeight:60,
+            queryParams: { isTree: "false" },
+            valueField:"id",
+            textField:"text",
+            onLoadSuccess: function () {
+                $('#SelectType').combobox('setValue', '0');
+            }
+        });
+        //检索框面板
+
+        $("#SearchBar").panel({
+            height: 45,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+        //车辆表格高度
+        $("#vehicleTable").height($(document.body).height() - $("#SearchBar").height() - 37 - $("#Submit").height());
+        loadvehicleTable();
+    });
+
+    //所属企业下拉框
+    $("#DeptSel").combotree({
+        url: '/Dept/GetOrgNode',
+        queryParams: { isTree: "false" },
+        animate: true,
+        lines: true,
+        editable: true,
+        onClick: function (node) {
+            //if (node.id != "") {
+            //    GetListByDept(node.id);
+            //}
+        },
+        onLoadSuccess: function () {
+            $('#DeptSel').combotree('setValue', '@ViewBag.Deptid');
+        }
+    });
+
+    function loadvehicleTable() {
+        vehicleTable = $('#vehicleTable').datagrid({
+            url: '@Url.Action("GetCarList", "RailManager")',
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'CAR_ID', title: '车辆ID', width: 100, hidden: true },
+                { field: 'CAR_NO', title: '车牌号', width: 100, align: 'center', sortable: true },
+                { field: 'TYPE_NAME', title: '车辆类型', width: 60, align: 'center' },
+                { field: 'TER_NO', title: '终端编号', width: 100, align: 'center', sortable: true },
+                { field: 'TER_SIMCARD', title: 'SIM卡号', width: 100, align: 'center', sortable: true },
+            ]],
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            sortName: 'EMPLOYEEID',
+            sortOrder: 'asc', //desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            queryParams: { "TerNo": TerNo, "CarNo": CarNo, "DeptSelId": DeptSelId, "ChildrenSel": Children },//查询参数
+            fitColumns: true,
+            pagination: true,
+            singleSelect: false,
+            onClickRow: function (value, rec) {
+            },
+            onLoadSuccess: function (data) {
+                //if (data.rows.length != 0) {
+                //    var rowdata = data.rows;
+                //    $.each(rowdata, function (index, val) {
+                //        if (val.ISCHECKED=="true")
+                //        {
+                //            $('#vehicleTable').datagrid("selectRow", index);
+                //        }
+                //    });
+                //}
+            }
+        });
+    };
+
+
+
+    //为表格增加参数重载数据
+    function addParam() {
+        TypeId = $("#SelectType").combobox('getValue');
+        if (TypeId == "0") {
+            TerNo = $("#NoValue").val();
+            CarNo = "";
+        }
+        else {
+            TerNo = "";
+            CarNo = $("#NoValue").val();
+        }
+
+        DeptSelId = $("#DeptSel").combotree('getValue');
+        if ($("#ChildDeptSel").attr("checked") == "checked") {
+            Children = "true";
+        }
+        else {
+            Children = "false";
+        }
+        var param = { "TerNo": TerNo, "CarNo": CarNo, "DeptSelId": DeptSelId, "ChildrenSel": Children };
+        $('#vehicleTable').datagrid("load", param);
+    };
+
+    function OnSubmit() {
+        rows = vehicleTable.datagrid('getSelections');
+        if (rows.length > 0) {
+            for (i = 0; i < rows.length; i++) {
+                SelectTerNoStr += rows[i].TER_NO + ",";
+            }
+
+            var ifr = window.parent.parent.document.getElementById('/RailManager/RailIndex');
+            var win = ifr.window || ifr.contentWindow;
+            var Parentobj = win.document.getElementById("hid_TerNoStr");
+            Parentobj.value = SelectTerNoStr;
+            win.AddAreaInfo();
+            window.parent.$(".dialog").dialog('close');
+        }
+        else {
+            $.messager.alert('警告', '您没有选择', 'error');
+        }
+    }
+
+    function clearForm() {
+        var ifr = window.parent.parent.document.getElementById('/RailManager/RailIndex');
+        var win = ifr.window || ifr.contentWindow;
+        win.deletePoint();
+        window.parent.parent.$(".dialog").dialog('close');
+    };
+</script>

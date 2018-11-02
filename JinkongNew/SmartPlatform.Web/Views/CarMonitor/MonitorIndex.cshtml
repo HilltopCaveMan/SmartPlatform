@@ -1,0 +1,1814 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Partial("_HeaderPartial")
+
+@model System.Collections.Generic.IList<GModel.RoleRight.MenuInfo>
+
+<div class="moitorContent" id="moitorContent">
+    <div id="contentwrapper11" class="contentwrapper withrightpanel">
+        <div class="subcontent chatcontent">
+            <div id="MapContainer">
+                <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+                <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+            </div>
+            <div id="chatmessage" class="chatmessage radius2" style="padding:5px;">
+                <div id="map" style="height:100%;width:100%;"></div><!--chatmessageinner-->
+                <div class="full" id="fullscreen">全屏</div>
+                @*<div class="Location" id="Location">测距</div>*@
+                <div class="Location"><input type="checkbox" name="check1" id="Location" />测距</div>
+                <div class="mappanel-btn">
+                    <input id="mointerCar" type="checkbox" name="check1" />实时监控
+                </div>
+                <div class="timeout" id="timeReturn"></div>
+                <div class="showPanelBtn allcar" id="AllCar">实时车辆</div>
+                <div class="showPanelBtn caic" id="showPanelCX">拆卸报警<span class="noft-red"></span></div>
+                <div class="showPanelBtn yuq" id="showPanelYQ">逾期报警<span class="noft-red"></span></div>
+                <div class="showPanelBtn duandian" id="showPanelDD">断电报警<span class="noft-red"></span></div>
+                <div class="showPanelBtn quyu" id="showPanelQY">区域报警<span class="noft-red"></span></div>
+                <div class="panelWrap" id="panelWrap">
+                    <div style="width:20px;height:200px;margin:-100px 0 0 -10px;color:#999;position:absolute;opacity:0.5;top:50%;left:50%;" id="showOverlayInfo">此处用于展示报警车辆信息</div>
+                    <div id="panel" style="position:absolute;"></div>
+                </div>
+                <a class="intoList down" href="#"></a>
+            </div><!--chatmessage-->
+        </div><!--subcontent-->
+    </div><!--contentwrapper-->
+    <div class="rightpanel" id="rightpanel">
+        <div class="rightpanelinner">
+            <div class="widgetbox uncollapsible">
+                <div class="widgetoptions">
+                    <input type="text" class="easyui-combotree" id="DeptSel" panelheight="400" style="width:100%;height:30px" />
+                </div>
+                <div class="widgetcontent userlistwidget nopadding">
+                    <div class="widgetcheck" style="height:21px;">
+                        <div id="ShowChild">
+                            <input id="ShowAll" type="checkbox" name="check2" />显示子企业的车辆
+                        </div>
+                    </div>
+                    <div class="easyui-tabs" id="CarStatu">
+                        <div title="全部">
+                            <div class="box-scroll" id="box-scroll">
+                                <ul id="MonitorList" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        @*<div title="在线">
+                                <div class="box-scroll" style="margin-top:10px;">
+                                    <ul id="MonitorList1" class="contactlist"></ul>
+                                </div>
+                            </div>*@
+                        <div title="离线">
+                            <div class="box-scroll" id="box-scroll2">
+                                <ul id="MonitorList2" class="contactlist"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="car_count" class="more" href="#"></a>
+                    @*<a class="more" href="#" onclick="AddShowCar()">查看更多车辆&nbsp;↓</a>*@
+                </div><!--widgetcontent-->
+            </div><!--widgetbox-->
+        </div><!--rightpanelinner-->
+    </div><!--rightpanel-->
+</div>
+<div id="contentwrapper" class="contentwrapper">
+    <div class="tableoptions">
+        <button class="deletebutton radius3" id="DownLoadData" title="table2">导出数据</button> &nbsp;
+    </div><!--tableoptions-->
+    <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+        <colgroup>
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th class="head0">回传时间</th>
+                <th class="head1">车牌号</th>
+                <th class="head0">终端编号</th>
+                <th class="head1">终端状态</th>
+                <th class="head0">定位方式</th>
+                <th class="head1">当前位置</th>
+                <th class="head0">SIM卡号</th>
+                <th class="head0">所属组织</th>
+                <th class="head1">回传次数</th>
+            </tr>
+        </thead>
+        <tbody @*id="ListData"*@></tbody>
+    </table>
+</div>
+
+<div id="target"></div>
+
+@Html.Partial("_FooterPartial")
+
+<script src="http://maps.google.cn/maps/api/js?sensor=false&language=zh-CN&libraries=drawing"></script>
+<script src="~/assets/javascripts/markerclusterer.js"></script>
+<script src="~/assets/javascripts/NameOverlay.js"></script>
+<script src="~/assets/javascripts/Index.js"></script>
+<script type="text/javascript">
+
+    var RowNumber = 1;
+    var SearchFlag = 0;
+    var SearchValue = "";
+    var SearchName = "";
+
+    var CKXQ = '@ViewBag.CKXQ';
+    var CKGJ = '@ViewBag.CKGJ';
+    var FSML = '@ViewBag.FSML';
+
+    //当前页面类型（AllCar:实时车辆监控,CXWarning:拆卸报警,DDWarning:断电报警）
+    var MapType = "AllCar";
+
+    TimeOutGoogle();
+
+    function TimeOutGoogle() {
+        try {
+            if (google) {
+
+            }
+        }
+        catch (Exception) {
+            if (window.parent.$.messager.confirm("确定", "谷歌地图连接超时,是否跳转到百度地图?", function (t) {
+                if (t) {
+                    window.location.href = "/CarMonitor/BDMonitorIndex";
+                    $("#BaiDuMap").css({ "background": "#0094ff", "color": "#ffffff" });
+                    $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+            }
+            }));
+        }
+    }
+
+    var lineSymbol = {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 5,
+        strokeColor: '#5A5AAD'
+    };
+
+    var countdown;
+    var count;
+    //车辆监控
+    @*var CLJK= '@ViewBag.CLJK';*@
+    //终端监控
+    var ZDJK = '@ViewBag.ZDJK';
+    //统计报表
+    @*var TJBB= '@ViewBag.TJBB';*@
+    //系统管理按钮
+    @*var XTGLAN= '@ViewBag.XTGLAN';*@
+    var MonitorMap = {};
+    //车辆监控data和markers
+    MonitorMap.pics = null;
+    MonitorMap.markers = [];
+    //车辆报警data和markers
+    MonitorMap.WarningData = null;
+    MonitorMap.WarningMarkers = [];
+    MonitorMap.map = null;
+    MonitorMap.markerClusterer = null;
+    MonitorMap.infoWindow = null;
+    //测距
+    MonitorMap.polyline;
+    MonitorMap.polylinesArray = [];
+    MonitorMap.lenArray = [];
+    MonitorMap.Overlay = [];
+    var polymarker;
+    var divLay;
+    var number = 0;
+
+    var data = null;
+    var t;
+    var CarTable;
+    var isPanelShow = false;
+    var innerHeight;
+    var target = $('#target');
+
+    //地图区域变动后，调整同步右侧车辆面板列表
+    function GoogleMap_BoundsChanged(e) {
+
+        var bounds = MonitorMap.map.getBounds();
+        var markers = MonitorMap.markers;
+
+        if (MapType != "AllCar") {
+            markers = MonitorMap.WarningMarkers;
+        }
+
+        //NorthEast
+        var max_lat = bounds.getNorthEast().lat();
+        var max_lng = bounds.getNorthEast().lng();
+        //SouthWest
+        var min_lat = bounds.getSouthWest().lat();
+        var min_lng = bounds.getSouthWest().lng();
+
+        var mks = new Array();
+
+        if (markers != null
+            && markers.length > 0) {
+            for (var i = 0; i < markers.length; i++) {
+                var mk = markers[i];
+                var lat = mk.position.lat();
+                var lng = mk.position.lng();
+
+                if (lat > min_lat && lat < max_lat
+                    && lng > min_lng && lng < max_lng) {
+                    mks.push(mk);
+                }
+            }
+        }
+
+        G_ShowCurMarkerClusterer(mks);
+    }
+
+    //初始化谷歌地图
+    function initmap() {
+
+        var latlng = new google.maps.LatLng(39.920532, 103.504355);
+        var options = {
+            'zoom': 4,
+            'center': latlng,
+            'mapTypeId': google.maps.MapTypeId.ROADMAP,
+            'minZoom': 0
+        };
+
+        MonitorMap.map = new google.maps.Map(document.getElementById('map'), options);
+
+        //google.maps.event.addListener(MonitorMap.map, 'bounds_changed', GoogleMap_BoundsChanged);
+        google.maps.event.addListener(MonitorMap.map, 'idle', GoogleMap_BoundsChanged);
+
+        MonitorMap.infoWindow = new google.maps.InfoWindow();
+
+        var lineSymbol = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 5,
+            strokeColor: '#c0392b'
+        };
+
+        var lineSymbol1 = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 2
+        };
+
+        MonitorMap.polyline = new google.maps.Polyline({
+            path: [],
+            icons: [{
+                icon: lineSymbol,
+                offset: '0%'
+            }, {
+                icon: lineSymbol1,
+                offset: '100%',
+            }],
+            map: MonitorMap.map
+        });
+    }
+
+    //初始化数据
+    MonitorMap.init = function (data) {
+        MonitorMap.pics = data;
+        MonitorMap.showMarkers();
+    };
+
+    //车辆报警初始化
+    MonitorMap.WarningInit = function (data) {
+
+        MonitorMap.WarningData = data;
+        MonitorMap.WarningShowMarkers();
+    };
+
+    //搜索
+    MonitorMap.showMarkers = function () {
+
+        MonitorMap.markers = [];
+        if (MonitorMap.markerClusterer) {
+            MonitorMap.markerClusterer.clearMarkers();
+        }
+
+        var panel = $('#MonitorList');
+        var panel2 = $('#MonitorList2');
+
+        var startTime = new Date();
+        var numMarkers = MonitorMap.pics.length;
+
+        var obj_marker = null;
+
+        var G_Marker_Cnt = 0;
+
+        //全局变量统计离线数量
+        G_CarOrTerCount_LX = 0;
+
+        for (var i = 0; i < numMarkers; i++) {
+
+            obj_marker = MonitorMap.pics[i];
+
+            if (obj_marker.GoogleLatitude != 0
+                && obj_marker.GoogleLongitude != 0) {
+
+                G_Marker_Cnt++;
+
+                //公共变量
+                var latLng = new google.maps.LatLng(obj_marker.GoogleLatitude, obj_marker.GoogleLongitude);
+                var fn = MonitorMap.markerClickFunction(obj_marker, latLng);
+
+                var MarkerLXFlag = GetMarkerLXFlag(obj_marker, startTime);
+
+                //创建 右侧车辆列表
+                //+++++++++++++++++++++++++++++++++++++
+                if (G_Marker_Cnt < 100) {
+
+                    var li = $('<li class="online"  data-id="on' + i + '"></li>');
+                    var a = $('<a href=""></a>')
+
+                    //var div = $('<div class="img-list"></div>')
+
+                    var div = '<div class="img-list">';
+
+                    //var img = null;
+                    if (obj_marker.CarId == null) {
+                        //img = $('<img src="../Content/Images/noboundcar.png" width="34" height="34" />');
+                        div += '<img src="../Content/Images/noboundcar.png" width="34" height="34" />';
+                    }
+                    else {
+                        //img = $('<img src="../Content/Images/cca1.png" width="34" height="34" />');
+                        div += '<img src="../Content/Images/cca1.png" width="34" height="34" />';
+                    }
+
+                    div += '</div>';
+
+                    //div.append(img);
+
+                    a.append(div);
+
+                    var span = $('<span></span>')
+
+                    //组织文本及tip
+                    //++++++++++++++++++++++++++++++++++++++++++++++
+                    BindSpanContent($(span), obj_marker);
+                    //++++++++++++++++++++++++++++++++++++++++++++++
+
+                    a.append(span);
+
+                    li.append(a);
+
+                    panel.append(li);
+
+                    //绑定事件
+                    li.click(fn);
+                    a.click(function () {
+                        $(this).parent().parent().find('a').removeClass('active');
+                        $(this).addClass('active');
+                        return true;
+                    });
+
+                    //复制离线对象
+                    if (MarkerLXFlag) {
+                        panel2.append(li.clone(true));
+                    }
+                }
+
+                if (MarkerLXFlag) {
+                    G_CarOrTerCount_LX++;
+                }
+
+                //创建 marker
+                //+++++++++++++++++++++++++++++++++++++
+                var marker = new google.maps.Marker({
+                    'position': latLng,
+                    'icon': lineSymbol,
+                    'CarNo': obj_marker.CarNo,
+                    'TerNo': obj_marker.TerNo,
+                    'TerStatus': obj_marker.TerStatus,
+                    'Positioningtime': obj_marker.Positioningtime,
+                    'CarPosition': obj_marker.Position,
+                    'Speed': obj_marker.Speed
+                });
+
+                google.maps.event.addListener(marker, 'click', fn);
+
+                MonitorMap.markers.push(marker);
+
+                //+++++++++++++++++++++++++++++++++++++
+            }
+        }
+
+        showCarOrTerCount(G_Marker_Cnt);
+
+        window.setTimeout(MonitorMap.time, 0);
+    };
+
+    //车辆报警加载标记
+    MonitorMap.WarningShowMarkers = function () {
+        MonitorMap.WarningMarkers = [];
+        if (MonitorMap.markerClusterer) {
+            MonitorMap.markerClusterer.clearMarkers();
+        }
+        var panel = $('#MonitorList');
+        var numMarkers = MonitorMap.WarningData.length;
+
+        var G_Marker_Cnt = 0;
+        var G_Marker_Cnt_Lx = 0;
+
+        var obj_marker = null;
+
+        for (var i = 0; i < numMarkers; i++) {
+
+            obj_marker = MonitorMap.WarningData[i];
+
+            if (obj_marker.GoogleLatitude != 0
+                && obj_marker.GoogleLongitude != 0) {
+
+                G_Marker_Cnt++;
+
+                //公共变量
+                var latLng = new google.maps.LatLng(
+                                                obj_marker.GoogleLatitude,
+                                                obj_marker.GoogleLongitude);
+
+                var fn = MonitorMap.markerClickFunction(obj_marker, latLng);
+
+                //创建右侧车辆列表
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                if (G_Marker_Cnt < 100) {
+
+                    var li = $('<li class="online" data-id="on' + i + '"></li>');
+                    var a = $('<a href=""></a>');
+
+                    var div = $('<div class="img-list"></div>');
+                    var img = $('<img />');
+                    $(img).attr({ "src": "../Content/Images/cca1.png", "width": "34", "height": "34" });
+                    $(div).append(img);
+                    $(a).append(div);
+                    var span = $('<span></span>');
+                    //$(span).text(obj_marker.CarNo);
+
+                    //组织文本及tip
+                    //++++++++++++++++++++++++++++++++++++++++++++++
+                    BindSpanContent($(span), obj_marker);
+                    //++++++++++++++++++++++++++++++++++++++++++++++
+
+                    $(a).append(span);
+                    $(li).append(a);
+                    $(panel).append(li);
+
+                    //绑定事件
+                    $(li).click(fn);
+                    $(a).click(function () {
+                        $(this).parent().parent().find('a').removeClass('active');
+                        $(this).addClass('active');
+                        return true;
+                    });
+                }
+
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                //创建 marker
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                var marker = new google.maps.Marker({
+                    'position': latLng,
+                    'icon': '../Content/Icon/map-marker-ball-pink.png',
+                    'CarNo': obj_marker.CarNo,
+                    'CarAdminName': obj_marker.CarAdminName,
+                    'TerNo': obj_marker.TerNo,
+                    'TerStatus': obj_marker.TerStatus,
+                    'Positioningtime': obj_marker.Positioningtime,
+                    'CarPosition': obj_marker.Position,
+                    'Speed': obj_marker.Speed
+                });
+
+                google.maps.event.addListener(marker, 'click', fn);
+
+                MonitorMap.WarningMarkers.push(marker);
+            }
+        }
+
+        showCarOrTerCount(G_Marker_Cnt);
+
+        window.setTimeout(MonitorMap.WarningTime, 0);
+    };
+
+    //加载显示当前被单击聚合Marker对象
+    function G_ShowCurMarkerClusterer(markers) {
+
+        var panel = $('#MonitorList').html("");
+        var panel2 = $('#MonitorList2').html("");
+
+        var startTime = new Date();
+
+        if (markers == null) return;
+        if (markers.length == 0) return;
+
+        for (var i = 0; i < markers.length; i++) {
+
+            if (i > 100) break;
+
+            var cur_marker = markers[i];
+
+            var li = $('<li class="online" data-id="on' + i + '"></li>');
+            var a = $('<a href=""></a>')
+
+            var div = '<div class="img-list">';
+
+            //var div = $('<div class="img-list"></div>')
+            //var img = $('<img />');
+
+            if ((cur_marker.CarNo != null)
+                && (cur_marker.CarNo != "")) {
+                //$(img).attr({ "src": "../Content/Images/cca1.png", "width": "34", "height": "34" });
+                div += ' <img src="../Content/Images/cca1.png" width = "34" height ="34" /> ';
+            }
+            else {
+                //$(img).attr({ "src": "../Content/Images/noboundcar.png", "width": "34", "height": "34" });
+                div += ' <img src="../Content/Images/noboundcar.png" width = "34" height ="34" /> ';
+            }
+
+            div += '</div> ';
+            //$(div).append(img);
+
+            a.append(div);
+
+            var span = $('<span></span>')
+
+            //组织文本及tip
+            //++++++++++++++++++++++++++++++++++++++++++++++
+            BindSpanContent($(span), cur_marker);
+            //++++++++++++++++++++++++++++++++++++++++++++++
+
+            a.append(span);
+            li.append(a);
+            panel.append(li);
+
+            var latLng = new google.maps.LatLng(cur_marker.position.lat(), cur_marker.position.lng());
+
+            var cur_MonitorMap_pics = null;
+
+            if (MonitorMap.pics != null
+                && MonitorMap.pics.length > 0) {
+                for (var k = 0; k < MonitorMap.pics.length; k++) {
+                    if (MonitorMap.pics[k].TerNo == cur_marker.TerNo) {
+                        cur_MonitorMap_pics = MonitorMap.pics[k];
+                        break;
+                    }
+                }
+            }
+
+            if (cur_MonitorMap_pics != null) {
+                var fn = MonitorMap.markerClickFunction(cur_MonitorMap_pics, latLng);
+                li.click(fn);
+            }
+
+            /*
+            var endTime = new Date(Date.parse(cur_MonitorMap_pics.Rtime.replace(/-/g, "/"))).getTime();
+            var hours = Math.abs((startTime.getTime() - endTime)) / (1000 * 60 * 60);
+            if (hours > 48
+                && (cur_MonitorMap_pics.TerStatus == "已激活"
+                    || cur_MonitorMap_pics.TerStatus == "其他")
+                )
+            {
+                panel2.append(li.clone(true));
+            }
+            */
+            var MarkerLXFlag = GetMarkerLXFlag(cur_MonitorMap_pics, startTime);
+            if (MarkerLXFlag) {
+                panel2.append(li.clone(true));
+            }
+        }
+    }
+
+    //创建 marker tip 内容
+    function CreateMarkerPopContent(cur_marker) {
+        var infoHtml = new Array();
+
+        //有线
+        if (cur_marker.ProModel == 'Homer3M'
+            || cur_marker.ProModel == 'Homer3B-2') {
+
+            infoHtml.push('<div class="info">');
+            infoHtml.push('<h3 class="infowindowheader">' + cur_marker.CarNo + '</h3>');
+            infoHtml.push('<table>');
+            infoHtml.push(' <tr><td>车主姓名：</td><td>' + cur_marker.CarAdminName + '</td></tr>');
+            infoHtml.push(' <tr><td>终端编号：</td><td>' + cur_marker.TerNo + '</td></tr>');
+            infoHtml.push(' <tr><td>速度：</td><td>' + cur_marker.Speed + '</td></tr>');
+
+            if (parseFloat(cur_marker.Speed.replace("公里", "")) > 0) {
+                infoHtml.push('<tr><td>车辆状态：</td><td>行驶</td></tr>');
+            }
+            else {
+                infoHtml.push('<tr><td>车辆状态：</td><td>停止</td></tr>');
+            }
+
+            var state = cur_marker.ReplydataName == null ? "正常" : cur_marker.ReplydataName;
+
+            infoHtml.push(' <tr><td>设备状态：</td><td>' + state + '</td></tr>');
+            infoHtml.push(' <tr><td>回传时间：</td><td>' + cur_marker.Rtime + '</td>');
+            infoHtml.push(' </tr><tr><td>地理位置：</td><td>' + cur_marker.Position + '</td></tr>');
+            infoHtml.push('</table>');
+            infoHtml.push('<div class="infowindowfooter">');
+        }
+        else {
+            //无线
+            infoHtml.push('<div class="info">');
+            infoHtml.push('<h3 class="infowindowheader">' + cur_marker.CarNo + '</h3>');
+            infoHtml.push('<table>');
+            infoHtml.push(' <tr><td>车主姓名：</td><td>' + cur_marker.CarAdminName + '</td></tr>');
+            infoHtml.push(' <tr><td>终端编号：</td><td>' + cur_marker.TerNo + '</td></tr>');
+            infoHtml.push(' <tr><td>设备状态：</td><td>' + cur_marker.TerStatus + '</td></tr>');
+            infoHtml.push(' <tr><td>回传时间：</td><td>' + cur_marker.Rtime + '</td></tr>');
+            infoHtml.push(' <tr><td>地理位置：</td> <td>' + cur_marker.Position + '</td></tr>');
+            infoHtml.push('</table>');
+            infoHtml.push('<div class="infowindowfooter">');
+        }
+
+        if (CKXQ == "true") {
+            infoHtml.push('<button class="stdbtn btn_lime " type="button" onclick="LookDetail(\'' + cur_marker.CarId + '\',\'' + escape(cur_marker.CarNo) + '\',\'' + cur_marker.TerNo + '\')">查看详情</button>');
+        }
+
+        if (CKGJ == "true") {
+            infoHtml.push('<button class="stdbtn btn_default" type="button"  onclick="PlayTrack(\'' + cur_marker.CarId + '\',\'' + escape(cur_marker.CarNo) + '\',\'' + cur_marker.TerNo + '\',\'' + cur_marker.ProName + '\')">历史轨迹</button>');
+        }
+
+        if (FSML == "true") {
+            infoHtml.push('<button class="stdbtn btn_blue" type="button"  onclick="SendCMD(\'' + escape(cur_marker.CarNo) + '\',\'' + cur_marker.TerNo + '\',\'' + cur_marker.ProName + '\')">发送命令</button>');
+        }
+
+        infoHtml.push('<button class="stdbtn btn_blue" type="button"  onclick="RealTrail(\'' + escape(cur_marker.CarNo) + '\',\'' + cur_marker.TerNo + '\')">实时跟踪</button>');
+
+        infoHtml.push('<button class="stdbtn btn_blue" type="button"  onclick="ShowRail(\'' + cur_marker.TerNo + '\')">电子围栏</button></div></div>');
+
+        return infoHtml.join("");
+    }
+
+    function BindSpanContent($span, cur_marker) {
+        //组织文本及tip
+        //++++++++++++++++++++++++++++++++++++++++++++++
+        ///*
+
+        var span_text = "";
+        var span_title = "";
+
+        if (cur_marker.CarAdminName != undefined) {
+            span_text += "|" + cur_marker.CarAdminName;
+        }
+        span_title += "车主：" + (cur_marker.CarAdminName == undefined ? "" : cur_marker.CarAdminName);
+
+        if (cur_marker.CarNo != undefined) {
+            span_text += "|" + cur_marker.CarNo;
+        }
+        span_title += "|车牌号：" + (cur_marker.CarNo == undefined ? "" : cur_marker.CarNo);
+
+        if (cur_marker.TerNo != undefined) {
+            span_text += "|" + cur_marker.TerNo;
+        }
+        span_title += "|终端号：" + (cur_marker.TerNo == undefined ? "" : cur_marker.TerNo);
+
+        if (span_text.length > 0) {
+            span_text = span_text.substring(1);
+        }
+
+        $span.text(span_text);
+        $span.attr("title", span_title);
+
+        //*/
+        //++++++++++++++++++++++++++++++++++++++++++++++
+    }
+
+    MonitorMap.markerclick = function (k) {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }
+    }
+
+    function GoogleMarkerClick(CarOrTerNo) {
+
+        e.cancelBubble = true;
+        e.returnValue = false;
+
+        if (e.stopPropagation) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
+        var cur_marker = null;
+        var markers = MonitorMap.markers;
+
+        if (MapType != "AllCar") {
+            markers = MonitorMap.WarningMarkers;
+        }
+        if (markers.length > 0) {
+            var flg = false;
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i].CarNo == CarOrTerNo) {
+                    flg = true;
+                    cur_marker = markers[i];
+                }
+            }
+            if (!flg) {
+                for (var i = 0; i < markers.length; i++) {
+                    if (markers[i].TerNo == CarOrTerNo) {
+                        flg = true;
+                        cur_marker = markers[i];
+                    }
+                }
+            }
+        }
+        if (cur_marker == null)
+            return;
+
+        if (cur_marker.Position == null) {
+            cur_marker.Position = "暂无定位位置"
+        }
+        if (cur_marker.Speed == null) {
+            cur_marker.Speed = "0";
+        }
+
+        //组织 marker 窗口内容
+        var infoHtml = CreateMarkerPopContent(cur_marker);
+
+        /*
+        MonitorMap.map.setCenter(latlng);
+        MonitorMap.map.setZoom(15);
+        MonitorMap.infoWindow.setContent(infoHtml);
+        MonitorMap.infoWindow.setPosition(latlng);
+        MonitorMap.infoWindow.open(MonitorMap.map);
+
+        */
+    }
+
+    //谷歌地图点击标记
+    MonitorMap.markerClickFunction = function (pic, latlng) {
+
+        return function (e) {
+
+            e.cancelBubble = true;
+            e.returnValue = false;
+
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+
+            if (pic.Position == null) {
+                pic.Position = "暂无定位位置";
+            }
+
+            if (pic.Speed == null) {
+                pic.Speed = "0";
+            }
+
+            //组织 marker 窗口内容
+            //var infoHtml = CreateMarkerPopContent(pic);
+
+            MonitorMap.map.setCenter(latlng);
+            MonitorMap.map.setZoom(15);
+
+            //MonitorMap.infoWindow.setContent(infoHtml);
+            MonitorMap.infoWindow.setContent(CreateMarkerPopContent(pic));
+
+            MonitorMap.infoWindow.setPosition(latlng);
+            MonitorMap.infoWindow.open(MonitorMap.map);
+        };
+    };
+
+    //关闭标记
+    MonitorMap.markerOutFunction = function () {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            MonitorMap.infoWindow.close();
+        }
+    }
+
+    //清除地图标记
+    MonitorMap.clear = function () {
+        for (var i = 0, marker; marker = MonitorMap.markers[i]; i++) {
+            marker.setMap(null);
+        }
+    };
+
+    //清除地图标记 重新加载地图数据
+    MonitorMap.change = function () {
+        MonitorMap.clear();
+        MonitorMap.showMarkers();
+    };
+
+    MonitorMap.time = function () {
+        var options = {
+            gridSize: 40,
+            minimumClusterSize: 2,
+            maxZoom: 21
+        };
+        if (MonitorMap.markers.length > 0) {
+            MonitorMap.markerClusterer = new MarkerClusterer(
+                                                    MonitorMap.map,
+                                                    MonitorMap.markers,
+                                                    options,
+                                                    MonitorMap.infoWindow);
+        }
+    };
+
+    MonitorMap.WarningTime = function () {
+        var options = {
+            gridSize: 40,
+            minimumClusterSize: 2,
+            maxZoom: 21
+        };
+        if (MonitorMap.WarningMarkers.length > 0) {
+            MonitorMap.markerClusterer = new MarkerClusterer(
+                                                    MonitorMap.map,
+                                                    MonitorMap.WarningMarkers,
+                                                    options,
+                                                    MonitorMap.infoWindow);
+        }
+    };
+
+    //调用百度地图
+    function BaiDuMap() {
+        window.location.href = "/CarMonitor/BDMonitorIndex";
+        $("#BaiDuMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+    //调用谷歌地图
+    function GoogleMap() {
+        $("#GoogleMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#BaiDuMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+    //设置菜单列表
+    function setScroll() {
+        $("#box-scroll").slimScroll({
+            height: '20px',
+            position: 'right',
+            alwaysVisible: true
+        });
+    }
+
+    //测距功能  开启测距
+    function getDistance() {
+        if (number == 0) {
+            google.maps.event.addListener(MonitorMap.map, "click", function (event) {
+                addMarker(event.latLng);
+            });
+            google.maps.event.addListener(MonitorMap.map, "dblclick", function (event) {
+                addMarker(event.latLng);
+            });
+        } else if (number == 1) {
+            myDis.open();  //开启鼠标测距
+        }
+    }
+
+    //创建标记
+    function CreateMarker(lat, lng, MyGoToCommunityZoom) {
+        var singapoerCenter = new google.maps.LatLng(lat, lng);
+        var myOptions = {
+            zoom: MyGoToCommunityZoom,
+            center: singapoerCenter,
+            navigationControl: true,
+            scaleControl: true,
+            streetViewControl: true,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        MonitorMap.map.setOptions(myOptions);
+    }
+
+    //测距显示图标
+    function SetIcon() {
+        var icons = MonitorMap.polyline.get('icons');
+        icons[0].offset = '100%';
+        MonitorMap.polyline.set('icons', icons);
+    }
+
+    //添加新标记
+    function addMarker(location) {
+        var path = MonitorMap.polyline.getPath();
+        path.push(location);
+        SetIcon();
+        var icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            strokeColor: "#ff0000 ",
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 3
+        }
+        var myOptions = {
+            position: location,
+            draggable: true,
+            map: MonitorMap.map,
+            icon: icon
+        };
+        polymarker = new google.maps.Marker(myOptions);
+        MonitorMap.lenArray.push(polymarker);
+        var dis = (MonitorMap.polyline.getLength() / 1000).toFixed(3)
+
+        if (MonitorMap.lenArray.length == 0) {
+            divLay = new NameOverlay(location, "0公里");
+            MonitorMap.Overlay.push(divLay);
+            divLay.setMap(MonitorMap.map);
+        } else {
+            divLay = new NameOverlay(location, dis + "公里");
+            MonitorMap.Overlay.push(divLay);
+            divLay.setMap(MonitorMap.map);
+        }
+    }
+
+    //清除测距/新标记
+    function DisClear() {
+        if (number == 0) {
+            for (var i = 0; i < MonitorMap.lenArray.length; i++) {
+                MonitorMap.lenArray[i].setMap(null);
+            }
+            MonitorMap.lenArray = [];
+            for (var k = 0; k < MonitorMap.Overlay.length; k++) {
+                MonitorMap.Overlay[k].setMap(null);
+            }
+            MonitorMap.Overlay = [];
+            MonitorMap.polyline.setPath([]);
+            google.maps.event.clearListeners(MonitorMap.map);
+        }
+    }
+
+    //画出路径覆盖层
+    function drawOverlay() {
+        //路线数组
+        var flightPlanCoordinates = [];
+        //将坐标压入路线数组
+        if (MonitorMap.lenArray) {
+            for (i in MonitorMap.lenArray) {
+                flightPlanCoordinates.push(MonitorMap.lenArray[i].getPosition());
+            }
+        }
+        //路径选项
+        var myOptions = {
+            path: flightPlanCoordinates,
+            map: MonitorMap.map,
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        };
+        MonitorMap.polyline = new google.maps.Polyline(myOptions);
+        //清除原有折线路径
+        if (MonitorMap.polylinesArray) {
+            for (i in MonitorMap.polylinesArray) {
+                MonitorMap.polylinesArray[i].setMap(null);
+            }
+            MonitorMap.polylinesArray = [];
+        }
+        MonitorMap.polyline.setMap(MonitorMap.map);
+        MonitorMap.polylinesArray.push(MonitorMap.polyline);
+    }
+
+    ///距离算法
+    google.maps.LatLng.prototype.distanceFrom = function (latlng) {
+        var lat = [this.lat(), latlng.lat()]
+        var lng = [this.lng(), latlng.lng()] //var R = 6371; // km (change this constant to get miles)
+        var R = 6378137; // In meters
+        var dLat = (lat[1] - lat[0]) * Math.PI / 180;
+        var dLng = (lng[1] - lng[0]) * Math.PI / 180;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat[0] * Math.PI / 180) * Math.cos(lat[1] * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return Math.round(d);
+    }
+
+    google.maps.Marker.prototype.distanceFrom = function (marker) {
+        return this.getPosition().distanceFrom(marker.getPosition());
+    }
+
+    google.maps.Polyline.prototype.getLength = function () {
+        var d = 0;
+        var path = this.getPath();
+        var latlng;
+        for (var i = 0; i < path.getLength() - 1; i++) {
+            latlng = [path.getAt(i), path.getAt(i + 1)];
+            d += latlng[0].distanceFrom(latlng[1]);
+        }
+        return d;
+    }
+
+    // 删除所有叠加物
+    function deleteOverlays() {
+
+        if (MonitorMap.lenArray) {
+            for (i in MonitorMap.lenArray) {
+                MonitorMap.lenArray[i].setMap(null);
+            }
+            MonitorMap.lenArray.length = 0;
+        }
+
+        //清除原有折线路径
+        if (MonitorMap.polylinesArray) {
+            for (i in MonitorMap.polylinesArray) {
+                MonitorMap.polylinesArray[i].setMap(null);
+            }
+            MonitorMap.polylinesArray = [];
+        }
+    }
+
+    $(function () {
+
+        //终端监控
+        if (ZDJK == "true") {
+            var li = "<li id='CZDJK'><a href='/Terminal/TerminalMonitor' style='font-size:14px;'>终端监控</a></li>";
+            $("#CUL li:eq(0)").after(li);
+        }
+
+        if (window.innerHeight != undefined) {
+            innerHeight = window.innerHeight;
+        }
+        else {
+            var B = document.body, D = document.documentElement;
+            innerHeight = Math.min(D.clientHeight, B.clientHeight);
+        }
+
+        /*
+        $('#moitorContent').height(innerHeight - 111);
+        $('#chatmessage').height($('#moitorContent').height() - 30);
+        $('#rightpanel').height(innerHeight - 111);
+        $('#CarStatu .panel-body').height($('#rightpanel').height() - 158);
+        $('#box-scroll').height($('#CarStatu .panel-body').height() - 10);
+        $('#box-scroll2').height($('#CarStatu .panel-body').height() - 10);
+        */
+
+        var h_MoitorContent = innerHeight - 111;
+        $('#moitorContent').height(h_MoitorContent);
+        $('#chatmessage').height(h_MoitorContent - 30);
+        $('#rightpanel').height(h_MoitorContent);
+
+        var h_RightPanel = h_MoitorContent - 158;
+        $('#CarStatu .panel-body').height(h_RightPanel);
+        $('#box-scroll').height(h_RightPanel - 10);
+        $('#box-scroll2').height(h_RightPanel - 10);
+
+        $("input, textarea, select").uniform();
+
+        initmap();
+
+        if ($.browser.msie) {
+            $('input:checkbox').click(function () {
+                this.blur();
+                this.focus();
+            });
+        };
+        $("#mointerCar").change(function () {
+            if ($('#mointerCar').attr("checked") == 'checked') {
+                count = 15;
+                countdown = setInterval(countDown, 1000);
+            }
+            else {
+                $("#timeReturn").text("");
+                clearInterval(countdown);
+            }
+            function countDown() {
+                $("#timeReturn").text(+count + " 秒后刷新...");
+                if (count == 0) {
+                    count = 16;
+                    if (MapType == "AllCar") {
+                        Reflash();
+                    } else if (MapType == "CXWarning") {
+                        GetWarningListByDept("4", "", "false");
+                    }
+                    else if (MapType == "DDWarning") {
+                        GetWarningListByDept("", "020307", "false");
+                    }
+                    else if (MapType == "QYWarning") {
+                        GetWarningListByDept("", "301", "false");
+                    }
+                }
+                count--;
+            }
+        });
+        target.loadingOverlay();
+        $.post("/CarMonitor/GetList",
+            {
+                Businessdivisionid: "@ViewBag.Deptid",
+                SelType: "Dept",
+                RowNumber: 1
+            },
+            function (e) {
+                target.loadingOverlay('remove');
+                if (e != "" && e != "[]") {
+                    data = eval(e);
+                    MonitorMap.init(data);
+                    LoadDataTable(data);
+                }
+                else {
+                    $("#MonitorList").html("<h3>该企业下没有车</h3>");
+
+                    showCarOrTerCount(0);
+                }
+            }
+        )
+        $("#fullscreen").toggle(function () {
+            $("#chatmessage").addClass('fulldiv');
+            $('#chatmessage').height(window.innerHeight);
+            $('#fullscreen').text('缩回');
+            document.body.style.overflow = 'hidden';
+            google.maps.event.trigger(MonitorMap.map, 'resize');
+            $(".intoList").css('display', 'none');
+        }, function () {
+            $('#fullscreen').text('全屏');
+            $("#chatmessage").removeClass('fulldiv');
+            $('#chatmessage').height($('#moitorContent').height() - 30);
+            document.body.style.overflow = 'scroll';
+            google.maps.event.trigger(MonitorMap.map, 'resize');
+            $(".intoList").css('display', 'block');
+        })
+
+        $("#DeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            queryParams: { isTree: "false" },
+            animate: true,
+            lines: true,
+            editable: true,
+            onClick: function (node) {
+                if (node.id != "") {
+                    GetListByDept(node.id);
+                }
+                initmap();
+            },
+            onLoadSuccess: function () {
+                $('#DeptSel').combotree('setValue', '@ViewBag.Deptid');
+                @*var deptcode = '@ViewBag.Deptcode';
+                if (deptcode.length <= 8)
+                {
+                    $("#ShowChild").hide();
+                }
+                else
+                {
+                    $("#ShowChild").show();
+                }*@
+            }
+        });
+
+        $("#showPanelBtn").onclick = showPanel;
+
+        $("#ShowAll").change(function () {
+            $("#MonitorList").html('');
+            $("#MonitorList2").html('');
+            $("#ListData").html('');
+            MonitorMap.clear();
+            MonitorMap.markers = [];
+            var DCode = "";
+            if ($("#ShowAll").is(':checked') == true) {
+                DCode = "true";
+            }
+            else {
+                DCode = "false";
+            }
+            var DeptId = $('#DeptSel').combotree('getValue');
+            if (DeptId != "") {
+                target.loadingOverlay();
+                $.post("/CarMonitor/GetList",
+                    {
+                        Businessdivisionid: DeptId,
+                        DeptCode: DCode,
+                        SelType: "Dept",
+                        RowNumber: 1
+                    },
+
+                    function (e) {
+                        target.loadingOverlay('remove');
+                        data = eval(e);
+                        MonitorMap.init(data);
+
+                        CarTable = $('#dyntable').DataTable();
+                        CarTable.destroy();
+                        LoadDataTable(data);
+
+                        if (e != null && e != "[]") {
+
+                        }
+                        else if (e != []) {
+                            $("#MonitorList").html("<h3>该企业下没有车</h3>");
+                            showCarOrTerCount(0);
+                        }
+                    })
+            }
+            else {
+                window.parent.$.messager.alert('提示', '请选择企业！', 'info');
+            }
+        });
+
+        $(".intoList").toggle(function () {
+            $("html,body").animate({ scrollTop: $('#dyntable').offset().top }, 300, 'swing');
+            $(".intoList").removeClass('down');
+            $(".intoList").addClass('up');
+        }, function () {
+            $("html,body").animate({ scrollTop: $('.topheader').offset().top }, 300, 'swing');
+            $(".intoList").removeClass('up');
+            $(".intoList").addClass('down');
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#DeptSel'));
+
+        $("#DownLoadData").click(function (e) {
+            var DeptId = $('#DeptSel').combotree('getValue');
+            if ($("#ShowAll").is(':checked') == true) {
+                DCode = "true";
+            }
+            else {
+                DCode = "false";
+            }
+            $.post("../CarMonitor/DownLoadExcel",
+                {
+                    Businessdivisionid: DeptId,
+                    DeptCode: DCode,
+                    SelType: "Dept"
+                },
+
+                function (e) {
+                    if (e.indexOf("Files") > 0) {
+                        window.location.href = e;
+                    } else {
+                        window.parent.$.messager.alert('提示', '导出失败，请重新导出！', 'info');
+                    }
+                })
+        })
+
+        WarningCX();
+        WarningDD();
+        WarningQY();
+
+        $('#AllCar').click(function () {
+            MapType = "AllCar";
+            GetListByDept($('#DeptSel').combotree('getValue'));
+        });
+
+        //拆除报警
+        $('#showPanelCX').click(function () {
+            MapType = "CXWarning";
+            GetWarningListByDept("4", "", "true");
+            WarningCX();
+        });
+
+        //逾期报警
+        $('#showPanelYQ').click(function () {
+            $(this).find('span').hide();
+        })
+
+        //断电报警
+        $('#showPanelDD').click(function () {
+            MapType = "DDWarning";
+            GetWarningListByDept("", "020307", "true");
+            WarningDD();
+        });
+
+        //区域报警
+        $('#showPanelQY').click(function () {
+            MapType = "QYWarning";
+            GetWarningListByDept("", "301", "true");
+            WarningQY();
+        });
+
+        $("#Location").change(function () {
+            if ($('#Location').attr("checked") == 'checked') {
+                getDistance();
+            } else {
+                DisClear();
+            }
+        });
+    });
+
+    //增减显示数目
+    function AddShowCar() {
+        RowNumber++;
+        $("#MonitorList").html('');
+        $("#MonitorList2").html('');
+        MonitorMap.clear();
+        MonitorMap.markers = [];
+
+        if (RowNumber > 10) {
+            window.parent.$.messager.alert('提示', '加载数据量大,请精确查找！', 'info');
+            RowNumber = 10;
+        }
+        if (SearchFlag == 0) {
+            var DCode = "";
+            if ($("#ShowAll").is(':checked') == true) {
+                DCode = "true";
+            }
+            else {
+                DCode = "false";
+            }
+            var DeptId = $('#DeptSel').combotree('getValue');
+            if (DeptId != "") {
+                target.loadingOverlay();
+                $.post("/CarMonitor/GetList", { Businessdivisionid: DeptId, DeptCode: DCode, SelType: "Dept", RowNumber: RowNumber }, function (e) {
+                    target.loadingOverlay('remove');
+                    data = eval(e);
+                    MonitorMap.init(data);
+                    CarTable = $('#dyntable').DataTable();
+                    CarTable.destroy();
+                    LoadDataTable(data);
+                    if (e != null && e != "[]") {
+
+                    } else if (e != []) {
+                        $("#MonitorList").html("<h3>该企业下没有车</h3>");
+                        showCarOrTerCount(0);
+                    }
+                })
+            } else {
+                window.parent.$.messager.alert('提示', '请选择企业！', 'info');
+            }
+        }
+        else if (SearchFlag == 1) {
+            var SelType = "";
+            var CarNo = "";
+            var TerNo = "";
+            var ShowChild = "true";
+            if (SearchValue == "") {
+                ShowChild = "false";
+                SelType = "Dept";
+                $('#DeptSel').combotree('setValue', '@ViewBag.Deptid');
+                var deptcode = '@ViewBag.Deptcode';
+                if (deptcode.length <= 8) {
+                    $("#ShowChild").hide();
+                }
+                else {
+                    $("#ShowChild").show();
+                }
+            }
+            else {
+                if (SearchName == "CarNo") {
+                    CarNo = SearchValue;
+                    SelType = "Car";
+                } else if (SearchName == "TerNo") {
+                    TerNo = SearchValue;
+                    SelType = "Ter";
+                }
+            }
+            target.loadingOverlay();
+            $.post("/CarMonitor/GetList", { CarNo: CarNo, TerNo: TerNo, DeptCode: ShowChild, SelType: SelType, RowNumber: RowNumber }, function (e) {
+                target.loadingOverlay('remove');
+                if (e != null && e != "[]") {
+                    data = eval(e);
+                    MonitorMap.init(data);
+                    CarTable = $('#dyntable').DataTable();
+                    CarTable.destroy();
+                    LoadDataTable(data);
+                }
+                else if (e == "[]") {
+                    data = eval(e);
+                    MonitorMap.init(data);
+                    $("#MonitorList").html("<h3>没有此车或终端</h3>");
+                }
+            });
+        }
+    }
+
+    //拆除报警
+    function WarningCX() {
+        var DeptId = $('#DeptSel').combotree('getValue');
+        if ($("#ShowAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        $.ajax({
+            url: "/CarMonitor/GetCXWaringCount",
+            data: { Businessdivisionid: DeptId, Businessdivisioncode: DCode },
+            type: "POST",
+            success: function (data) {
+                $('#showPanelCX').find('span').html(data);
+                window.setTimeout("WarningCX()", 60000);
+            }, error: function (data) {
+                window.setTimeout("WarningCX()", 60000);
+            }
+        })
+    }
+    //断电报警
+    function WarningDD() {
+        var DeptId = $('#DeptSel').combotree('getValue');
+        if ($("#ShowAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        $.ajax({
+            url: "/CarMonitor/GetDDWaringCount",
+            data: { Businessdivisionid: DeptId, Businessdivisioncode: DCode },
+            type: "POST",
+            success: function (data) {
+                $('#showPanelDD').find('span').html(data);
+                window.setTimeout("WarningDD()", 60000);
+            }, error: function (data) {
+                window.setTimeout("WarningDD()", 60000);
+            }
+        })
+    }
+    //区域报警
+    function WarningQY() {
+        var DeptId = $('#DeptSel').combotree('getValue');
+        if ($("#ShowAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        $.ajax({
+            url: "/CarMonitor/GetQYWaringCount",
+            data: { Businessdivisionid: DeptId, Businessdivisioncode: DCode },
+            type: "POST",
+            success: function (data) {
+                $('#showPanelQY').find('span').html(data);
+                window.setTimeout("WarningQY()", 60000);
+            }, error: function (data) {
+                window.setTimeout("WarningQY()", 60000);
+            }
+        })
+    }
+
+    //历史轨迹
+    function PlayTrack(CarId, CarNo, TerNo, ProName) {
+        if (ProName == "Homer3M" || ProName == "Homer3B-2") {
+            window.parent.$.DialogOpen('/HistoryTrail/BDYXTrailNewIndex?CarId=' + CarId + '&TerNo=' + TerNo, { title: '' + unescape(CarNo) + '的轨迹', width: '95%', height: '98%' });
+        }
+        else {
+            window.parent.$.DialogOpen('/HistoryTrail/BDTrailNewIndex?CarId=' + CarId + '&TerNo=' + TerNo, { title: '' + unescape(CarNo) + '的轨迹', width: '95%', height: '98%' });
+        }
+    }
+
+    //查看详情
+    function LookDetail(CarId, CarNo, TerNo) {
+        window.parent.$.DialogOpen('/CarDetail/Index?CarId=' + CarId + '&TerNo=' + TerNo, { title: '' + unescape(CarNo) + '的详情', width: 750, height: 450 })
+    }
+
+    //发送命令
+    function SendCMD(CarNo, TerNo, ProName) {
+        if (ProName == "一代无线GPS") {
+            window.parent.$.DialogOpen('/SendCMD/DevSendCMD?str=' + TerNo, { title: unescape(CarNo), width: 880, height: 500 })
+        }
+        else if (ProName == "二代无线GPS") {
+            window.parent.$.DialogOpen('/SendCMD/DevSendCMD_New?str=' + TerNo, { title: unescape(CarNo), width: 900, height: 500 })
+        }
+        else if (ProName == "Homer3M") {
+            window.parent.$.DialogOpen('/SendCMD/WiredDevCMD?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+        }
+        else if (ProName == "Homer3B-2") {
+            window.parent.$.DialogOpen('/SendCMD/WiredDevCMD?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+        }
+        else {
+
+        }
+    }
+
+    //实时跟踪
+    function RealTrail(CarNo, TerNo) {
+        window.open('/HistoryTrail/BDRealTrail?TerNo=' + TerNo + '&CarNo=' + unescape(CarNo));
+    }
+
+    //电子围栏
+    function ShowRail(TerNo) {
+        window.parent.$.DialogOpen('/RailManager/GGRailView?TerNo=' + TerNo, { title: '电子围栏', width: 900, height: 600 });
+    }
+
+    //实时车辆
+    function GetListByDept(DeptId) {
+
+        $("#MonitorList").html('');
+        $("#MonitorList2").html('');
+        $("#ListData").html('');
+        MonitorMap.clear();
+        MonitorMap.markers = [];
+        var DCode = "";
+        if ($("#ShowAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        target.loadingOverlay();
+        $.post("/CarMonitor/GetList",
+            {
+                Businessdivisionid: DeptId,
+                DeptCode: DCode,
+                SelType: "Dept",
+                RowNumber: 1
+            },
+            function (e) {
+                target.loadingOverlay('remove');
+                data = eval(e);
+                MonitorMap.init(data);
+                CarTable = $('#dyntable').DataTable();
+                CarTable.destroy();
+                LoadDataTable(data);
+
+                if (e != null && e != "[]") {
+
+                }
+                else if (e == "[]") {
+                    $("#MonitorList").html("<h3>该企业下没有车</h3>");
+                    showCarOrTerCount(0);
+                }
+            }
+        )
+    }
+
+    //页面刷新(TerStatus:报警类型，ReplydataCode 报警代码,linkType(true:手动访问，false:自动访问))
+    function GetWarningListByDept(TerStatus, ReplydataCode, linkType) {
+        var DeptId = $('#DeptSel').combotree('getValue');
+        $("#MonitorList").html('');
+        $("#MonitorList2").html('');
+        $("#ListData").html('');
+        MonitorMap.clear();
+        MonitorMap.markers = [];
+        if (MonitorMap.markerClusterer) {
+            MonitorMap.markerClusterer.clearMarkers();
+        }
+        var DCode = "";
+        if ($("#ShowAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        if (linkType == "true") {
+            target.loadingOverlay();
+        }
+        $.post("/CarMonitor/GetList", { Businessdivisionid: DeptId, DeptCode: DCode, TerStatus: TerStatus, ReplydataCode: ReplydataCode, SelType: "Dept", RowNumber: 1 }, function (e) {
+            if (linkType == "true") {
+                target.loadingOverlay('remove');
+            }
+            if (e != null && e != "[]") {
+                data = eval(e);
+                MonitorMap.WarningInit(data);
+                CarTable = $('#dyntable').DataTable();
+                CarTable.destroy();
+                LoadDataTable(data);
+            } else if (e == "[]") {
+                $("#MonitorList").html("<h3>该企业下无报警车辆</h3>");
+                showCarOrTerCount(0);
+            }
+        })
+    }
+
+    //地图刷新
+    function Reflash() {
+
+        var DeptId = $('#DeptSel').combotree('getValue');
+
+        $("#MonitorList").html('');
+        $("#MonitorList2").html('');
+        $("#ListData").html('');
+
+        MonitorMap.clear();
+        MonitorMap.markers = [];
+
+        if (MonitorMap.markerClusterer) {
+            MonitorMap.markerClusterer.clearMarkers();
+        }
+
+        var DCode = "";
+        if ($("#ShowAll").is(':checked') == true) {
+            DCode = "true";
+        }
+        else {
+            DCode = "false";
+        }
+        $.post("/CarMonitor/GetList", { Businessdivisionid: DeptId, DeptCode: DCode, SelType: "Dept", RowNumber: RowNumber }, function (e) {
+            data = eval(e);
+            debugger;
+            MonitorMap.init(data);
+            CarTable = $('#dyntable').DataTable();
+            CarTable.destroy();
+            LoadDataTable(data);
+            if (e != null && e != "[]") {
+
+            }
+            else if (e == "[]") {
+                $("#MonitorList").html("<h3>该企业下没有车</h3>");
+                showCarOrTerCount(0);
+            }
+        })
+    }
+
+    //搜索 carno terno
+    function doSearch(value, name) {
+        $("#MonitorList").html('');
+        $("#MonitorList2").html('');
+        $("#ListData").html('');
+        MonitorMap.clear();
+        MonitorMap.markers = [];
+        if (MonitorMap.markerClusterer) {
+            MonitorMap.markerClusterer.clearMarkers();
+        }
+        SearchFlag = 1;
+        SearchValue = value;
+        SearchName = name;
+        var SelType = "";
+        var CarNo = "";
+        var TerNo = "";
+        var ShowChild = "true";
+        if (value == "") {
+            ShowChild = "false";
+            SelType = "Dept";
+            $('#DeptSel').combotree('setValue', '@ViewBag.Deptid');
+            var deptcode = '@ViewBag.Deptcode';
+            if (deptcode.length <= 8) {
+                $("#ShowChild").hide();
+            }
+            else {
+                $("#ShowChild").show();
+            }
+            initmap();
+        }
+        else {
+            if (name == "CarNo") {
+                CarNo = value;
+                SelType = "Car";
+            } else if (name == "TerNo") {
+                TerNo = value;
+                SelType = "Ter";
+            }
+        }
+        target.loadingOverlay();
+        $.post("/CarMonitor/GetList", { CarNo: CarNo, TerNo: TerNo, DeptCode: ShowChild, SelType: SelType, RowNumber: RowNumber }, function (e) {
+            target.loadingOverlay('remove');
+            if (e != null && e != "[]") {
+                data = eval(e);
+                MonitorMap.init(data);
+                CarTable = $('#dyntable').DataTable();
+                CarTable.destroy();
+                LoadDataTable(data);
+            } else if (e == "[]") {
+                data = eval(e);
+                MonitorMap.init(data);
+                $("#MonitorList").html("<h3>没有此车或终端</h3>");
+            }
+        })
+    }
+    //显示结果面板动作
+    function showPanel() {
+        if (isPanelShow == false) {
+            isPanelShow = true;
+            $("showPanelBtn").style.right = "230px";
+            $("panelWrap").style.height = "230px";
+        } else {
+            isPanelShow = false;
+            $("showPanelBtn").style.right = "0px";
+            $("panelWrap").style.height = "0px";
+        }
+    }
+    function LoadDataTable(data) {
+        CarTable = $('#dyntable').dataTable({
+            language: {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ) 共_TOTAL_条",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "search": "模糊查询"
+            },
+            initComplete: function () {
+                $("#mytool").append('<button id="datainit" type="button" class="btn btn-primary btn-sm">导出数据</button>&nbsp');
+            },
+            data: data,
+            columns: [
+                { "data": "Rtime" },
+                { "data": "CarNo" },
+                { "data": "TerNo" },
+                { "data": "TerStatus" },
+                { "data": "Ifposition" },
+                { "data": "Position" },
+                { "data": "TerSimcard" },
+                { "data": "Businessdivisionname" },
+                { "data": "Postbacktimes" }
+            ],
+            "columnDefs": [{
+                targets: [0],
+                orderData: [0, 1]  //如果第一列进行排序，有相同数据则按照第二列顺序排列
+            }, {
+                targets: [1],
+                orderData: [1, 0]  //如果第二列进行排序，有相同数据则按照第一列顺序排列
+            }, {
+                targets: [4],
+                orderData: [4, 0]  //如果第五列进行排序，有相同数据则按照第一列顺序排列
+            }],
+            lengthChange: true,
+            pageLength: 10,
+            scrollCollapse: true,
+            pagingType: "full_numbers",
+            scrollX: true,
+            ordering: true
+        });
+    }
+
+    window.onresize = function () {
+        $('#moitorContent').height(innerHeight - 111);
+        $('#chatmessage').height($('#moitorContent').height() - 30);
+        $('#rightpanel').height(innerHeight - 111);
+        $('#CarStatu .panel-body').height($('#rightpanel').height() - 158);
+        $('#box-scroll').height($('#CarStatu .panel-body').height() - 10);
+    }
+
+    MonitorMap.showMarkers_bak = function () {
+        MonitorMap.markers = [];
+        if (MonitorMap.markerClusterer) {
+            MonitorMap.markerClusterer.clearMarkers();
+        }
+        var panel = $('#MonitorList');
+        var panel2 = $('#MonitorList2');
+        var startTime = new Date();
+        var numMarkers = MonitorMap.pics.length;
+        for (var i = 0; i < numMarkers; i++) {
+            if (MonitorMap.pics[i].GoogleLatitude != 0 && MonitorMap.pics[i].GoogleLongitude != 0) {
+                var li = $('<li class="online"  data-id="on' + i + '"></li>');
+                var a = $('<a href=""></a>')
+                var div = $('<div class="img-list"></div>')
+                var img = $('<img />');
+                if (MonitorMap.pics[i].CarId == null) {
+                    $(img).attr({ "src": "../Content/Images/noboundcar.png", "width": "34", "height": "34" });
+                } else {
+                    $(img).attr({ "src": "../Content/Images/cca1.png", "width": "34", "height": "34" });
+                }
+                $(div).append(img);
+                $(a).append(div);
+                var span = $('<span></span>')
+                $(span).text(MonitorMap.pics[i].CarNo);
+                $(a).append(span);
+                $(li).append(a);
+                $(panel).append(li);
+
+                var latLng = new google.maps.LatLng(MonitorMap.pics[i].GoogleLatitude, MonitorMap.pics[i].GoogleLongitude);
+                var marker = new google.maps.Marker({
+                    'position': latLng,
+                    'icon': lineSymbol,
+                    'CarNo': MonitorMap.pics[i].CarNo,
+                    'CarAdminName': MonitorMap.pics[i].CarAdminName,
+                    'TerNo': MonitorMap.pics[i].TerNo,
+                    'TerStatus': MonitorMap.pics[i].TerStatus,
+                    'Positioningtime': MonitorMap.pics[i].Positioningtime,
+                    'CarPosition': MonitorMap.pics[i].Position,
+                    'Speed': MonitorMap.pics[i].Speed
+                });
+
+                var fn = MonitorMap.markerClickFunction(MonitorMap.pics[i], latLng);
+                google.maps.event.addListener(marker, 'click', fn);
+
+                $(li).click(fn);
+
+                $(a).click(function () {
+                    $(this).parent().parent().find('a').removeClass('active');
+                    $(this).addClass('active');
+                    return true;
+                });
+
+                MonitorMap.markers.push(marker);
+
+                var endTime = new Date(Date.parse(MonitorMap.pics[i].Rtime.replace(/-/g, "/"))).getTime();
+                var hours = Math.abs((startTime.getTime() - endTime)) / (1000 * 60 * 60);
+                if (hours > 48 && (MonitorMap.pics[i].TerStatus == "已激活" || MonitorMap.pics[i].TerStatus == "其他")) {
+                    $(panel2).append(li.clone(true));
+                }
+            }
+        }
+        window.setTimeout(MonitorMap.time, 0);
+    };
+</script>
+
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 13px;
+        right: 200px;
+        border: 1px solid #999;
+    }
+
+        #MapContainer div {
+            width: 75px;
+            float: left;
+            text-align: center;
+        }
+
+    #BaiDuMap {
+        background: #ffffff;
+        color: #797070;
+        cursor: pointer;
+    }
+
+    #GoogleMap {
+        color: #fff;
+        cursor: pointer;
+        background: #0094ff;
+    }
+</style>

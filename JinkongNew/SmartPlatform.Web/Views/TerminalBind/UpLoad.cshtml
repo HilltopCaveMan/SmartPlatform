@@ -1,0 +1,56 @@
+﻿
+@using (Html.BeginForm("UpLoadForm", "TerminalBind", FormMethod.Post, new { @class = "", enctype = "multipart/form-data" }))
+{
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        <p>
+            <label><i>*</i>所属企业</label>
+            <div class="field">
+                <input name="DeptId" id="TerminalBindDept" class="textbox" type="text" style="height:30px;" panelheight="200" />
+                <b>
+
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>选择文件</label>
+            <div class="field">
+                <input id="up_img" name="file" type="file" />
+            </div>
+        </p>
+    </div>
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" type="submit">确定</button>
+        <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+    </div>
+}
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#TerminalBindDept").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            onLoadSuccess: function () {
+                //$('#CarTypeDept').combotree('setValue','@ViewBag.DeptId');
+            }
+        });
+        
+        BindSearchEvent($(" .textbox-text"), $('#TerminalBindDept'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#TerminalBindDept').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#TerminalBindDept').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+    })
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    };
+</script>
+
+

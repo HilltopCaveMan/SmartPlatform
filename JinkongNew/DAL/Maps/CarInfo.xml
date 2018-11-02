@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="CarInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="CarInfo" type="GModel.Car.CarInfo" />
+  </alias>
+  <resultMaps>
+    <resultMap id="CarInfoResult" class="CarInfo">
+      <result property="CarId" column="CarId" type="string" dbType="varchar"/>
+      <result property="CarNo" column="CarNo" type="string" dbType="varchar"/>
+      <result property="TypeId" column="TypeId" type="string" dbType="varchar"/>
+      <result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+      <result property="CarDate" column="CarDate" type="DateTime" dbType="DateTime"/>
+      <result property="CarAdminName" column="CarAdminName" type="string" dbType="varchar"/>
+      <result property="CarAdminCardid" column="CarAdminCardid" type="string" dbType="varchar"/>
+      <result property="CarDeptcode" column="CarDeptcode" type="string" dbType="varchar"/>
+      <result property="CarColor" column="CarColor" type="string" dbType="varchar"/>
+      <result property="CarFrame" column="CarFrame" type="string" dbType="varchar"/>
+      <result property="OwerAddress" column="OwerAddress" type="string" dbType="varchar"/>
+      <result property="OwerPhone" column="OwerPhone" type="string" dbType="varchar"/>
+      <result property="InstallName" column="InstallName" type="string" dbType="varchar"/>
+      <result property="InstallAddress" column="InstallAddress" type="string" dbType="varchar"/>
+      <result property="InstallPhone" column="InstallPhone" type="string" dbType="varchar"/>
+      <result property="InstallPlace" column="InstallPlace" type="string" dbType="varchar"/>
+      <result property="InstallTime" column="InstallTime" type="string" dbType="varchar"/>
+      <result property="EntryName" column="EntryName" type="string" dbType="varchar"/>
+      <result property="EntryPhone" column="EntryPhone" type="string" dbType="varchar"/>
+      <result property="SafeOrder" column="SafeOrder" type="string" dbType="varchar"/>
+      <result property="LoanMoney" column="LoanMoney" type="string" dbType="varchar"/>
+      <result property="LoanYear" column="LoanYear" type="string" dbType="varchar"/>
+      <result property="CarModel" column="CarModel" type="string" dbType="varchar"/>
+      <result property="EngineNumber" column="EngineNumber" type="string" dbType="varchar"/>
+      <result property="Description" column="Description" type="string" dbType="varchar"/>
+      <result property="ContractNum" column="ContractNum" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectCarByCarNo" parameterClass="string" resultMap="CarInfoResult">
+      SELECT CAR_ID AS CarId,CAR_NO AS CarNo,TYPE_ID AS TypeId,BUSINESSDIVISIONID AS Businessdivisionid,CAR_DATE AS CarDate,CAR_ADMINNAME as CarAdminName,CAR_ADMINCARDID as CarAdminCardid,CAR_COLOR as CarColor,CAR_FRAME as CarFrame,CAR_DEPTCODE as CarDeptcode,
+      OWERADDRESS as OwerAddress,OWERPHONE as OwerPhone,INSTALLNAME as InstallName,INSTALLADDRESS as InstallAddress,INSTALLPHONE as InstallPhone,INSTALLPLACE as InstallPlace,INSTALLTIME as InstallTime,ENTRYNAME as EntryName,ENTRYPHONE as EntryPhone,
+      SAFEORDER as SafeOrder,LOANMONEY as LoanMoney,LOANYEAR as LoanYear,CARMODEL as CarModel,ENGINENUMBER as EngineNumber,DESCRIPTION as Description,CONTRACTNUM as ContractNum
+      FROM CAR_INFO WHERE CAR_NO=#value#
+    </select>
+    <select id="SelectCarInfoPage" parameterClass="map" resultMap="CarInfoResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT CAR_ID AS CarId,CAR_NO AS CarNo,TYPE_ID AS TypeId,BUSINESSDIVISIONID AS Businessdivisionid,CAR_DATE AS CarDate,CAR_ADMINNAME as CarAdminName,CAR_ADMINCARDID as CarAdminCardid,CAR_COLOR as CarColor,CAR_FRAME as CarFrame,CAR_DEPTCODE as CarDeptcode,
+      OWERADDRESS as OwerAddress,OWERPHONE as OwerPhone,INSTALLNAME as InstallName,INSTALLADDRESS as InstallAddress,INSTALLPHONE as InstallPhone,INSTALLPLACE as InstallPlace,INSTALLTIME as InstallTime,ENTRYNAME as EntryName,ENTRYPHONE as EntryPhone,
+      SAFEORDER as SafeOrder,LOANMONEY as LoanMoney,LOANYEAR as LoanYear,CARMODEL as CarModel,ENGINENUMBER as EngineNumber,DESCRIPTION as Description,CONTRACTNUM as ContractNum
+      FROM CAR_INFO
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    <select id="SelectCarInfoCount" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM CAR_INFO 
+    </select>
+
+    <!--根据企业ID查询本企业下的车的数量，不包括子企业-->
+    <select id="SelectCarInfoCountByDeptId" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM CAR_INFO WHERE BUSINESSDIVISIONID=#value#
+    </select>
+    <insert id="InsertCarInfo" parameterClass="CarInfo">
+      INSERT INTO CAR_INFO
+      (CAR_ID,CAR_NO,TYPE_ID,BUSINESSDIVISIONID,CAR_DATE,CAR_ADMINNAME,CAR_ADMINCARDID,CAR_COLOR,CAR_FRAME,CAR_DEPTCODE,OWERADDRESS,OWERPHONE,INSTALLNAME,INSTALLADDRESS,INSTALLPHONE,INSTALLPLACE,
+      INSTALLTIME,ENTRYNAME,ENTRYPHONE,SAFEORDER,LOANMONEY,LOANYEAR,CARMODEL,ENGINENUMBER,DESCRIPTION,CONTRACTNUM)
+      VALUES(#CarId#,#CarNo#,#TypeId#,#Businessdivisionid#,sysdate,#CarAdminName#,#CarAdminCardid#,#CarColor#,#CarFrame#,#CarDeptcode#,#OwerAddress#,#OwerPhone#,#InstallName#,#InstallAddress#,#InstallPhone#,#InstallPlace#,
+      #InstallTime#,#EntryName#,#EntryPhone#,#SafeOrder#,#LoanMoney#,#LoanYear#,#CarModel#,#EngineNumber#,#Description#,#ContractNum#)
+    </insert>
+    <update id="UpdateCarInfo" parameterClass="CarInfo">
+      UPDATE CAR_INFO
+      SET CAR_NO=#CarNo#,TYPE_ID=#TypeId#,BUSINESSDIVISIONID=#Businessdivisionid#,CAR_ADMINNAME=#CarAdminName#,CAR_ADMINCARDID=#CarAdminCardid#,CAR_COLOR=#CarColor#,CAR_FRAME=#CarFrame#,CAR_DEPTCODE=#CarDeptcode#,
+      OWERADDRESS=#OwerAddress#,OWERPHONE=#OwerPhone#,INSTALLNAME=#InstallName#,INSTALLADDRESS=#InstallAddress#,INSTALLPHONE=#InstallPhone#,INSTALLPLACE=#InstallPlace#,INSTALLTIME=#InstallTime#,ENTRYNAME=#EntryName#,ENTRYPHONE=#EntryPhone#,
+      SAFEORDER=#SafeOrder#,LOANMONEY=#LoanMoney#,LOANYEAR=#LoanYear#,CARMODEL=#CarModel#,ENGINENUMBER=#EngineNumber#,DESCRIPTION=#Description#,CONTRACTNUM=#ContractNum#
+      WHERE CAR_ID=#CarId#
+    </update>
+    <update id="UpdateCarInfoByCarNo" parameterClass="CarInfo">
+      UPDATE CAR_INFO
+      SET TYPE_ID=#TypeId#,BUSINESSDIVISIONID=#Businessdivisionid#,CAR_ADMINNAME=#CarAdminName#,CAR_ADMINCARDID=#CarAdminCardid#,CAR_COLOR=#CarColor#,CAR_FRAME=#CarFrame#,CAR_DEPTCODE=#CarDeptcode#,
+      OWERADDRESS=#OwerAddress#,OWERPHONE=#OwerPhone#,INSTALLNAME=#InstallName#,INSTALLADDRESS=#InstallAddress#,INSTALLPHONE=#InstallPhone#,INSTALLPLACE=#InstallPlace#,INSTALLTIME=#InstallTime#,ENTRYNAME=#EntryName#,ENTRYPHONE=#EntryPhone#,
+      SAFEORDER=#SafeOrder#,LOANMONEY=#LoanMoney#,LOANYEAR=#LoanYear#,CARMODEL=#CarModel#,ENGINENUMBER=#EngineNumber#,DESCRIPTION=#Description#,CONTRACTNUM=#ContractNum#
+      WHERE CAR_NO=#CarNo#
+    </update>
+    <update id="UpdateTerInfoByCarId" parameterClass="CarInfo">
+      UPDATE TERMINAL_INFO
+      SET DEPT_ID=#Businessdivisionid#,TER_DEPTCODE=#CarDeptcode#
+      WHERE CAR_ID=#CarId#
+    </update>
+    <delete id="DeleteCarInfo" parameterClass="string">
+      DELETE FROM CAR_INFO
+      WHERE  CAR_ID = #value#
+    </delete>
+
+    <!--根据企业ID查询企业下的车的数量，包括所有子企业-->
+    <select id="SelectCarCountByDeptId" parameterClass="string" resultClass="int">
+      SELECT COUNT(*)
+      FROM CAR_INFO CI
+      WHERE CI.BUSINESSDIVISIONID IN
+      (SELECT TA.BUSINESSDIVISIONID
+      FROM DEPT_INFO TA
+      JOIN (SELECT DI.BUSINESSDIVISIONCODE
+      FROM DEPT_INFO DI
+      WHERE DI.BUSINESSDIVISIONID = #value#) TB
+      ON TA.BUSINESSDIVISIONCODE LIKE TB.BUSINESSDIVISIONCODE || '%'
+      AND TA.ISDEL = '0')
+    </select>
+
+    <select id="SelectCarInfoCountByCarType" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM CAR_INFO WHERE TYPE_ID=#value#
+    </select>
+    <!--根据车辆ID查询车辆信息-->
+    <select id="SelectCarByCarId" parameterClass="string" resultMap="CarInfoResult">
+      SELECT ci.CAR_ID AS CarId,ci.CAR_NO AS CarNo,ci.BUSINESSDIVISIONID AS Businessdivisionid,ci.CAR_DATE AS CarDate,ci.CAR_DATE AS CarDate,ct.TYPE_NAME AS TypeId,ci.CAR_ADMINNAME as CarAdminName,ci.CAR_ADMINCARDID as CarAdminCardid,ci.CAR_COLOR as CarColor,ci.CAR_FRAME as CarFrame,ci.CAR_DEPTCODE as CarDeptcode,
+      ci.OWERADDRESS as OwerAddress,ci.OWERPHONE as OwerPhone,ci.INSTALLNAME as InstallName,ci.INSTALLADDRESS as InstallAddress,ci.INSTALLPHONE as InstallPhone,ci.INSTALLPLACE as InstallPlace,ci.INSTALLTIME as InstallTime,ci.ENTRYNAME as EntryName,ci.ENTRYPHONE as EntryPhone,
+      ci.SAFEORDER as SafeOrder,ci.LOANMONEY as LoanMoney,ci.LOANYEAR as LoanYear,ci.CARMODEL as CarModel,ci.ENGINENUMBER as EngineNumber,ci.DESCRIPTION as Description,ci.CONTRACTNUM as ContractNum
+      FROM CAR_INFO ci left JOIN CAR_TYPE ct ON ci.TYPE_ID=ct.TYPE_ID where CAR_ID=#value#
+    </select>
+  </statements>
+</sqlMap>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="NotselMenuView" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="NotselMenuView" type="GModel.RoleRight.NotselMenuView" />
+</alias>
+<resultMaps>
+	<resultMap id="NotselMenuViewResult" class="NotselMenuView">
+		<result property="MenuId" column="MenuId" type="string" dbType="varchar"/>
+		<result property="MenuName" column="MenuName" type="string" dbType="varchar"/>
+		<result property="MenuUrl" column="MenuUrl" type="string" dbType="varchar"/>
+		<result property="MenuParent" column="MenuParent" type="string" dbType="varchar"/>
+		<result property="MenuCreatetime" column="MenuCreatetime" type="DateTime" dbType="DateTime"/>
+		<result property="MenuIcon" column="MenuIcon" type="string" dbType="varchar"/>
+		<result property="MenuType" column="MenuType" type="string" dbType="varchar"/>
+		<result property="Fmenuname" column="Fmenuname" type="string" dbType="varchar"/>
+		<result property="Fmenuparent" column="Fmenuparent" type="string" dbType="varchar"/>
+		<result property="Furl" column="Furl" type="string" dbType="varchar"/>
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectNotselMenuView" parameterClass="string" resultMap="NotselMenuViewResult">
+		SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_TYPE AS MenuType,FMENUNAME AS Fmenuname,FMENUPARENT AS Fmenuparent,FURL AS Furl
+		FROM NOTSEL_MENU_VIEW  
+	</select>
+	<select id="SelectNotselMenuViewPage" parameterClass="map" resultMap="NotselMenuViewResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+			SELECT MENU_ID AS MenuId,MENU_NAME AS MenuName,MENU_URL AS MenuUrl,MENU_PARENT AS MenuParent,MENU_CREATETIME AS MenuCreatetime,MENU_ICON AS MenuIcon,MENU_TYPE AS MenuType,FMENUNAME AS Fmenuname,FMENUPARENT AS Fmenuparent,FURL AS Furl
+			FROM NOTSEL_MENU_VIEW  
+		<isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectNotselMenuViewCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM NOTSEL_MENU_VIEW   
+	</select>
+</statements>
+</sqlMap>

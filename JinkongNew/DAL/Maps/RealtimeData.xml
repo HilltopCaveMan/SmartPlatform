@@ -1,0 +1,938 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="RealtimeData" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="RealtimeData" type="GModel.Location.RealtimeData" />
+    <typeAlias alias="Selectcarmonitor" type="GModel.Location.Selectcarmonitor" />
+    <typeAlias alias="TerData" type="GModel.Location.TerData" />
+    
+
+  </alias>
+  <resultMaps>
+    <resultMap id="RealtimeDataResult" class="RealtimeData">
+      <result property="Id" column="Id" type="string" dbType="varchar"/>
+      <result property="Rawdataid" column="Rawdataid" type="string" dbType="varchar"/>
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="GenerationNum" column="GenerationNum" type="string" dbType="varchar"/>
+      <result property="Factorynum" column="Factorynum" type="string" dbType="varchar"/>
+      <result property="Rtime" column="Rtime" type="DateTime" dbType="DateTime"/>
+      <result property="Protocolversion" column="Protocolversion" type="string" dbType="varchar"/>
+      <result property="Programverson" column="Programverson" type="string" dbType="varchar"/>
+      <result property="Gpsverson" column="Gpsverson" type="string" dbType="varchar"/>
+      <result property="Positioningtime" column="Positioningtime" type="DateTime" dbType="DateTime"/>
+      <result property="TerStatus" column="TerStatus" type="string" dbType="varchar"/>
+      <result property="TerModel" column="TerModel" type="string" dbType="varchar"/>
+      <result property="Worktime" column="Worktime" type="double" dbType="Real"/>
+      <result property="Sleeptime" column="Sleeptime" type="string" dbType="varchar"/>
+      <result property="Ntervalltime" column="Ntervalltime" type="string" dbType="varchar"/>
+      <result property="TerVbatt" column="TerVbatt" type="string" dbType="varchar"/>
+      <result property="Totalworktime" column="Totalworktime" type="double" dbType="Real"/>
+      <result property="Blinddatanum" column="Blinddatanum" type="string" dbType="varchar"/>
+      <result property="TerStatrtimes" column="TerStatrtimes" type="string" dbType="varchar"/>
+      <result property="Ifblinddata" column="Ifblinddata" type="string" dbType="varchar"/>
+      <result property="Ifposition" column="Ifposition" type="string" dbType="varchar"/>
+      <result property="Northorsouth" column="Northorsouth" type="string" dbType="varchar"/>
+      <result property="Eastorwest" column="Eastorwest" type="string" dbType="varchar"/>
+      <result property="Latitude" column="Latitude" type="double" dbType="Real"/>
+      <result property="Longitude" column="Longitude" type="double" dbType="Real"/>
+      <result property="BaiduLatitude" column="BaiduLatitude" type="double" dbType="Real"/>
+      <result property="BaiduLongitude" column="BaiduLongitude" type="double" dbType="Real"/>
+      <result property="GoogleLatitude" column="GoogleLatitude" type="double" dbType="Real"/>
+      <result property="GoogleLongitude" column="GoogleLongitude" type="double" dbType="Real"/>
+      <result property="Position" column="Position" type="string" dbType="varchar"/>
+      <result property="Speed" column="Speed" type="string" dbType="varchar"/>
+      <result property="Direction" column="Direction" type="string" dbType="varchar"/>
+      <result property="Height" column="Height" type="string" dbType="varchar"/>
+      <result property="Gpsant" column="Gpsant" type="string" dbType="varchar"/>
+      <result property="Usesatellite" column="Usesatellite" type="double" dbType="Real"/>
+      <result property="Visualsatellite" column="Visualsatellite" type="double" dbType="Real"/>
+      <result property="Gpsrssi" column="Gpsrssi" type="string" dbType="varchar"/>
+      <result property="Gsmrssi" column="Gsmrssi" type="string" dbType="varchar"/>
+      <result property="Lca" column="Lca" type="string" dbType="varchar"/>
+      <result property="Cell" column="Cell" type="string" dbType="varchar"/>
+      <result property="Gsmrssi1" column="Gsmrssi1" type="string" dbType="varchar"/>
+      <result property="Lca1" column="Lca1" type="string" dbType="varchar"/>
+      <result property="Cell1" column="Cell1" type="string" dbType="varchar"/>
+      <result property="Gsmrssi2" column="Gsmrssi2" type="string" dbType="varchar"/>
+      <result property="Lca2" column="Lca2" type="string" dbType="varchar"/>
+      <result property="Cell2" column="Cell2" type="string" dbType="varchar"/>
+      <result property="Gsmrssi3" column="Gsmrssi3" type="string" dbType="varchar"/>
+      <result property="Lca3" column="Lca3" type="string" dbType="varchar"/>
+      <result property="Cell3" column="Cell3" type="string" dbType="varchar"/>
+      <result property="Province" column="Province" type="string" dbType="varchar"/>
+      <result property="City" column="City" type="string" dbType="varchar"/>
+      <result property="County" column="County" type="string" dbType="varchar"/>
+      <result property="Workstate" column="Workstate" type="string" dbType="varchar"/>
+      <result property="Postbacktimes" column="Postbacktimes" type="double" dbType="Real"/>
+      <result property="Gsmrssi4" column="Gsmrssi4" type="string" dbType="varchar"/>
+      <result property="Lca4" column="Lca4" type="string" dbType="varchar"/>
+      <result property="Cell4" column="Cell4" type="string" dbType="varchar"/>
+      <result property="Gsmrssi5" column="Gsmrssi5" type="string" dbType="varchar"/>
+      <result property="Lca5" column="Lca5" type="string" dbType="varchar"/>
+      <result property="Cell5" column="Cell5" type="string" dbType="varchar"/>
+      <result property="Gsmrssi6" column="Gsmrssi6" type="string" dbType="varchar"/>
+      <result property="Lca6" column="Lca6" type="string" dbType="varchar"/>
+      <result property="Cell6" column="Cell6" type="string" dbType="varchar"/>
+      <result property="Accstate" column="Accstate" type="string" dbType="varchar"/>
+      <result property="Lat" column="Lat" type="string" dbType="varchar"/>
+      <result property="Lng" column="Lng" type="string" dbType="varchar"/>
+      <result property="ReplydataCode" column="ReplydataCode" type="string" dbType="varchar"/>
+      <result property="Carworktemp" column="Carworktemp" type="double" dbType="Real"/>
+      <result property="RemainlPct" column="RemainlPct" type="string" dbType="varchar"/>
+      <result property="AddupDist" column="AddupDist" type="double" dbType="Real"/>
+    </resultMap>
+    <resultMap id="SelectcarmonitorResult" class="Selectcarmonitor">
+      <result property="BaiduLatitude" column="BaiduLatitude" type="double" dbType="Real"/>
+      <result property="BaiduLongitude" column="BaiduLongitude" type="double" dbType="Real"/>
+      <result property="GoogleLatitude" column="GoogleLatitude" type="double" dbType="Real"/>
+      <result property="GoogleLongitude" column="GoogleLongitude" type="double" dbType="Real"/>
+      <result property="Rtime" column="Rtime" type="DateTime" dbType="DateTime"/>
+      <result property="Sleeptime" column="Sleeptime" type="string" dbType="varchar"/>
+      <result property="Settype" column="Settype" type="string" dbType="varchar"/>
+      <result property="CarNo" column="CarNo" type="string" dbType="varchar"/>
+      <result property="CarId" column="CarId" type="string" dbType="varchar"/>
+      <result property="CarAdminName" column="CarAdminName" type="string" dbType="varchar"/>
+      <result property="OwerPhone" column="OwerPhone" type="string" dbType="varchar"/>
+      <result property="InstallAddress" column="InstallAddress" type="string" dbType="varchar"/>
+      <result property="InstallTime" column="InstallTime" type="string" dbType="varchar"/>
+      <result property="Id" column="Id" type="string" dbType="varchar"/>
+      <result property="Rawdataid" column="Rawdataid" type="string" dbType="varchar"/>
+      <result property="Positioningtime" column="Positioningtime" type="DateTime" dbType="DateTime"/>
+      <result property="Ifposition" column="Ifposition" type="string" dbType="varchar"/>
+      <result property="Postbacktimes" column="Postbacktimes" type="double" dbType="Real"/>
+      <result property="Speed" column="Speed" type="string" dbType="varchar"/>
+      
+      <result property="TerStatus" column="TerStatus" type="string" dbType="varchar"/>
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="Position" column="Position" type="string" dbType="varchar"/>
+      <result property="TerGuid" column="TerGuid" type="string" dbType="varchar"/>
+      <result property="TerSimcard" column="TerSimcard" type="string" dbType="varchar"/>
+      <result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+      <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+      <result property="ProModel" column="ProModel" type="string" dbType="varchar"/>
+      <result property="ProName" column="ProName" type="string" dbType="varchar"/>
+      <result property="ReplydataCode" column="ReplydataCode" type="string" dbType="varchar"/>
+      <result property="ReplydataName" column="ReplydataName" type="string" dbType="varchar"/>
+      <result property="StateName" column="StateName" type="string" dbType="varchar"/>
+      <result property="TianShu" column="TianShu" type="double" dbType="Real"/>
+      <result property="Northorsouth" column="Northorsouth" type="string" dbType="varchar"/>
+      <result property="Eastorwest" column="Eastorwest" type="string" dbType="varchar"/>
+    </resultMap>
+
+    <resultMap id="TerDataResult" class="TerData">
+      <result property="Id" column="Id" type="string" dbType="varchar"/>
+      <result property="Rawdataid" column="Rawdataid" type="string" dbType="varchar"/>
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="CarNo" column="CarNo" type="string" dbType="varchar"/>
+      <result property="CarAdminName" column="CarAdminName" type="string" dbType="varchar"/>
+      <result property="ProName" column="ProName" type="string" dbType="varchar"/>
+      <result property="StateName" column="StateName" type="string" dbType="varchar"/>
+      <result property="GenerationNum" column="GenerationNum" type="string" dbType="varchar"/>
+      <result property="Factorynum" column="Factorynum" type="string" dbType="varchar"/>
+      <result property="Rtime" column="Rtime" type="DateTime" dbType="DateTime"/>
+      <result property="Protocolversion" column="Protocolversion" type="string" dbType="varchar"/>
+      <result property="Programverson" column="Programverson" type="string" dbType="varchar"/>
+      <result property="Gpsverson" column="Gpsverson" type="string" dbType="varchar"/>
+      <result property="Positioningtime" column="Positioningtime" type="DateTime" dbType="DateTime"/>
+      <result property="TerStatus" column="TerStatus" type="string" dbType="varchar"/>
+      <result property="TerModel" column="TerModel" type="string" dbType="varchar"/>
+      <result property="Worktime" column="Worktime" type="double" dbType="Real"/>
+      <result property="Sleeptime" column="Sleeptime" type="string" dbType="varchar"/>
+      <result property="Ntervalltime" column="Ntervalltime" type="string" dbType="varchar"/>
+      <result property="TerVbatt" column="TerVbatt" type="string" dbType="varchar"/>
+      <result property="Totalworktime" column="Totalworktime" type="double" dbType="Real"/>
+      <result property="Blinddatanum" column="Blinddatanum" type="string" dbType="varchar"/>
+      <result property="TerStatrtimes" column="TerStatrtimes" type="string" dbType="varchar"/>
+      <result property="Ifblinddata" column="Ifblinddata" type="string" dbType="varchar"/>
+      <result property="Ifposition" column="Ifposition" type="string" dbType="varchar"/>
+      <result property="Northorsouth" column="Northorsouth" type="string" dbType="varchar"/>
+      <result property="Eastorwest" column="Eastorwest" type="string" dbType="varchar"/>
+      <result property="Latitude" column="Latitude" type="double" dbType="Real"/>
+      <result property="Longitude" column="Longitude" type="double" dbType="Real"/>
+      <result property="BaiduLatitude" column="BaiduLatitude" type="double" dbType="Real"/>
+      <result property="BaiduLongitude" column="BaiduLongitude" type="double" dbType="Real"/>
+      <result property="GoogleLatitude" column="GoogleLatitude" type="double" dbType="Real"/>
+      <result property="GoogleLongitude" column="GoogleLongitude" type="double" dbType="Real"/>
+      <result property="Position" column="Position" type="string" dbType="varchar"/>
+      <result property="Speed" column="Speed" type="string" dbType="varchar"/>
+      <result property="Direction" column="Direction" type="string" dbType="varchar"/>
+      <result property="Height" column="Height" type="string" dbType="varchar"/>
+      <result property="Gpsant" column="Gpsant" type="string" dbType="varchar"/>
+      <result property="Usesatellite" column="Usesatellite" type="double" dbType="Real"/>
+      <result property="Visualsatellite" column="Visualsatellite" type="double" dbType="Real"/>
+      <result property="Gpsrssi" column="Gpsrssi" type="string" dbType="varchar"/>
+      <result property="Gsmrssi" column="Gsmrssi" type="string" dbType="varchar"/>
+      <result property="Lca" column="Lca" type="string" dbType="varchar"/>
+      <result property="Cell" column="Cell" type="string" dbType="varchar"/>
+      <result property="Gsmrssi1" column="Gsmrssi1" type="string" dbType="varchar"/>
+      <result property="Lca1" column="Lca1" type="string" dbType="varchar"/>
+      <result property="Cell1" column="Cell1" type="string" dbType="varchar"/>
+      <result property="Gsmrssi2" column="Gsmrssi2" type="string" dbType="varchar"/>
+      <result property="Lca2" column="Lca2" type="string" dbType="varchar"/>
+      <result property="Cell2" column="Cell2" type="string" dbType="varchar"/>
+      <result property="Gsmrssi3" column="Gsmrssi3" type="string" dbType="varchar"/>
+      <result property="Lca3" column="Lca3" type="string" dbType="varchar"/>
+      <result property="Cell3" column="Cell3" type="string" dbType="varchar"/>
+      <result property="Province" column="Province" type="string" dbType="varchar"/>
+      <result property="City" column="City" type="string" dbType="varchar"/>
+      <result property="County" column="County" type="string" dbType="varchar"/>
+      <result property="Workstate" column="Workstate" type="string" dbType="varchar"/>
+      <result property="Postbacktimes" column="Postbacktimes" type="double" dbType="Real"/>
+      <result property="Gsmrssi4" column="Gsmrssi4" type="string" dbType="varchar"/>
+      <result property="Lca4" column="Lca4" type="string" dbType="varchar"/>
+      <result property="Cell4" column="Cell4" type="string" dbType="varchar"/>
+      <result property="Gsmrssi5" column="Gsmrssi5" type="string" dbType="varchar"/>
+      <result property="Lca5" column="Lca5" type="string" dbType="varchar"/>
+      <result property="Cell5" column="Cell5" type="string" dbType="varchar"/>
+      <result property="Gsmrssi6" column="Gsmrssi6" type="string" dbType="varchar"/>
+      <result property="Lca6" column="Lca6" type="string" dbType="varchar"/>
+      <result property="Cell6" column="Cell6" type="string" dbType="varchar"/>
+      <result property="Accstate" column="Accstate" type="string" dbType="varchar"/>
+      <result property="Lat" column="Lat" type="string" dbType="varchar"/>
+      <result property="Lng" column="Lng" type="string" dbType="varchar"/>
+      <result property="ReplydataCode" column="ReplydataCode" type="string" dbType="varchar"/>
+      <result property="Carworktemp" column="Carworktemp" type="double" dbType="Real"/>
+      <result property="RemainlPct" column="RemainlPct" type="string" dbType="varchar"/>
+      <result property="AddupDist" column="AddupDist" type="double" dbType="Real"/>
+      <result property="TerSimcard" column="TerSimcard" type="string" dbType="varchar"/>
+      <result property="Ter_Innettime" column="Ter_Innettime" type="DateTime" dbType="DateTime"/>
+      <result property="Ter_Activetime" column="Ter_Activetime" type="DateTime" dbType="DateTime"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+      <result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+      <result property="Tertypeid" column="Tertypeid" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectRealtimeData" parameterClass="string" resultMap="RealtimeDataResult">
+      SELECT ID AS Id,RAWDATAID AS Rawdataid,TER_NO AS TerNo,GENERATION_NUM AS GenerationNum,FACTORYNUM AS Factorynum,RTIME AS Rtime,PROTOCOLVERSION AS Protocolversion,PROGRAMVERSON AS Programverson,GPSVERSON AS Gpsverson,POSITIONINGTIME AS Positioningtime,TER_STATUS AS TerStatus,TER_MODEL AS TerModel,WORKTIME AS Worktime,SLEEPTIME AS Sleeptime,NTERVALLTIME AS Ntervalltime,TER_VBATT AS TerVbatt,TOTALWORKTIME AS Totalworktime,BLINDDATANUM AS Blinddatanum,TER_STATRTIMES AS TerStatrtimes,IFBLINDDATA AS Ifblinddata,IFPOSITION AS Ifposition,NORTHORSOUTH AS Northorsouth,EASTORWEST AS Eastorwest,LATITUDE AS Latitude,LONGITUDE AS Longitude,BAIDU_LATITUDE AS BaiduLatitude,BAIDU_LONGITUDE AS BaiduLongitude,GOOGLE_LATITUDE AS GoogleLatitude,GOOGLE_LONGITUDE AS GoogleLongitude,POSITION AS Position,SPEED AS Speed,DIRECTION AS Direction,HEIGHT AS Height,GPSANT AS Gpsant,USESATELLITE AS Usesatellite,VISUALSATELLITE AS Visualsatellite,GPSRSSI AS Gpsrssi,GSMRSSI AS Gsmrssi,LCA AS Lca,CELL AS Cell,GSMRSSI1 AS Gsmrssi1,LCA1 AS Lca1,CELL1 AS Cell1,GSMRSSI2 AS Gsmrssi2,LCA2 AS Lca2,CELL2 AS Cell2,GSMRSSI3 AS Gsmrssi3,LCA3 AS Lca3,CELL3 AS Cell3,PROVINCE AS Province,CITY AS City,COUNTY AS County,WORKSTATE AS Workstate,POSTBACKTIMES AS Postbacktimes,GSMRSSI4 AS Gsmrssi4,LCA4 AS Lca4,CELL4 AS Cell4,GSMRSSI5 AS Gsmrssi5,LCA5 AS Lca5,CELL5 AS Cell5,GSMRSSI6 AS Gsmrssi6,LCA6 AS Lca6,CELL6 AS Cell6,ACCSTATE AS Accstate,LAT_ AS Lat,LNG_ AS Lng ,REPLYDATACODE AS ReplydataCode,CARWORKTEMP AS Carworktemp,REMAINL_PCT RemainlPct,ADDUP_DIST AS  AddupDist
+      FROM REALTIME_DATA WHERE TER_NO=#value#
+    </select>
+
+    <select id="GetTerData" parameterClass="map" resultMap="TerDataResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT TI.TER_GUID              AS Id,
+      DI.BUSINESSDIVISIONNAME         AS Businessdivisionname,
+      DI.BUSINESSDIVISIONID         AS Businessdivisionid,
+      RD.RAWDATAID        AS Rawdataid,
+      TI.TER_NO           AS TerNo,
+      CI.CAR_NO           AS CarNo,
+      CI.CAR_ADMINNAME    AS CarAdminName,
+      PI.PRO_NAME         AS ProName,
+      (case when RD.ter_status='2' then '库存'
+      when RD.ter_status='5' then '到期'
+      when RD.ter_status='6' then '休眠'
+      when (cast(sysdate-RD.RTIME as integer) &lt;#DayNumber#) then '在线'
+      when (cast(sysdate-RD.RTIME as integer) &gt;=#DayNumber#) then CONCAT(CONCAT('离线(',cast(sysdate-RTIME as integer)),'天)') else '其他' end ) AS StateName,
+      RD.GENERATION_NUM   AS GenerationNum,
+      RD.FACTORYNUM       AS Factorynum,
+      RD.RTIME            AS Rtime,
+      RD.PROTOCOLVERSION  AS Protocolversion,
+      RD.PROGRAMVERSON    AS Programverson,
+      RD.GPSVERSON        AS Gpsverson,
+      RD.POSITIONINGTIME  AS Positioningtime,
+      RD.TER_STATUS       AS TerStatus,
+      RD.TER_MODEL        AS TerModel,
+      RD.WORKTIME         AS Worktime,
+      RD.SLEEPTIME        AS Sleeptime,
+      RD.NTERVALLTIME     AS Ntervalltime,
+      RD.TER_VBATT        AS TerVbatt,
+      RD.TOTALWORKTIME    AS Totalworktime,
+      RD.BLINDDATANUM     AS Blinddatanum,
+      RD.TER_STATRTIMES   AS TerStatrtimes,
+      RD.IFBLINDDATA      AS Ifblinddata,
+      RD.IFPOSITION       AS Ifposition,
+      RD.NORTHORSOUTH     AS Northorsouth,
+      RD.EASTORWEST       AS Eastorwest,
+      RD.LATITUDE         AS Latitude,
+      RD.LONGITUDE        AS Longitude,
+      RD.BAIDU_LATITUDE   AS BaiduLatitude,
+      RD.BAIDU_LONGITUDE  AS BaiduLongitude,
+      RD.GOOGLE_LATITUDE  AS GoogleLatitude,
+      RD.GOOGLE_LONGITUDE AS GoogleLongitude,
+      RD.POSITION         AS Position,
+      RD.SPEED            AS Speed,
+      RD.DIRECTION        AS Direction,
+      RD.HEIGHT           AS Height,
+      RD.GPSANT           AS Gpsant,
+      RD.USESATELLITE     AS Usesatellite,
+      RD.VISUALSATELLITE  AS Visualsatellite,
+      RD.GPSRSSI          AS Gpsrssi,
+      RD.GSMRSSI          AS Gsmrssi,
+      RD.LCA              AS Lca,
+      RD.CELL             AS Cell,
+      RD.GSMRSSI1         AS Gsmrssi1,
+      RD.LCA1             AS Lca1,
+      RD.CELL1            AS Cell1,
+      RD.GSMRSSI2         AS Gsmrssi2,
+      RD.LCA2             AS Lca2,
+      RD.CELL2            AS Cell2,
+      RD.GSMRSSI3         AS Gsmrssi3,
+      RD.LCA3             AS Lca3,
+      RD.CELL3            AS Cell3,
+      RD.PROVINCE         AS Province,
+      RD.CITY             AS City,
+      RD.COUNTY           AS County,
+      RD.WORKSTATE        AS Workstate,
+      RD.POSTBACKTIMES    AS Postbacktimes,
+      RD.GSMRSSI4         AS Gsmrssi4,
+      RD.LCA4             AS Lca4,
+      RD.CELL4            AS Cell4,
+      RD.GSMRSSI5         AS Gsmrssi5,
+      RD.LCA5             AS Lca5,
+      RD.CELL5            AS Cell5,
+      RD.GSMRSSI6         AS Gsmrssi6,
+      RD.LCA6             AS Lca6,
+      RD.CELL6            AS Cell6,
+      RD.ACCSTATE         AS Accstate,
+      RD.LAT_             AS Lat,
+      RD.LNG_             AS Lng,
+      RD.REPLYDATACODE    AS ReplydataCode,
+      RD.CARWORKTEMP      AS Carworktemp,
+      RD.REMAINL_PCT      AS RemainlPct,
+      RD.ADDUP_DIST       AS AddupDist,
+      TI.TER_TYPEID       AS Tertypeid,
+      TI.TER_SIMCARD AS TerSimcard,
+      TI.TER_INNETTIME AS Ter_Innettime,
+      TI.ACTIVETIME  AS Ter_Activetime
+      FROM TERMINAL_INFO TI JOIN DEPT_INFO DI ON TI.DEPT_ID=DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="UserLname">
+          TI.TER_NO IN (select ter_no from SETMANAGER where username=#UserLname#)
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TerNo">
+          TI.TER_NO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ProId">
+          TI.TER_TYPEID=#ProId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="StartTerNo">
+          TI.TER_NO &gt;=#StartTerNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="EndTerNo">
+          TI.TER_NO &lt;=#EndTerNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          TI.DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE LIKE #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="AddTerMonth">
+          to_char(TI.TER_INNETTIME,'yyyymm')=#AddTerMonth#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="OverTerMonth">
+          to_char(TI.TER_OVERTIME,'yyyymm')=#OverTerMonth#
+        </isNotEmpty>
+      </dynamic>
+      LEFT JOIN CAR_INFO CI ON TI.CAR_ID = CI.CAR_ID
+      LEFT JOIN　PRODUCTS_INFO PI ON TI.TER_TYPEID=PI.PRO_ID
+      LEFT JOIN REALTIME_DATA RD ON TI.TER_NO= RD.TER_NO where 1=1
+      <isNotEmpty prepend="AND" property="CarNo">
+         CI.CAR_NO LIKE '%'||#CarNo#||'%'
+      </isNotEmpty>
+      <isNotEmpty prepend="AND" property="Rawdataid">
+         RD.RAWDATAID IS NOT NULL
+      </isNotEmpty>
+      <isEqual property="StateId" compareValue="1">
+        AND cast(sysdate-RD.RTIME as integer)&lt;#DayNumber# and ((RD.ter_status not in ('2','5','6')) or RD.ter_status is null)
+      </isEqual>
+      <isEqual property="StateId" compareValue="2">
+        AND cast(sysdate-RD.RTIME as integer) &gt;=#DayNumber# and ((RD.ter_status not in ('2','5','6')) or RD.ter_status is null)
+      </isEqual>
+      <isEqual property="StateId" compareValue="3">
+        and RD.ter_status='5'
+      </isEqual>
+      <isEqual property="StateId" compareValue="4">
+        and RD.ter_status='2'
+      </isEqual>
+      <isEqual property="StateId" compareValue="5">
+        and RD.ter_status='6'
+      </isEqual>
+      <isEqual property="StateId" compareValue="6">
+        and RD.SETTYPE='101' and RD.SLEEPTIME IS not NULL
+      </isEqual>
+      <isEqual property="StateId" compareValue="7">
+        and RD.RTIME IS NULL
+      </isEqual>
+      <isEqual property="TerModel" compareValue="1">
+        and RD.TER_MODEL='1'
+      </isEqual>
+      <isEqual property="TerModel" compareValue="2">
+        and RD.TER_MODEL='2'
+      </isEqual>
+      <isEqual property="TerModel" compareValue="3">
+        and RD.TER_MODEL='3'
+      </isEqual>
+      <isEqual property="TerModel" compareValue="4">
+        and RD.TER_MODEL is null
+      </isEqual>
+      ORDER BY TI.TER_NO ASC
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+
+    <select id="GetTerDataCount" parameterClass="map" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO TI JOIN DEPT_INFO DI ON TI.DEPT_ID=DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="UserLname">
+          TI.TER_NO IN (select ter_no from SETMANAGER where username=#UserLname#)
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TerNo">
+          TI.TER_NO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ProId">
+          TI.TER_TYPEID=#ProId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="StartTerNo">
+          TI.TER_NO &gt;=#StartTerNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="EndTerNo">
+          TI.TER_NO &lt;=#EndTerNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          TI.DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE LIKE #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="AddTerMonth">
+          to_char(TI.TER_INNETTIME,'yyyymm')=#AddTerMonth#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="OverTerMonth">
+          to_char(TI.TER_OVERTIME,'yyyymm')=#OverTerMonth#
+        </isNotEmpty>
+      </dynamic>
+      LEFT JOIN CAR_INFO CI ON TI.CAR_ID = CI.CAR_ID
+      LEFT JOIN　PRODUCTS_INFO PI ON TI.TER_TYPEID=PI.PRO_ID
+      LEFT JOIN REALTIME_DATA RD ON TI.TER_NO= RD.TER_NO where 1=1
+      <isNotEmpty prepend="AND" property="CarNo">
+        CI.CAR_NO LIKE '%'||#CarNo#||'%'
+      </isNotEmpty>
+      <isEqual property="StateId" compareValue="1">
+        AND cast(sysdate-RD.RTIME as integer)&lt;#DayNumber# and ((RD.ter_status not in ('2','5','6')) or RD.ter_status is null)
+      </isEqual>
+      <isEqual property="StateId" compareValue="2">
+        AND cast(sysdate-RD.RTIME as integer) &gt;=#DayNumber# and ((RD.ter_status not in ('2','5','6')) or RD.ter_status is null)
+      </isEqual>
+      <isEqual property="StateId" compareValue="3">
+        and RD.ter_status='5'
+      </isEqual>
+      <isEqual property="StateId" compareValue="4">
+        and RD.ter_status='2'
+      </isEqual>
+      <isEqual property="StateId" compareValue="5">
+        and RD.ter_status='6'
+      </isEqual>
+      <isEqual property="StateId" compareValue="6">
+        and RD.SETTYPE='101' and RD.SLEEPTIME IS not NULL
+      </isEqual>
+      <isEqual property="StateId" compareValue="7">
+        and RD.RTIME IS NULL
+      </isEqual>
+      <isEqual property="TerModel" compareValue="1">
+        and RD.TER_MODEL='1'
+      </isEqual>
+      <isEqual property="TerModel" compareValue="2">
+        and RD.TER_MODEL='2'
+      </isEqual>
+      <isEqual property="TerModel" compareValue="3">
+        and RD.TER_MODEL='3'
+      </isEqual>
+      <isEqual property="TerModel" compareValue="4">
+        and RD.TER_MODEL is null
+      </isEqual>
+    </select>
+    
+    
+   
+    <select id="SelectRealtimeDataPage" parameterClass="map" resultMap="RealtimeDataResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT ID AS Id,RAWDATAID AS Rawdataid,TER_NO AS TerNo,GENERATION_NUM AS GenerationNum,FACTORYNUM AS Factorynum,RTIME AS Rtime,PROTOCOLVERSION AS Protocolversion,PROGRAMVERSON AS Programverson,GPSVERSON AS Gpsverson,POSITIONINGTIME AS Positioningtime,TER_STATUS AS TerStatus,TER_MODEL AS TerModel,WORKTIME AS Worktime,SLEEPTIME AS Sleeptime,NTERVALLTIME AS Ntervalltime,TER_VBATT AS TerVbatt,TOTALWORKTIME AS Totalworktime,BLINDDATANUM AS Blinddatanum,TER_STATRTIMES AS TerStatrtimes,IFBLINDDATA AS Ifblinddata,IFPOSITION AS Ifposition,NORTHORSOUTH AS Northorsouth,EASTORWEST AS Eastorwest,LATITUDE AS Latitude,LONGITUDE AS Longitude,BAIDU_LATITUDE AS BaiduLatitude,BAIDU_LONGITUDE AS BaiduLongitude,GOOGLE_LATITUDE AS GoogleLatitude,GOOGLE_LONGITUDE AS GoogleLongitude,POSITION AS Position,SPEED AS Speed,DIRECTION AS Direction,HEIGHT AS Height,GPSANT AS Gpsant,USESATELLITE AS Usesatellite,VISUALSATELLITE AS Visualsatellite,GPSRSSI AS Gpsrssi,GSMRSSI AS Gsmrssi,LCA AS Lca,CELL AS Cell,GSMRSSI1 AS Gsmrssi1,LCA1 AS Lca1,CELL1 AS Cell1,GSMRSSI2 AS Gsmrssi2,LCA2 AS Lca2,CELL2 AS Cell2,GSMRSSI3 AS Gsmrssi3,LCA3 AS Lca3,CELL3 AS Cell3,PROVINCE AS Province,CITY AS City,COUNTY AS County,WORKSTATE AS Workstate,POSTBACKTIMES AS Postbacktimes,GSMRSSI4 AS Gsmrssi4,LCA4 AS Lca4,CELL4 AS Cell4,GSMRSSI5 AS Gsmrssi5,LCA5 AS Lca5,CELL5 AS Cell5,GSMRSSI6 AS Gsmrssi6,LCA6 AS Lca6,CELL6 AS Cell6,ACCSTATE AS Accstate,LAT_ AS Lat,LNG_ AS Lng ,REPLYDATACODE AS ReplydataCode,CARWORKTEMP AS Carworktemp,REMAINL_PCT RemainlPct,ADDUP_DIST AS  AddupDist
+      FROM REALTIME_DATA 
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    <select id="SelectRealtimeDataCount" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM REALTIME_DATA 
+    </select>
+    <insert id="InsertRealtimeData" parameterClass="RealtimeData">
+      INSERT INTO REALTIME_DATA
+      (ID,RAWDATAID,TER_NO,GENERATION_NUM,FACTORYNUM,RTIME,PROTOCOLVERSION,PROGRAMVERSON,GPSVERSON,POSITIONINGTIME,TER_STATUS,TER_MODEL,WORKTIME,SLEEPTIME,NTERVALLTIME,TER_VBATT,TOTALWORKTIME,BLINDDATANUM,TER_STATRTIMES,IFBLINDDATA,IFPOSITION,NORTHORSOUTH,EASTORWEST,LATITUDE,LONGITUDE,BAIDU_LATITUDE,BAIDU_LONGITUDE,GOOGLE_LATITUDE,GOOGLE_LONGITUDE,POSITION,SPEED,DIRECTION,HEIGHT,GPSANT,USESATELLITE,VISUALSATELLITE,GPSRSSI,GSMRSSI,LCA,CELL,GSMRSSI1,LCA1,CELL1,GSMRSSI2,LCA2,CELL2,GSMRSSI3,LCA3,CELL3,PROVINCE,CITY,COUNTY,WORKSTATE,POSTBACKTIMES,GSMRSSI4,LCA4,CELL4,GSMRSSI5,LCA5,CELL5,GSMRSSI6,LCA6,CELL6,ACCSTATE,LAT_,LNG_,CARWORKTEMP,REMAINL_PCT,ADDUP_DIST,REPLYDATACODE,REPLYDATANAME)
+      VALUES(#Id#,#Rawdataid#,#TerNo#,#GenerationNum#,#Factorynum#,#Rtime:DateTime:1/1/0001 12:00:00 AM#,#Protocolversion#,#Programverson#,#Gpsverson#,#Positioningtime:DateTime:1/1/0001 12:00:00 AM#,#TerStatus#,#TerModel#,#Worktime#,#Sleeptime#,#Ntervalltime#,#TerVbatt#,#Totalworktime#,#Blinddatanum#,#TerStatrtimes#,#Ifblinddata#,#Ifposition#,#Northorsouth#,#Eastorwest#,#Latitude#,#Longitude#,#BaiduLatitude#,#BaiduLongitude#,#GoogleLatitude#,#GoogleLongitude#,#Position#,#Speed#,#Direction#,#Height#,#Gpsant#,#Usesatellite#,#Visualsatellite#,#Gpsrssi#,#Gsmrssi#,#Lca#,#Cell#,#Gsmrssi1#,#Lca1#,#Cell1#,#Gsmrssi2#,#Lca2#,#Cell2#,#Gsmrssi3#,#Lca3#,#Cell3#,#Province#,#City#,#County#,#Workstate#,#Postbacktimes#,#Gsmrssi4#,#Lca4#,#Cell4#,#Gsmrssi5#,#Lca5#,#Cell5#,#Gsmrssi6#,#Lca6#,#Cell6#,#Accstate#,#Lat#,#Lng#,#Carworktemp#,#RemainlPct#,#AddupDist#,#ReplydataCode#,#ReplydataName#)
+    </insert>
+    <update id="UpdateRealtimeData" parameterClass="RealtimeData">
+      UPDATE REALTIME_DATA
+      SET RAWDATAID=#Rawdataid#,TER_NO=#TerNo#,GENERATION_NUM=#GenerationNum#,FACTORYNUM=#Factorynum#,RTIME=#Rtime#,PROTOCOLVERSION=#Protocolversion#,PROGRAMVERSON=#Programverson#,GPSVERSON=#Gpsverson#,POSITIONINGTIME=#Positioningtime#,TER_STATUS=#TerStatus#,TER_MODEL=#TerModel#,WORKTIME=#Worktime#,SLEEPTIME=#Sleeptime#,NTERVALLTIME=#Ntervalltime#,TER_VBATT=#TerVbatt#,TOTALWORKTIME=#Totalworktime#,BLINDDATANUM=#Blinddatanum#,TER_STATRTIMES=#TerStatrtimes#,IFBLINDDATA=#Ifblinddata#,IFPOSITION=#Ifposition#,NORTHORSOUTH=#Northorsouth#,EASTORWEST=#Eastorwest#,LATITUDE=#Latitude#,LONGITUDE=#Longitude#,BAIDU_LATITUDE=#BaiduLatitude#,BAIDU_LONGITUDE=#BaiduLongitude#,GOOGLE_LATITUDE=#GoogleLatitude#,GOOGLE_LONGITUDE=#GoogleLongitude#,POSITION=#Position#,SPEED=#Speed#,DIRECTION=#Direction#,HEIGHT=#Height#,GPSANT=#Gpsant#,USESATELLITE=#Usesatellite#,VISUALSATELLITE=#Visualsatellite#,GPSRSSI=#Gpsrssi#,GSMRSSI=#Gsmrssi#,LCA=#Lca#,CELL=#Cell#,GSMRSSI1=#Gsmrssi1#,LCA1=#Lca1#,CELL1=#Cell1#,GSMRSSI2=#Gsmrssi2#,LCA2=#Lca2#,CELL2=#Cell2#,GSMRSSI3=#Gsmrssi3#,LCA3=#Lca3#,CELL3=#Cell3#,PROVINCE=#Province#,CITY=#City#,COUNTY=#County#,WORKSTATE=#Workstate#,POSTBACKTIMES=#Postbacktimes#,GSMRSSI4=#Gsmrssi4#,LCA4=#Lca4#,CELL4=#Cell4#,GSMRSSI5=#Gsmrssi5#,LCA5=#Lca5#,CELL5=#Cell5#,GSMRSSI6=#Gsmrssi6#,LCA6=#Lca6#,CELL6=#Cell6#,REPLYDATACODE=#ReplydataCode#,REPLYDATANAME=#ReplydataName#
+      WHERE TER_NO = #TerNo#
+    </update>
+    
+    <delete id="DeleteRealtimeData" parameterClass="string">
+      DELETE FROM REALTIME_DATA
+      WHERE $value$
+    </delete>
+    <select id="SelectCarMonitor" parameterClass="map" resultMap="SelectcarmonitorResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      select * from (
+      SELECT DISTINCT T2.BAIDU_LATITUDE       AS BaiduLatitude,
+      T2.BAIDU_LONGITUDE      AS BaiduLongitude,
+      T2.GOOGLE_LATITUDE      AS GoogleLatitude,
+      T2.GOOGLE_LONGITUDE     AS GoogleLongitude,
+      T2.RTIME                AS Rtime,
+      T2.SETTYPE              AS Settype,
+      T2.SLEEPTIME            AS Sleeptime,
+      T2.CAR_NO               AS CarNo,
+      T2.CAR_ID               AS CarId,
+      COALESCE(T2.CAR_ADMINNAME,' ') as CarAdminName,
+      COALESCE(T2.OWERPHONE,' ') as OwerPhone,
+      COALESCE(T2.INSTALLADDRESS,' ') as InstallAddress,
+      COALESCE(T2.INSTALLTIME,' ') as InstallTime,
+      T2.ID                   AS Id,
+      T2.RAWDATAID            AS Rawdataid,
+      T2.POSITIONINGTIME      AS Positioningtime,
+      T2.NORTHORSOUTH     AS Northorsouth,
+      T2.EASTORWEST       AS Eastorwest,
+      case T2.IFPOSITION when '定位' then 'GPS' when '不定位' then '基站' else '其他' end AS Ifposition,
+      T2.POSTBACKTIMES        AS Postbacktimes,
+      T2.SPEED                AS Speed,
+      case T2.TER_STATUS when '4' then '已拆除' when '1' then '测试' when '2' then '待激活' when '3' then '已激活' when '5' then '到期' when '6' then '休眠' when '7' then '已使用' else '其他' end AS TerStatus,
+      T2.REPLYDATACODE as ReplydataCode,
+      T2.REPLYDATANAME as ReplydataName,
+      T2.TER_NO AS TerNo,
+      nvl(T2.POSITION,'设备周边无地理信息描述') AS Position,
+      T2.TER_GUID             AS TerGuid,
+      T2.TER_SIMCARD AS TerSimcard,
+      T2.BUSINESSDIVISIONID   AS Businessdivisionid,
+      T2.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      T2.BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      T2.PRO_MODEL            AS ProModel,
+      T2.PRO_NAME             AS ProName,
+      T2.StateName            AS StateName,
+      T2.TianShu              AS TianShu
+      FROM (SELECT RD.BAIDU_LATITUDE,
+      RD.BAIDU_LONGITUDE,
+      RD.GOOGLE_LATITUDE,
+      RD.GOOGLE_LONGITUDE,
+      RD.POSITION,
+      RD.RTIME,
+      RD.SETTYPE,
+      RD.SLEEPTIME,
+      RD.ID,
+      RD.RAWDATAID,
+      RD.IFPOSITION,
+      RD.POSTBACKTIMES,
+      RD.SPEED,
+      RD.POSITIONINGTIME,
+      RD.NORTHORSOUTH,
+      RD.EASTORWEST,
+      TI.TER_GUID,
+      TI.TER_NO,
+      TI.TER_SIMCARD,
+      RD.TER_STATUS,
+      RD.REPLYDATACODE,
+      RD.REPLYDATANAME,
+      CI.CAR_NO,
+      CI.CAR_ID,
+      CI.CAR_ADMINNAME,
+      CI.OWERPHONE,
+      CI.INSTALLADDRESS,
+      CI.INSTALLTIME,
+      DI.BUSINESSDIVISIONID,
+      DI.BUSINESSDIVISIONNAME,
+      DI.BUSINESSDIVISIONCODE,
+      PI.PRO_MODEL,
+      PI.PRO_NAME,
+      case when RD.ter_status='2' then 'kc'
+      when RD.ter_status='5' then 'dq'
+      when RD.ter_status='6' then 'xm'
+      when cast(sysdate-RD.RTIME as integer)&gt;=7.1 then 'lx' else 'zx' end as StateName,
+      cast(sysdate-RD.RTIME as integer) as TianShu
+      FROM REALTIME_DATA RD
+      JOIN TERMINAL_INFO TI
+      ON RD.TER_NO = TI.TER_NO
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerStatus">
+          RD.TER_STATUS = #TerStatus#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ReplydataCode">
+          RD.REPLYDATACODE = #ReplydataCode#
+        </isNotEmpty>
+      </dynamic>
+      JOIN PRODUCTS_INFO PI ON TI.TER_TYPEID=PI.PRO_ID
+      JOIN CAR_INFO CI
+      ON TI.CAR_ID = CI.CAR_ID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          (upper(CI.CAR_NO) like '%'||#TerNo#||'%'  OR　upper(TI.TER_NO) like '%'||#TerNo#||'%' OR　upper(CI.CAR_ADMINNAME) like '%'||#TerNo#||'%')
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="UserLname">
+          TI.TER_NO in (select ter_no from SETMANAGER where username=#UserLname#)
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Northorsouth">
+          ((PI.PRO_MODEL='HOMEO' or PI.PRO_MODEL='HOMEOF') and RD.NORTHORSOUTH=#Northorsouth# and RD.EASTORWEST='0')
+        </isNotEmpty>
+      </dynamic>
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DI.BUSINESSDIVISIONID = #Businessdivisionid#
+        </isNotEmpty>
+      </dynamic>
+      ) T2
+      Left JOIN (SELECT T.CAR_ID, MAX(T.RTIME) AS RTIME
+      FROM (SELECT RD.RTIME, CI.CAR_ID
+      FROM REALTIME_DATA rd
+      JOIN TERMINAL_INFO TI
+      ON RD.TER_NO = TI.TER_NO
+      JOIN CAR_INFO CI
+      ON TI.CAR_ID = CI.CAR_ID) T
+      GROUP BY T.CAR_ID) TMT
+      ON T2.CAR_ID = TMT.CAR_ID
+      AND T2.RTIME = TMT.RTIME where T2.RTIME is not null
+      <dynamic>
+        <isNotEmpty property="SelType">
+          UNION
+          SELECT
+          RDD.BAIDU_LATITUDE AS BaiduLatitude,
+          RDD.BAIDU_LONGITUDE AS BaiduLongitude,
+          RDD.GOOGLE_LATITUDE AS GoogleLatitude,
+          RDD.GOOGLE_LONGITUDE AS GoogleLongitude,
+          RDD.RTIME AS Rtime,
+          RDD.SETTYPE AS Settype,
+          RDD.SLEEPTIME AS Sleeptime,
+          TII.TER_NO AS CarNo,
+          ''  AS CarId,
+          ' ' as CarAdminName,
+          ' ' as OwerPhone,
+          ' ' as InstallAddress,
+          ' ' as InstallTime,
+          RDD.ID AS Id,
+          RDD.RAWDATAID AS Rawdataid,
+          RDD.POSITIONINGTIME AS Positioningtime,
+          RDD.NORTHORSOUTH AS　Northorsouth,
+          RDD.EASTORWEST　AS Eastorwest,
+          case RDD.IFPOSITION when '定位' then 'GPS' when '不定位' then '基站' else '其他' end AS Ifposition,
+          RDD.POSTBACKTIMES AS Postbacktimes,
+          RDD.SPEED AS Speed,
+          case  RDD.TER_STATUS when '4' then '已拆除' when '1' then '测试' when '2' then '待激活' when '3' then '已激活' when '5' then '到期' when '6' then '休眠' when '7' then '已使用' else '其他' end AS TerStatus,
+          RDD.REPLYDATACODE as ReplydataCode,
+          RDD.REPLYDATANAME as ReplydataName,
+          TII.TER_NO AS TerNo,
+          RDD.POSITION AS Position,
+          TII.TER_GUID AS TerGuid,
+          TII.TER_SIMCARD AS TerSimcard,
+          DII.BUSINESSDIVISIONID AS Businessdivisionid,
+          DII.BUSINESSDIVISIONNAME AS Businessdivisionname,
+          DII.BUSINESSDIVISIONCODE AS Businessdivisioncode,
+          PII.PRO_MODEL AS ProModel,
+          PII.PRO_NAME AS ProName,
+          case when RDD.ter_status='2' then 'kc'
+          when RDD.ter_status='5' then 'dq'
+          when RDD.ter_status='6' then 'xm'
+          when cast(sysdate-RDD.RTIME as integer)&gt;=7.1 then 'lx' else 'zx' end as StateName,
+          cast(sysdate-RDD.RTIME as integer) as TianShu
+          FROM TERMINAL_INFO TII JOIN REALTIME_DATA RDD ON TII.TER_NO=RDD.TER_NO AND (TII.CAR_ID IS NULL OR TII.CAR_ID='')
+          <dynamic prepend="AND">
+            <isNotEmpty prepend="AND" property="TerStatus">
+              RDD.TER_STATUS = #TerStatus#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="ReplydataCode">
+              RDD.REPLYDATACODE = #ReplydataCode#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="TerNo">
+              upper(TII.TER_NO) like '%'||#TerNo#||'%'
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="UserLname">
+              TII.TER_NO in (select ter_no from SETMANAGER where username=#UserLname#)
+            </isNotEmpty>
+          </dynamic>
+          JOIN DEPT_INFO DII ON TII.DEPT_ID=DII.BUSINESSDIVISIONID
+          <dynamic prepend="AND">
+            <isNotEmpty prepend="AND" property="Businessdivisioncode">
+              DII.BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="Businessdivisionid">
+              DII.BUSINESSDIVISIONID = #Businessdivisionid#
+            </isNotEmpty>
+          </dynamic>
+          JOIN PRODUCTS_INFO PII ON TII.TER_TYPEID=PII.PRO_ID
+          <isNotEmpty prepend="AND" property="Northorsouth">
+            ((PII.PRO_MODEL='HOMEO' or PII.PRO_MODEL='HOMEOF') and RDD.NORTHORSOUTH=#Northorsouth# and RDD.EASTORWEST='0')
+          </isNotEmpty>
+          where RDD.RTIME is not null) tab1 order by Rtime desc
+        </isNotEmpty>
+      </dynamic>
+
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+    <select id ="SelectTerMonitor" parameterClass="Selectcarmonitor" resultMap="SelectcarmonitorResult">
+      SELECT RD.BAIDU_LATITUDE AS BaiduLatitude,
+      RD.BAIDU_LONGITUDE AS BaiduLongitude,
+      RD.GOOGLE_LATITUDE AS GoogleLatitude,
+      RD.GOOGLE_LONGITUDE AS GoogleLongitude,
+      RD.POSITION AS Position,
+      RD.RTIME AS Rtime,
+      RD.SETTYPE AS Settype,
+      RD.ID AS Id,
+      RD.RAWDATAID  AS Rawdataid,
+      RD.IFPOSITION AS Ifposition,
+      RD.POSTBACKTIMES AS Postbacktimes,
+      RD.POSITIONINGTIME AS Positioningtime,
+      RD.NORTHORSOUTH AS　Northorsouth,
+      RD.EASTORWEST　AS Eastorwest,
+      RD.REPLYDATACODE AS ReplydataCode,
+      RD.REPLYDATANAME AS ReplydataName,
+      TI.TER_GUID AS TerGuid,
+      TI.TER_NO AS TerNo,
+      TI.TER_SIMCARD AS TerSimcard,
+      case RD.TER_STATUS  when '4' then '已拆除' when '1' then '测试' when '2' then '待激活' when '3' then '已激活' when '5' then '到期' when '6' then '休眠' when '7' then '已使用' else '其他' end AS TerStatus,
+      CI.CAR_NO AS CarNo,
+      CI.CAR_ID AS CarId,
+      case when RD.ter_status='2' then 'kc'
+      when RD.ter_status='5' then 'dq'
+      when RD.ter_status='6' then 'xm'
+      when cast(sysdate-RD.RTIME as integer)&gt;=7.1 then 'lx' else 'zx' end as StateName,
+      cast(sysdate-RD.RTIME as integer) as TianShu,
+      DI.BUSINESSDIVISIONID AS Businessdivisionid,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      PI.PRO_NAME AS ProName,
+      PI.PRO_MODEL AS ProModel
+      FROM REALTIME_DATA RD
+      JOIN TERMINAL_INFO TI
+      ON RD.TER_NO = TI.TER_NO
+      JOIN PRODUCTS_INFO PI ON TI.TER_TYPEID=PI.PRO_ID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="CarNo">
+          CI.CAR_NO like '%'||#CarNo#||'%'
+        </isNotEmpty>
+      </dynamic>
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DI.BUSINESSDIVISIONID = #Businessdivisionid#
+        </isNotEmpty>
+      </dynamic>
+      LEFT JOIN CAR_INFO CI
+      ON TI.CAR_ID = CI.CAR_ID  ORDER BY TERNO DESC
+    </select>
+    <select id ="SelectCXWarningCount" parameterClass="Selectcarmonitor" resultClass="int">
+      SELECT COUNT(*) FROM  (SELECT DISTINCT CI.CAR_ID
+      FROM TERMINAL_INFO TI
+      JOIN CAR_INFO CI
+      ON TI.CAR_ID = CI.CAR_ID
+      JOIN REALTIME_DATA RD
+      ON TI.TER_NO = RD.TER_NO AND RD.TER_STATUS='4'
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DI.BUSINESSDIVISIONID = #Businessdivisionid#
+        </isNotEmpty>
+      </dynamic>
+
+      UNION
+      SELECT TII.Ter_No AS DATAVAL
+      FROM TERMINAL_INFO TII
+      JOIN REALTIME_DATA RDD
+      ON TII.TER_NO = RDD.TER_NO AND RDD.TER_STATUS='4' AND (TII.CAR_ID IS NULL OR TII.CAR_ID='')
+      JOIN DEPT_INFO DII
+      ON TII.DEPT_ID = DII.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DII.BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DII.BUSINESSDIVISIONID = #Businessdivisionid#
+        </isNotEmpty>
+      </dynamic>
+      ) A
+    </select>
+
+    <select id ="SelectDDWarningCount" parameterClass="Selectcarmonitor" resultClass="int">
+      SELECT COUNT(*) FROM  (SELECT TI.TER_NO
+      FROM TERMINAL_INFO TI
+      JOIN REALTIME_DATA RD
+      ON TI.TER_NO = RD.TER_NO AND RD.REPLYDATACODE='020307'
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DI.BUSINESSDIVISIONID = #Businessdivisionid#
+        </isNotEmpty>
+      </dynamic>
+      ) A
+    </select>
+
+    <select id ="SelectQYWarningCount" parameterClass="Selectcarmonitor" resultClass="int">
+      SELECT COUNT(*) FROM  (SELECT TI.TER_NO
+      FROM TERMINAL_INFO TI
+      JOIN REALTIME_DATA RD
+      ON TI.TER_NO = RD.TER_NO AND RD.REPLYDATACODE='301'
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DI.BUSINESSDIVISIONID = #Businessdivisionid#
+        </isNotEmpty>
+      </dynamic>
+      ) A
+    </select>
+
+    <select id="GetTerHistoryData" parameterClass="map" resultMap="TerDataResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT RD.ID               AS Id,
+      '' AS Businessdivisionname,
+      '' AS Businessdivisionid,
+      '' AS CarNo,
+      '' AS CarAdminName,
+      '' AS ProName,
+      '' AS StateName,
+      RD.RAWDATAID        AS Rawdataid,
+      RD.TER_NO           AS TerNo,
+      RD.GENERATION_NUM   AS GenerationNum,
+      RD.FACTORYNUM       AS Factorynum,
+      RD.RTIME            AS Rtime,
+      RD.PROTOCOLVERSION  AS Protocolversion,
+      RD.PROGRAMVERSON    AS Programverson,
+      RD.GPSVERSON        AS Gpsverson,
+      RD.POSITIONINGTIME  AS Positioningtime,
+      RD.TER_STATUS       AS TerStatus,
+      RD.TER_MODEL        AS TerModel,
+      RD.WORKTIME         AS Worktime,
+      RD.SLEEPTIME        AS Sleeptime,
+      RD.NTERVALLTIME     AS Ntervalltime,
+      RD.TER_VBATT        AS TerVbatt,
+      RD.TOTALWORKTIME    AS Totalworktime,
+      RD.BLINDDATANUM     AS Blinddatanum,
+      RD.TER_STATRTIMES   AS TerStatrtimes,
+      RD.IFBLINDDATA      AS Ifblinddata,
+      RD.IFPOSITION       AS Ifposition,
+      RD.NORTHORSOUTH     AS Northorsouth,
+      RD.EASTORWEST       AS Eastorwest,
+      RD.LATITUDE         AS Latitude,
+      RD.LONGITUDE        AS Longitude,
+      RD.BAIDU_LATITUDE   AS BaiduLatitude,
+      RD.BAIDU_LONGITUDE  AS BaiduLongitude,
+      RD.GOOGLE_LATITUDE  AS GoogleLatitude,
+      RD.GOOGLE_LONGITUDE AS GoogleLongitude,
+      RD.POSITION         AS Position,
+      RD.SPEED            AS Speed,
+      RD.DIRECTION        AS Direction,
+      RD.HEIGHT           AS Height,
+      RD.GPSANT           AS Gpsant,
+      RD.USESATELLITE     AS Usesatellite,
+      RD.VISUALSATELLITE  AS Visualsatellite,
+      RD.GPSRSSI          AS Gpsrssi,
+      RD.GSMRSSI          AS Gsmrssi,
+      RD.LCA              AS Lca,
+      RD.CELL             AS Cell,
+      RD.GSMRSSI1         AS Gsmrssi1,
+      RD.LCA1             AS Lca1,
+      RD.CELL1            AS Cell1,
+      RD.GSMRSSI2         AS Gsmrssi2,
+      RD.LCA2             AS Lca2,
+      RD.CELL2            AS Cell2,
+      RD.GSMRSSI3         AS Gsmrssi3,
+      RD.LCA3             AS Lca3,
+      RD.CELL3            AS Cell3,
+      RD.PROVINCE         AS Province,
+      RD.CITY             AS City,
+      RD.COUNTY           AS County,
+      RD.WORKSTATE        AS Workstate,
+      RD.POSTBACKTIMES    AS Postbacktimes,
+      RD.GSMRSSI4         AS Gsmrssi4,
+      RD.LCA4             AS Lca4,
+      RD.CELL4            AS Cell4,
+      RD.GSMRSSI5         AS Gsmrssi5,
+      RD.LCA5             AS Lca5,
+      RD.CELL5            AS Cell5,
+      RD.GSMRSSI6         AS Gsmrssi6,
+      RD.LCA6             AS Lca6,
+      RD.CELL6            AS Cell6,
+      RD.ACCSTATE         AS Accstate,
+      RD.LAT_             AS Lat,
+      RD.LNG_             AS Lng,
+      RD.REPLYDATACODE       AS ReplydataCode,
+      RD.CARWORKTEMP      AS Carworktemp,
+      RD.REMAINL_PCT      RemainlPct,
+      RD.ADDUP_DIST       AS AddupDist,
+      TI.TER_TYPEID       AS Tertypeid,
+      TI.TER_SIMCARD AS TerSimcard,
+      TI.TER_INNETTIME AS Ter_Innettime,
+      TI.ACTIVETIME  AS Ter_Activetime
+      FROM HISTORICAL_DATA RD JOIN TERMINAL_INFO TI ON RD.TER_NO=TI.TER_NO
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TI.TER_NO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          TI.DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="st">
+        RD.RTIME &gt;= to_date(#st#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>   
+        <isNotEmpty prepend="AND" property="ed">
+        RD.RTIME &lt;= to_date(#ed#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+      </dynamic>
+      ORDER BY RD.Rtime DESC
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    
+    <select id="GetTerHistoryDataCount" parameterClass="map" resultClass="int">
+      SELECT count(*)
+      FROM HISTORICAL_DATA RD JOIN TERMINAL_INFO TI ON RD.TER_NO=TI.TER_NO
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TI.TER_NO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          TI.DEPT_ID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="st">
+        RD.RTIME &gt;= to_date(#st#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ed">
+        RD.RTIME &lt;= to_date(#ed#,'yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+      </dynamic>
+    </select>
+    
+  </statements>
+</sqlMap>

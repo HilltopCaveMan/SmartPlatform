@@ -1,0 +1,182 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_511.cshtml";
+}
+@Html.Partial("_HeaderPartial_VersionInfo")
+
+<style>
+    .content {
+        margin: 0 auto;
+    }
+
+    .title {
+        font-size: 20px;
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight:bolder;
+        font-family:'Microsoft YaHei';
+    }
+
+    .bt1 {
+        font-size: 15px;
+        font-weight:bold;
+    }
+
+    .bt2 {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .bt3 {
+        font-size: 13px;
+        margin-left:20px;
+    }
+
+    .nr {
+        font-size: 15px;
+        text-indent: 2em;
+        font-weight: bold;
+    }
+
+    p {
+        margin-bottom: 5px;
+    }
+</style>
+<div style="width:100%; line-height:28px; padding:20px 0;">
+    <div style=" margin: 0 auto; width: 800px;">
+        <div class="title">北京博创联动平台服务升级公告</div>
+        <div style="text-align:center;">更新日期：2017-01-11</div>
+        <br />
+        <br />
+        <p class="nr">
+            一、离线用户查询
+        </p>
+        <p class="bt3">
+            1.“终端统计”界面，离线状态设备查询从原来的7天增至1-15天。
+        </p>
+        <p class="bt3">
+            2.“状态类型”选择“离线设备”，后面弹出时间选择框，选择时间查询即可。
+        </p>
+        <img src="~/assets/images/VersionInfo/web10.png" style="width: 556px; margin-left: 20px;" />
+        <br />
+        <br />
+        <p class="nr">
+            二、失联报警
+        </p>
+        <p class="bt3">
+            1．“设备状态统计”新增失联报警
+        </p>
+        <p class="bt3">
+            2．失联报警定义：15天以上未回传数据的设备，视为失联并报警。
+        </p>
+        <img src="~/assets/images/VersionInfo/web11.png" style="width: 556px; height: 224px; margin-left: 20px;" />
+        <br />
+        <br />
+
+        <p class="nr">
+            三、月新增车辆查询
+        </p>
+        <p class="bt3">
+            在“终端统计”中，可按照月份查询月新增的设备。
+        </p>
+        <img src="~/assets/images/VersionInfo/web12.png" style="width: 556px; height: 224px; margin-left: 20px; " />
+        <br />
+        <br />
+        <p class="nr">
+            四、月结清车辆查询
+        </p>
+        <p class="bt3">
+            在“终端统计”中，可按照月份查询月结清的设备。
+        </p>
+        <img src="~/assets/images/VersionInfo/web13.png" style="width: 556px; height: 224px; margin-left: 20px; " />
+        <br />
+        <br />
+        <p class="nr">
+            五、低电预警
+        </p>
+        <p class="bt3">
+            1.“报警统计”中新增低电量预警。
+        </p>
+        <p class="bt3">
+            1.低电量预警定义：无线设备回传数据超过1000条，会发出预警（注：不是报警，本预警功能为提醒设备可能会因电量不足导致无法继续回传数据）
+        </p>
+        <img src="~/assets/images/VersionInfo/web14.png" style="width: 556px; height: 224px; margin-left: 20px; " />
+        <br />
+        <br />
+        <p class="nr">
+            六、疑似掉落报警
+        </p>
+        <p class="bt3">
+            1.“报警统计”中新增疑似掉落报警。
+        </p>
+        <p class="bt3">
+            2.疑似掉落报警定义：设备为“已拆除”状态，五天内位置发生明显变化，则视为疑似掉落，并报警。
+        </p>
+        <img src="~/assets/images/VersionInfo/web15.png" style="width: 556px; height: 224px; margin-left: 20px; " />
+        <br />
+        <br />
+        <p class="nr">
+            七、疑似拆除报警
+        </p>
+        <p class="bt3">
+            1.“报警统计”中新增疑似拆除报警。
+        </p>
+        <p class="bt3">
+            2.疑似拆除报警定义：设备为“已拆除”状态，五天内位置没有发生明显变化，或没有上传数据则视为疑似拆除，并报警。
+        </p>
+        <img src="~/assets/images/VersionInfo/web16.png" style="width: 556px; height: 224px; margin-left: 20px; " />
+        <br />
+        <br />
+        <p class="nr">
+            八、首页报警推送
+        </p>
+        <p class="bt3">
+            1.首页右上角新增报警设备总数推送。
+        </p>
+        <p class="bt3">
+            2.点击到转报警统计界面进行详细查看。
+        </p>
+        <img src="~/assets/images/VersionInfo/web17.png" style="width: 556px; height: 224px; margin-left: 20px; " />
+        <br />
+        <br />
+        <p class="nr">
+            九、平台自动退出优化
+        </p>
+        <p class="bt3">
+            1.取消了平台3分钟不操作自动退出。
+        </p>
+        <p class="bt3">
+            2.现在平台将不会自动退出。
+        </p>   
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <div class="title">汽车金融APP使用手册更新说明：</div>
+        <div style="text-align:center;">更新日期：2016-10-17</div>
+        <p class="nr">
+            对系统操作界面视图进行了图片的更新和新增功能进行了视图添加和解释说明。具体表现如下，
+        </p>
+        <p class="bt3">
+            1 主页面
+        </p>
+        <img src="/assets/images/VersionInfo/App5.png" style="margin-left:20px;" />
+
+        <p class="nr">
+            1)找车界面右侧功能栏功能图标新增文字说明和左侧添加了平面地图与卫星地图选择功能块
+        </p>
+        <p class="nr">
+            2)装车界面和我的界面做了视图界面优化
+        </p>
+        <p class="nr">
+            3)我的页面添加了意见反馈功能
+        </p>
+        <p class="bt3" style="color:red;">
+            注：Android版发布后即可更新使用，IOS版需要App Store审核通过可以下载更新（具体在发布后一周可更新）
+        </p>
+</div>
+</div>
+
+@Html.Partial("_FooterPartial")

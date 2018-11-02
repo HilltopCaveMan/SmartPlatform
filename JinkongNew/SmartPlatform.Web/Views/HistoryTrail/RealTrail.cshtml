@@ -1,0 +1,434 @@
+﻿
+<div id="mapdiv">
+    <div id="MapContainer">
+        <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+        <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+    </div>
+    <div id="map-TrailNew" style="height:100%;float:left;width:70%;">
+    </div>
+    <div style="height:100%;float:left;width:30%;background:#fff;">
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="dyntable">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">回传时间</th>
+                    <th class="head1">当前位置</th>
+                    @*//<th class="head1">车牌号</th>*@
+                    <th class="head0">终端编号</th>
+                    <th class="head1">终端状态</th>
+                    <th class="head0">定位方式</th>
+                    <th class="head1">纬度</th>
+                    <th class="head0">经度</th>
+                    @*//<th class="head0">SIM卡号</th>
+                    //<th class="head0">所属组织</th>
+                    //<th class="head1">回传次数</th>*@
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+<script src="http://maps.google.cn/maps/api/js?sensor=false&language=zh-CN&libraries=drawing"></script>
+<script src="~/assets/javascripts/NameOverlay.js"></script>
+<script type="text/javascript" language="javascript">
+    var RealTrailMap = {};
+    RealTrailMap.poly = null;
+    RealTrailMap.pics = [];
+    RealTrailMap.map = null;
+    RealTrailMap.markers = [];
+    RealTrailMap.infoWindow = null;
+    var data = null;
+    var curr_time = new Date();
+    var sh;
+    var count = 0;
+    var PLAYSTATU = "stop";
+    var BeginTime;
+    var EndTime;
+    var Spend;
+    var CarTable, tableHeight;
+    function initRealTrailMap() {
+        var latlng = new google.maps.LatLng(39.919204, 116.40608);
+        var options = {
+            zoom: 14,
+            center: latlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            maxZoom: 19,
+            minZoom: 1
+        };
+        RealTrailMap.map = new google.maps.Map(document.getElementById('map-TrailNew'), options);
+
+        var lineSymbol = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 5,
+            strokeColor: '#c0392b'
+        };
+        var lineSymbol1 = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 2
+        };
+        RealTrailMap.poly = new google.maps.Polyline({
+            path: [],
+            icons: [{
+                icon: lineSymbol,
+                offset: '0%'
+            }, {
+                icon: lineSymbol1,
+                offset: '100%',
+            }],
+            map: RealTrailMap.map
+        });
+        RealTrailMap.infoWindow = new google.maps.InfoWindow();
+    }
+
+    RealTrailMap.init = function (data) {
+        RealTrailMap.pics = data;
+        RealTrailMap.poly.setMap(RealTrailMap.map);
+        RealTrailMap.showMarkers();
+    };
+
+    RealTrailMap.showMarkers = function () {
+        var path = RealTrailMap.poly.getPath();
+        RealTrailMap.markers = [];
+        var numMarkers = RealTrailMap.pics.length;
+        if (numMarkers > 0) {
+            for (var i = (numMarkers - 1) ; i >= 0; i--) {
+                if (data[i].GoogleLatitude != 0 && data[i].GoogleLongitude != 0) {
+                    var latLng = new google.maps.LatLng(data[i].GoogleLatitude, data[i].GoogleLongitude);
+                    path.push(latLng);
+                    if (i == (data.length - 1)) {
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            title: '#' + path.getLength(),
+                            'icon': '../Content/Icon/start.png'
+                        });
+                        var fn = RealTrailMap.markerClickFunction(data[i], latLng);
+                        google.maps.event.addListener(marker, 'click', fn);
+                        RealTrailMap.markers.push(marker);
+                    } else if (i == 0) {
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            title: '#' + path.getLength(),
+                            'icon': '../Content/Icon/Finish.png'
+                        });
+                        var fn = RealTrailMap.markerClickFunction(data[i], latLng);
+                        google.maps.event.addListener(marker, 'click', fn);
+                        RealTrailMap.markers.push(marker);
+                    } else {
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            title: '#' + path.getLength(),
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                strokeColor: "#ff0000 ",
+                                strokeOpacity: 1,
+                                strokeWeight: 2,
+                                scale: 3
+                            }
+                        });
+                        var fn = RealTrailMap.markerClickFunction(data[i], latLng);
+                        google.maps.event.addListener(marker, 'click', fn);
+                        RealTrailMap.markers.push(marker);
+                    }
+                }
+            }
+        }
+
+        window.setTimeout(RealTrailMap.time, 0);
+    };
+
+    RealTrailMap.markerClickFunction = function (pic, latlng) {
+        return function (e) {
+            e.cancelBubble = true;
+            e.returnValue = false;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            var title = pic.Id;
+            var url = pic.Id;
+            var fileurl = pic.Id;
+            var status = "";
+            switch (pic.TerStatus) {
+                case "1":
+                    status = "测试";
+                    break;
+                case "2":
+                    status = "待激活";
+                    break;
+                case "3":
+                    status = "已激活";
+                    break;
+                case "4":
+                    status = "已拆除";
+                    break;
+                default:
+                    status = "";
+                    break;
+            }
+
+            var infoHtml = '<div class="info">'
+                        + '<h3 class="infowindowheader">' + pic.Rtime + '</h3>'
+                        + '<table ><tr><td>终端编号：</td><td>' + pic.TerNo + '</td></tr><tr><td>设备状态：</td><td>' + status + '</td></tr><tr><td>地理位置：</td> <td>' + pic.Position + '</td> </tr></table></div>'
+            RealTrailMap.infoWindow.setContent(infoHtml);
+            RealTrailMap.infoWindow.setPosition(latlng);
+            RealTrailMap.infoWindow.open(RealTrailMap.map);
+        };
+    };
+
+    function MapWindow(Latitude, Longitude, Rtime, TerNo, Status, Position) {
+        var infoHtml = '<div class="info">'
+                    + '<h3 class="infowindowheader">' + Rtime + '</h3>'
+                    + '<table ><tr><td>终端编号：</td><td>' + TerNo + '</td></tr><tr><td>设备状态：</td><td>';
+        switch (Status) {
+            case "1":
+                infoHtml += "测试";
+                break;
+            case "2":
+                infoHtml += "待激活";
+                break;
+            case "3":
+                infoHtml += "已激活";
+                break;
+            case "4":
+                infoHtml += "已拆除";
+                break;
+            default:
+                infoHtml += "";
+                break;
+        }
+        infoHtml += '</td></tr><tr><td>地理位置：</td> <td>' + Position + '</td></tr></table></div>'
+        RealTrailMap.infoWindow.setContent(infoHtml);
+        var latLng = new google.maps.LatLng(Latitude, Longitude);
+        RealTrailMap.infoWindow.setPosition(latLng);
+        RealTrailMap.infoWindow.open(RealTrailMap.map);
+
+
+    }
+
+    RealTrailMap.clear = function () {
+        for (var i = 0, marker; marker = RealTrailMap.markers[i]; i++) {
+            marker.setMap(null);
+        }
+    };
+
+    RealTrailMap.change = function () {
+        RealTrailMap.clear();
+        RealTrailMap.showMarkers();
+    };
+
+    RealTrailMap.time = function () {
+        if (RealTrailMap.markers.length > 0) {
+            var bounds = new google.maps.LatLngBounds();
+            for (var i = 0; i < RealTrailMap.markers.length; i++) {
+                RealTrailMap.markers[i].setMap(RealTrailMap.map);
+                bounds.extend(RealTrailMap.markers[i].getPosition());
+            }
+            RealTrailMap.map.fitBounds(bounds);
+        }
+    };
+    $(function () {
+        $('#mapdiv').height(window.innerHeight);
+        tableHeight = $('#mapdiv').height() - 115;
+        jQuery("input, textarea, select").uniform();
+        initRealTrailMap();
+        $.ajax({
+            url: "/HistoryTrail/GetRealtimeData",
+            data: { TerNo: '@ViewBag.TerNo' },
+            type: "POST",
+            success: function (data) {
+                var realdata = eval('[' + data + ']');
+                var latlng = new google.maps.LatLng(realdata[0].GoogleLatitude, realdata[0].GoogleLongitude);
+                RealTrailMap.map.panTo(latlng);
+                var path = RealTrailMap.poly.getPath();
+                path.push(latlng);
+                RealTrailMap.pics.push(realdata[0]);
+                CarTable = $('#dyntable').DataTable();
+                CarTable.destroy();
+                LoadDataTable(RealTrailMap.pics);
+                SetIcon();
+                var marker = new google.maps.Marker({
+                    position: latlng,
+                    title: '#' + path.getLength(),
+                    map: RealTrailMap.map
+                }); 
+                window.setTimeout("GetData('@ViewBag.TerNo')", 5000);
+            }, error: function (data) {
+                window.setTimeout("GetData('@ViewBag.TerNo')", 5000);
+            }
+        })
+    })
+
+    function SetIcon() {
+        var icons = RealTrailMap.poly.get('icons');
+        icons[0].offset = '100%';
+        RealTrailMap.poly.set('icons', icons);
+    }
+
+    function GetData(TerNo) {
+        $.ajax({
+            url: "/HistoryTrail/GetRealtimeData",
+            data: { TerNo: TerNo },
+            type: "POST",
+            success: function (data) {
+                var realdata = eval('[' + data + ']');
+                var path = RealTrailMap.poly.getPath(); 
+                var lastlatlng = path.getAt(path.length - 1); 
+                if (RealTrailMap.pics[RealTrailMap.pics.length - 1].Rtime != realdata[0].Rtime) {
+                    var latlng = new google.maps.LatLng(realdata[0].GoogleLatitude, realdata[0].GoogleLongitude);
+                    var mapLatLngBounds = RealTrailMap.map.getBounds();
+                    if (!mapLatLngBounds.contains(latlng)) {
+                        RealTrailMap.map.panTo(latlng);
+                    }
+                    path.push(latlng); 
+                    RealTrailMap.pics.push(realdata[0]);
+                    SetIcon();
+                    CarTable = $('#dyntable').DataTable();
+                    CarTable.destroy();
+                    LoadDataTable(RealTrailMap.pics); 
+                } 
+                window.setTimeout("GetData('" + TerNo + "')", 5000);
+            }, error: function (data) {
+                window.setTimeout("GetData('" + TerNo + "')", 5000);
+            }
+        }) 
+    }
+
+    function LoadDataTable(data) {
+        CarTable = $('#dyntable').dataTable({
+            language: {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                "info": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 )",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "search": "模糊查询",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "前一页",
+                    "sNext": "后一页",
+                    "sLast": "末页"
+                }
+            },
+            "dom":
+                    "<'row'<'span12'l>r>" +
+                    "t" +
+                    "<'row'<'span6'i><'span6'p>>",
+            data: data,
+            columns: [
+        { "data": "Rtime" },
+        { "data": "Position" },
+        //{ "data": "CarNo" },
+        { "data": "TerNo" },
+        {
+            "data": "TerStatus", "render": function (data, type, full, meta) {
+                switch (data) {
+                    case "1":
+                        return "测试";
+                        break;
+                    case "2":
+                        return "待激活";
+                        break;
+                    case "3":
+                        return "已激活";
+                        break;
+                    case "4":
+                        return "已拆除";
+                        break;
+                    default:
+                        return "其他";
+                        break;
+
+                }
+
+                //return type === 'display' && data.length > 40 ?
+                //'<span title="' + data + '">' + data.substr(0, 38) + '...</span>' :
+                //data;
+            }
+        },
+        { "data": "Ifposition" },
+        { "data": "GoogleLatitude" },
+        { "data": "GoogleLongitude" }
+
+        //{ "data": "TerSimcard" },
+        //{ "data": "Businessdivisionname" },
+        //{ "data": "Postbacktimes" }
+            ],
+            "columnDefs": [{
+                targets: [0],
+                orderData: [0, 1]  //如果第一列进行排序，有相同数据则按照第二列顺序排列
+            }, {
+                targets: [1],
+                orderData: [1, 0]  //如果第二列进行排序，有相同数据则按照第一列顺序排列
+            }, {
+                targets: [2],
+                orderData: [2, 0]  //如果第五列进行排序，有相同数据则按照第一列顺序排列
+            }],
+            lengthChange: true,
+            pageLength: 10,
+            // scrollCollapse: true,
+            pagingType: "full_numbers",
+            scrollX: true,
+            scrollY: tableHeight,
+            ordering: true,
+            "order": [[0, 'desc'], [2, 'asc']]
+        });
+    }
+
+    //调用百度地图
+    function BaiDuMap() {
+        var terno = '@ViewBag.TerNo '
+        window.open("/HistoryTrail/BDRealTrail?TerNo="+terno);
+        window.close();
+        $("#BaiDuMap").css({ "background": "#0094ff", "color": "#fff" });
+        $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+    //调用谷歌地图
+    function GoogleMap() {
+        $("#map-TrailNew").show();
+        $("#BaiDuMap").css({ "background": "#ffffff", "color": "#797070" });
+        $("#GoogleMap").css({ "background": "#0094ff", "color": "#ffffff" });
+    }
+
+</script>
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 13px;
+        right: 600px;
+        border: 1px solid #999;
+    }
+
+        #MapContainer div {
+            width: 75px;
+            float: left;
+            text-align: center;
+        }
+
+    #BaiDuMap {
+        background: #ffffff;
+        color: #797070;
+        cursor: pointer;
+    }
+
+    #GoogleMap {
+        color: #fff;
+        cursor: pointer;
+        background: #0094ff;
+    }
+</style>

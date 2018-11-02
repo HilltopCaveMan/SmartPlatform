@@ -1,0 +1,220 @@
+﻿
+<div class="tabcontant">
+    <div id="audit_polluteManager_list_searchPanel"
+         style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+         class="easyui-panel" iconcls="icon-search" title="车辆保养情况总览"
+         collapsible="true" minimizable="false" maximizable="false"
+         closable="false">
+        <form id="audit_polluteManager_list_searchForm" method="post">
+            <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        车辆编号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        GPS编号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        SIM卡号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                   
+                    <td style="padding-left:30px;" rowspan="2" align="center">
+                        <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                        <a class="easyui-linkbutton" icon="icon-search"
+                           href="#">查询</a> &nbsp;&nbsp;
+                    </td>
+                </tr>
+
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        机型：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+
+                    <td style="padding-left: 15px;">
+                        经销商：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        保养时段：
+                    </td>
+                    <td>
+                        <select name="operatestatus" class="easyui-combobox" style="width:150px;height:20px;"
+                                id="audit_polluteManager_list_searchInput_operatestatus">
+                            <option value="0">-----请选择-----</option>
+                            <option value="501">50小时已保养</option>
+                            <option value="502">50小时未保养</option>
+                            <option value="2501">250小时已保养</option>
+                            <option value="2502">250小时未保养</option>
+                            <option value="5001">500小时已保养</option>
+                            <option value="5002">500小时未保养</option>
+                            <option value="10001">1000小时已保养</option>
+                            <option value="10002">1000小时未保养</option>
+                            <option value="15001">1500小时已保养</option>
+                            <option value="15002">1500小时未保养</option>
+                            <option value="20001">2000小时已保养</option>
+                            <option value="20002">2000小时未保养</option>
+                        </select>
+
+                    </td>
+                </tr>
+
+            </table>
+        </form>
+    </div>
+
+
+    <table id="KeepTable" data-options="rownumbers:true,singleSelect:true,toolbar:toolbar" class="easyui-datagrid" style="height:auto"></table>
+</div>
+<div id="dd"></div>
+<div id="keepSet" style="display:none">
+
+    <table border="1">
+
+        <tr>
+
+            <td>机型</td>
+            <td>维保说明</td>
+            <td>定期保养时间</td>
+            <td>操作</td>
+
+        </tr>
+        <tr>
+
+            <td>FR18-7</td>
+            <td></td>
+            <td>1000</td>
+            <td><a href="#">修改</a>　｜　<a href="#">删除</a></td>
+
+        </tr>
+        <tr>
+
+            <td>FR18-7</td>
+            <td></td>
+            <td>50</td>
+            <td><a href="#">修改</a>　｜　<a href="#">删除</a></td>
+
+        </tr>
+        <tr>
+
+            <td>FR18-7</td>
+            <td></td>
+            <td>500</td>
+            <td><a href="#">修改</a>　｜　<a href="#">删除</a></td>
+
+        </tr>
+        <tr>
+
+            <td>FR18-7</td>
+            <td></td>
+            <td>250</td>
+            <td><a href="#">修改</a>　｜　<a href="#">删除</a></td>
+
+        </tr>
+
+
+    </table>
+
+
+
+
+</div>
+
+
+<script type="text/javascript">
+
+
+
+
+    var toolbar = [{
+        text: '维保设定',
+        iconCls: 'icon-cut',
+        handler: function () { OpenKeepSet() }
+    },
+    {
+        text: '导出Excel表',
+        iconCls: 'icon-save',
+        handler: function () { alert('cut') }
+    }];
+
+
+
+    function OpenKeepSet() {
+        $('#keepSet').dialog({
+            title: '设置保养参数',
+            width: 300,
+            height: 250,
+            closed: true,
+            cache: false,
+            modal: true,
+        });
+
+        $('#keepSet').css('display', 'block')
+        $('#keepSet').dialog('open')
+
+    }
+
+
+    $(function () {
+        var dg = $('#KeepTable').datagrid({
+            data: [
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' },
+                { f1: '3F70001AZ-G', f2: 'FR60', f3: '张岩', f4: '廊坊市', f5: 'value14', f6: 'value14' }
+            ],
+            columns: [[
+                //{ field: 'ck', checkbox: true },
+                { field: 'f1', title: '车辆编号', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: '机型', width: 60, align: 'center' },
+                { field: 'f3', title: '经销商', width: 80, align: 'center' },
+                { field: 'f4', title: '用户', width: 40, align: 'center' },
+                { field: 'f5', title: '当前工作小时', width: 100, align: 'center' },
+                { field: 'f6', title: '保养时段', width: 80, align: 'center' }
+            ]],
+           // view: detailview,
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+            },
+            onExpandRow: function (index, row) {
+                $('#ddv-' + index).empty();
+                var nav = "";
+               
+                $('#KeepTable').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true
+        });
+        dg.datagrid('enableFilter', []);
+    });
+
+
+
+
+</script>

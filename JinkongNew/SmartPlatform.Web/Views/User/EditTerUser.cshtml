@@ -1,0 +1,144 @@
+﻿@model GModel.Basic.UserInfo
+<div style="padding:10px 70px 20px 20px">
+    @using (Ajax.BeginForm("EditTerUserForm", "User", FormMethod.Post, new AjaxOptions(), new { @class = "" }))
+    {
+        @Html.HiddenFor(m => m.UserId, new { @class = "" })
+        <table class="tableForm1" id="endUser">
+            <tr>
+                <td class="field"><i>*</i>登录名:</td>
+                <td>
+                    @Html.TextBoxFor(m => m.UserLname, new { @class = "easyui-textbox", @style = "width:180px;", @readonly = "true" })
+                    <input id="oldname" name="oldname" type="hidden" value="@Model.UserLname" />
+                </td>
+                <td class="field"><i>*</i>用户名称:</td>
+                <td>
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "easyui-textbox", @style = "width:180px;" })
+                </td>
+            </tr>
+            <tr>
+                <td><i>*</i>设备所属企业:</td>
+                <td id="TDDEPT">
+                    <input id="DeptId" class="easyui-combotree" type="text" style="height: 25px; width: 180px; float: left;" panelheight="150" />
+                </td>
+
+                <td><i>*</i>终端编号:</td>
+                <td>
+                    <input id="DdlTerBind" class="easyui-combotree" type="text" style="height: 25px; width: 180px; float: left;" panelheight="150" />
+
+                    <input id="userters" name="userters" type="hidden"/>
+                </td>
+
+            </tr>
+        </table>
+        <div class="formfooter" style="margin-left:-20px;">
+            <button class="stdbtn btn_blue" type="submit" onclick="return validate()">确定</button>
+            <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+        </div>
+        <div>
+            @Html.ValidationSummary(true, "")
+        </div>
+    }
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<style type="text/css">
+    i {
+        color: red;
+    }
+</style>
+<script type="text/javascript">
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    }
+
+    function validate() {
+        var msg = [];
+        var userlname = $("#UserLname").val();
+        if (userlname == "") {
+            msg.push("登录名不能为空！");
+        }
+        var username = $("#UserName").val();
+        if (username == "") {
+            msg.push("用户名称不能为空！");
+        }
+        var enterid = $('#DeptId').combotree('getValue');
+        if (enterid == "" || enterid == null) {
+            msg.push("所属企业不能为空！");
+        }
+        var terno = $('#DdlTerBind').combotree('getText');
+        if (terno == "" || terno == null) {
+            msg.push("终端编号不能为空！");
+        }
+        else {
+            $('#userters').val(terno);
+        }
+        if (msg.length > 0) {
+            window.parent.$.messager.alert("提示", msg.join("\r\n"), "info");
+            return false;
+        }
+    }
+
+    $(function () {
+        $("input, textarea, select").uniform();
+
+        $("#DeptId").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            animate: true,
+            onSelect: function (node) {
+                BindTer(node.id);
+            },
+            onLoadSuccess: function () {
+                $('#DeptId').combotree('setValue', '@ViewBag.EnterId');
+                BindTer('@ViewBag.EnterId');
+            }
+        });
+
+        BindSearchEvent($("#TDDEPT .textbox-text"), $('#DeptId'));
+    });
+
+    function BindTer(DeptId) {
+        //绑定终端
+        $('#DdlTerBind').combotree({
+            url: '/Terminal/GetDeptTerList?DeptId=' + DeptId,
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) > -1;
+            },
+            editable: true,
+            onSelect: function () { },
+            multiple: true,
+            value: '@Model.UserFunct'
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#DdlTerBind'));
+    }
+
+    function editFormSucceed() {
+        var ifr = window.parent.document.getElementById('/User/TerUserList');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#StaffTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "修改成功！",
+            timeout: 2000,
+        });
+    };
+    function editFormError(info) {
+        var errormsg = "";
+        if (info != "" && info != null) {
+            errormsg = info + ",修改失败！";
+        }
+        else {
+            errormsg = "修改失败！";
+        }
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: errormsg,
+            timeout: 2000,
+        });
+    };
+</script>
+
+

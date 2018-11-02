@@ -1,0 +1,298 @@
+﻿@using System.Collections.Generic;
+@model System.Data.DataSet
+
+@using (Html.BeginForm("EditCarInfoForm", "CarInfo", FormMethod.Post))
+{
+    <div id="EditDiv" class="stdform" style="padding:20px 70px 10px 60px; height:330px; overflow:auto">
+        <input type="hidden" value="" name="TypeName" id="TypeName" />
+        <input type="hidden" value="@Model.Tables[0].Rows[0]["CAR_NO"].ToString()" name="Hid_OldCarno" id="Hid_OldCarno" />
+        <input type="hidden" value="@ViewBag.Terno" name="Hid_TerNo" id="Hid_TerNo" />
+        <input type="hidden" value="@ViewBag.flag" name="flag" id="flag" />
+        <input type="hidden" value="@Model.Tables[0].Rows[0]["CAR_ID"].ToString()" name="CarId">
+        <p>
+            <label><i>*</i>车牌号</label>
+            <div class="field">
+                <input name="CarNo" id="CarNo" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["CAR_NO"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车主姓名</label>
+            <div class="field">
+                <input name="CarAdminName" id="CarAdminName" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["CAR_ADMINNAME"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>身份证号</label>
+            <div class="field">
+                <input name="CarAdminCardid" id="CarAdminCardid" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["CAR_ADMINCARDID"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车辆颜色</label>
+            <div class="field">
+                <input name="CarColor" id="CarColor" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["CAR_COLOR"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>车辆类型</label>
+            <div class="field">
+                <input name="TypeId" id="CarTypeEdit" class="textbox" panelheight="150" type="text" style="height:30px; " />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>所属企业</label>
+            <div class="field">
+                <input name="Businessdivisionid" id="CarDeptEdit" class="textbox" type="text" style="height:30px;" panelheight="150" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车主地址</label>
+            <div class="field">
+                <input name="OwerAddress" id="OwerAddress" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["OWERADDRESS"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车主电话</label>
+            <div class="field">
+                <input name="OwerPhone" id="OwerPhone" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["OWERPHONE"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装人</label>
+            <div class="field">
+                <input name="InstallName" id="InstallName" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["INSTALLNAME"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装位置</label>
+            <div class="field">
+                <input name="InstallAddress" id="InstallAddress" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["INSTALLADDRESS"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装人联系电话</label>
+            <div class="field">
+                <input name="InstallPhone" id="InstallPhone" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["INSTALLPHONE"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装地点</label>
+            <div class="field">
+                <input name="InstallPlace" id="InstallPlace" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["INSTALLPLACE"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装时间</label>
+            <div class="field">
+                <input name="InstallTime" id="InstallTime" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["INSTALLTIME"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>录入人</label>
+            <div class="field">
+                <input name="EntryName" id="EntryName" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["ENTRYNAME"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>录入人电话</label>
+            <div class="field">
+                <input name="EntryPhone" id="EntryPhone" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["ENTRYPHONE"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>合同号</label>
+            <div class="field">
+                <input name="ContractNum" id="ContractNum" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["CONTRACTNUM"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>保险单号</label>
+            <div class="field">
+                <input name="SafeOrder" id="SafeOrder" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["SAFEORDER"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>融资金额</label>
+            <div class="field">
+                <input name="LoanMoney" id="LoanMoney" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["LOANMONEY"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>贷款年限</label>
+            <div class="field">
+                <input name="LoanYear" id="LoanYear" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["LOANYEAR"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车辆型号</label>
+            <div class="field">
+                <input name="CarModel" id="CarModel" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["CARMODEL"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>发动机号</label>
+            <div class="field">
+                <input name="EngineNumber" id="EngineNumber" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["ENGINENUMBER"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车架号</label>
+            <div class="field">
+                <input name="CarFrame" id="CarFrame" class="textbox" type="text" value="@Model.Tables[0].Rows[0]["CAR_FRAME"].ToString()" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>备注</label>
+            <div class="field">
+                <textarea name="Description" id="Description" class="textbox" style="height: 55px; width: 260px">
+                    @Model.Tables[0].Rows[0]["DESCRIPTION"].ToString()
+                </textarea>
+                <b>
+                </b>
+            </div>
+        </p>
+        </div>
+        <div class="formfooter">
+            <button class="stdbtn btn_blue" onclick="return validate();" type="submit">确定</button>
+            <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+        </div>
+}
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script type="text/javascript">
+    function validate() {
+        var msg = [];
+        var carno = $('#CarNo').val();
+        if (carno == "") {
+            msg.push("车牌号不能为空！");
+        }
+        //var caradminname = $('#CarAdminName').val();
+        //if (caradminname == "") {
+        //    msg.push("车主姓名不能为空！");
+        //}
+        //var caradmincardid = $('#CarAdminCardid').val();
+        //if (caradmincardid == "") {
+        //    msg.push("身份证号不能为空！");
+        //}
+        //else {
+        //    var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+        //    if (reg.test(caradmincardid) == false)
+        //    {
+        //        msg.push("身份证号不合法！");
+        //    }
+        //}
+        var cartype = $('#CarTypeEdit').combobox('getText');
+        if (cartype == "") {
+            msg.push("车辆类型不能为空！");
+        }
+        $("#TypeName").val(cartype);
+
+        var deptId = $('#CarDeptEdit').combotree('getValue');
+        if (deptId == "" || deptId == null) {
+            msg.push("所属企业不能为空！");
+        }
+        if (msg.length > 0) {
+            window.parent.$.messager.alert('提示', msg.join("\r\n"), 'info');
+            return false;
+        }
+    }
+
+
+    function clearForm() {
+        var flag = $('#flag').val();
+        if (flag == 1)
+        {
+            window.parent.$("div.panel:last").find('.panel-tool-close').click();
+        }
+        else
+        {
+            window.parent.$(".dialog").dialog('close');
+        }
+    }
+
+    $(function () {
+        $("input, textarea, select").uniform();
+        $('#CarTypeEdit').combobox({
+            url: '@Url.Action("GetCarTypeList", "CarType")?DeptId=@ViewBag.Deptid',
+            valueField: 'TypeId',
+            textField: 'TypeName',
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) > -1;
+            },
+            onSelect: function (rec) {
+                $("#TypeName").val(rec.TypeName);
+            },
+            onLoadSuccess: function () {
+                $('#CarTypeEdit').combobox('setValue', '@ViewBag.Typeid');
+            }
+        });
+
+        $("#CarDeptEdit").combotree({
+            url: '/Dept/GetOrgNode?DeptId=@ViewBag.Deptid',
+            editable: true,
+            onLoadSuccess: function () {
+                $('#CarDeptEdit').combotree('setValue', '@ViewBag.Deptid');
+            }
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#CarDeptEdit'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#CarDeptEdit').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#CarDeptEdit').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+    })
+</script>

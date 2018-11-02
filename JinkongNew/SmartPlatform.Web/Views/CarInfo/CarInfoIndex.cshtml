@@ -1,0 +1,422 @@
+﻿@model  System.Collections.ArrayList
+<div class="tabcontant">
+    <table>
+        <tr>
+            <td>
+                <table id="CarOrgTable" style="width:14300px;">
+                    <thead>
+                        <tr>
+                            <th data-options="field:'CAR_ID',width:100, hidden: true ">车辆ID</th>
+                            <th data-options="field:'CAR_NO',width:70,align:'center'">车牌号</th>
+                            <th data-options="field:'TYPE_NAME',width:70,align:'center'">车辆类型</th>
+                            <th data-options="field:'CAR_COLOR',width:70,align:'center'">车辆颜色</th>
+                            <th data-options="field:'TER_NO',width:70,align:'center'">终端编号</th>
+                            <th data-options="field:'BUSINESSDIVISIONNAME',width:120,align:'center'">所属企业</th>
+                            <th data-options="field:'CAR_ADMINNAME',width:120,align:'center'">车主姓名</th>
+                            <th data-options="field:'CAR_ADMINCARDID',width:180,align:'center'">身份证号</th>
+                            <th data-options="field:'OWERADDRESS',width:180,align:'center'">车主地址</th>
+                            <th data-options="field:'OWERPHONE',width:180,align:'center'">车主电话</th>
+                            <th data-options="field:'INSTALLNAME',width:180,align:'center'">安装人</th>
+                            <th data-options="field:'INSTALLADDRESS',width:180,align:'center'">安装位置</th>
+                            <th data-options="field:'INSTALLPHONE',width:180,align:'center'">安装人联系电话</th>
+                            <th data-options="field:'INSTALLPLACE',width:180,align:'center'">安装地点</th>
+                            <th data-options="field:'INSTALLTIME',width:180,align:'center'">安装时间</th>
+                            <th data-options="field:'ENTRYNAME',width:180,align:'center'">录入人</th>
+                            <th data-options="field:'ENTRYPHONE',width:180,align:'center'">录入人电话</th>
+                            <th data-options="field:'CONTRACTNUM',width:180,align:'center'">合同号</th>
+                            <th data-options="field:'SAFEORDER',width:180,align:'center'">保险单号</th>
+                            <th data-options="field:'LOANMONEY',width:180,align:'center'">融资金额</th>
+                            <th data-options="field:'LOANYEAR',width:180,align:'center'">贷款年限</th>
+                            <th data-options="field:'CARMODEL',width:180,align:'center'">车辆型号</th>
+                            <th data-options="field:'ENGINENUMBER',width:180,align:'center'">发动机号</th>
+                            <th data-options="field:'CAR_FRAME',width:180,align:'center'">车架号</th>
+                            <th data-options="field:'DESCRIPTION',width:180,align:'center'">备注</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div id="tb" style="padding:5px;height:auto">
+                    <div style="margin-bottom:5px">
+                        @if (ViewBag.AddCar == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="AddCar()" iconcls="icon-add" plain="true">添加</a>
+                        }
+                        
+                        @if (ViewBag.EditCar == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="EditCar()" iconcls="icon-edit" plain="true">修改</a>
+                        }
+                        
+                        @if (ViewBag.XSZ == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="EditCar()" iconcls="icon-add" plain="true">添加行驶证信息</a>
+                        }
+
+                        @if (ViewBag.DelCar == "true")
+                        {
+                            <a href="#" class="easyui-linkbutton" onclick="DelCar()" iconcls="icon-remove" plain="true">删除</a>
+                        }
+                        <a href="#" class="easyui-linkbutton" id="ImpCarInfo" iconcls="icon-add" plain="true">批量导入车辆</a>
+                        <a href="#" class="easyui-linkbutton" id="DownLoadCar" iconcls="icon-add" plain="true">下载模板</a>
+                        <a href="#" class="easyui-linkbutton" id="ExportCarInfo" iconcls="icon-add" plain="true">导出</a>
+                    </div>
+                    <div>
+                        对象类型:<input id="ObjTypeSel" name="ObjTypeSel" type="text" class="easyui-combobox" style="width:100px; height:25px;" panelheight="110" />
+                          关键字:<input id="KeyTextSel" class="easyui-textbox" style="width:100px; height:25px;" />&nbsp;&nbsp;
+                        车辆类型:<input id="CarTypeSel" type="text" class="easyui-combobox" style="width:160px; height:25px;" />&nbsp;&nbsp;
+                        <div style="margin-top:5px;"></div>
+                        所属企业:<input id="TerDeptSel" class="easyui-combobox" style="width:200px; height:25px;" />&nbsp;&nbsp;
+                        <input type="checkbox" id="DeptSel" name="check2"/> <label for="DeptSel">查询子企业 </label>&nbsp;&nbsp;
+                        <a href="#" onclick="GetCarInfoByParamBtn()" class="easyui-linkbutton" iconcls="icon-search">查找</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                        <span id="CarCount" style="margin-bottom:5px; margin-right:10px;">0</span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="~/assets/javascripts/jquery.easyuitree.js"></script>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    var QrgTable;
+    var UserDeptId = '@ViewBag.DeptId';
+
+    $(function () {
+        $("input, textarea, select").uniform();
+        ////////组织机构的操作///////
+        //$('#CarOrgBar').panel({
+        //    title: "组织机构",
+        //    width: 250,
+        //    height: $(document.body).height() - 20,
+        //    tools: DeptManager
+        //});
+        $('#CarOrgTable').height($(document.body).height() - 20);
+        $('#CarOrgTable').width($(document.body).width() - 30); // - $('#CarOrgBar').width()
+
+        LoadTypeSel();
+
+        LoadCarInfoalList("");
+
+        //车辆类型下拉框
+        $('#CarTypeSel').combobox({
+            url: '/CarType/GetCarTypeList?TypeMode=true',
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) == 0;
+            },
+            valueField: 'TypeId',
+            textField: 'TypeName'
+        });
+
+        //所属企业
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false"}
+        });
+        
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#TerDeptSel').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#TerDeptSel').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+
+        $("#DownLoadCar").click(function (e) {
+            window.location.href = "../../Files/CarImpMould.xls";
+        })
+
+        //*******************************
+        //模糊查询企业列表
+        //*******************************
+        //$('#CarOrgName').searchbox({
+        //    width: 210,
+        //    searcher: function (value, name) {
+        //        $("#CarInfoEnterTree").tree("search", value);
+        //    },
+        //    prompt: '请输入......'
+        //});
+
+        $("#ImpCarInfo").click(function () {
+            window.parent.$.DialogOpen('/CarInfo/ImpCarInfo', { title: "导入车辆", width: 450, height: 400 })
+        });
+        $("#ExportCarInfo").click(function () {
+            var DeptID = $("#TerDeptSel").combotree("getValue");
+            if (DeptID == "" || DeptID==null)
+            {
+                DeptID = UserDeptId;
+            }
+        
+            var Children = "";
+            if ($("#DeptSel").attr("checked") == "checked") {
+                Children = "true";
+            }
+            var CarNoSel = $("#CarNoSel").val();
+            var TypeId = $("#CarTypeSel").combobox('getValue');
+            var Businessdivisionid = DeptID;
+            window.parent.$.DialogOpen('/CarInfo/ExportCarInfo?CarNo='
+            + CarNoSel + '&DeptId=' + DeptID + '&TypeId=' + TypeId + '&ChildrenSel='
+            + Children + '&Businessdivisionid=' + DeptID,
+            { title: "导出车辆信息", width: 300, height: 550 });
+        });
+        //得到汽车数量
+        GetCarCount();
+    });
+
+    //得到汽车数量
+    function GetCarCount()
+    {
+        var DeptID = $('#TerDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#DeptSel").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var CarNo = "";
+        var TerNo = "";
+        var AdminName = ""
+        var objtype = $('#ObjTypeSel').combobox('getValue');
+        if (objtype == "1") {
+            CarNo = $("#KeyTextSel").val();
+        }
+        else if (objtype == "2") {
+            TerNo = $("#KeyTextSel").val();
+        }
+        else if (objtype == "3") {
+            AdminName = $("#KeyTextSel").val();
+        }
+
+        var param = { CarNo: CarNo, TerNo: TerNo, CarAdminName: AdminName, TypeId: $("#CarTypeSel").combobox('getValue'), Businessdivisionid: DeptID, ChildrenSel: Children };
+        $.post("/CarInfo/GetCarCount", param, function (e) {
+            $("#CarCount").text("车辆数量：" + e);
+        })
+    }
+
+    //加载搜索类型
+    function LoadTypeSel()
+    {
+        var data = [
+         { "id": "1", "text": "车牌号" },
+         { "id": "2", "text": "终端编号" },
+         { "id": "3", "text": "车主姓名" },
+        ];
+
+        $('#ObjTypeSel')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#ObjTypeSel').combobox('setValue', 1);
+                }
+            })
+            .combobox("loadData", data);
+    }
+
+    //////////加载部门树//////////
+    //function LoadDepartmentTree() {
+    //    $('#CarInfoEnterTree').tree({
+    //        url: "/Dept/GetOrgNode",
+    //        animate: true,
+    //        lines: true,
+    //        onContextMenu: function (e, node) {
+    //            e.preventDefault();
+    //            // 选中节点
+    //            $('#CarInfoEnterTree').tree('select', node.target);
+    //            // 实例右键菜单
+    //            $('#CarOrgRightMenu').menu('show', {
+    //                left: e.pageX,
+    //                top: e.pageY
+    //            });
+    //        },
+    //        onLoadSuccess: function (node, data) {
+    //            $("#CarInfoEnterTree li:eq(0)").find("div:eq(0)").addClass("tree-node-selected");   //设置第一个节点高亮
+    //            var n = $("#CarInfoEnterTree").tree("getSelected");
+    //            if (n) {
+    //                LoadCarInfoalList(n.id);
+    //            }
+    //        },
+    //        onClick: function (node) {
+    //            GetCarInfoByParam(node.id);
+    //        }
+    //    });
+    //};
+
+    function GetCarInfoByParam(DeptID) {
+        var param = { Businessdivisionid: DeptID };
+        var a=$("#CarOrgTable").datagrid("load", param);
+        GetCarCount();
+    }
+
+    function GetCarInfoByParamBtn() {
+        var DeptID = $('#TerDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#DeptSel").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var CarNo="";
+        var TerNo = "";
+        var AdminName=""
+        var objtype = $('#ObjTypeSel').combobox('getValue');
+        if (objtype == "1") {
+            CarNo=$("#KeyTextSel").val();
+        }
+        else if (objtype == "2") {
+            TerNo=$("#KeyTextSel").val();
+        }
+        else if (objtype == "3") {
+            AdminName=$("#KeyTextSel").val();
+        }
+
+        var param = { CarNo: CarNo, TerNo: TerNo, CarAdminName: AdminName, TypeId: $("#CarTypeSel").combobox('getValue'), Businessdivisionid: DeptID, ChildrenSel: Children };
+        $("#CarOrgTable").datagrid("load", param);
+
+        GetCarCount();
+    }
+
+    function AddCar() {
+        window.parent.$.DialogOpen('/CarInfo/AddCar?Businessdivisionid=' + UserDeptId, { title: "添加车辆", width: 500, height: 450 });
+    }
+
+    function EditCar() {
+        var row = $('#CarOrgTable').datagrid('getSelected');
+        if (row) {
+            window.parent.$.DialogOpen('/CarInfo/EditCarInfo?CarId=' + row.CAR_ID+'&TerNo='+row.TER_NO, { title: "编辑车辆信息", width: 500, height: 450 });
+        } else {
+            window.parent.$.messager.show({
+                title: '提示',
+                msg: "请选择要编辑的车辆！",
+                timeout: 2000
+            });
+        }
+    }
+
+    function DelCar() {
+        row = $('#CarOrgTable').datagrid('getSelected');
+        if (row) {
+            if (row.RAWDATAID != null && row.RAWDATAID != "") {
+                if (row.TER_TYPEID == 0 || row.TER_TYPEID == 1) {   //无线设备
+                    window.parent.$.messager.defaults = { ok: "全部解绑", cancel: "单台解绑" };
+                    window.parent.$.messager.confirm('确定', '该设备为无线联动设备，请确认解绑方式？', function (t) {
+                        if (t) {
+                            var param = { carId: row.CAR_ID, terGuid: row.TER_GUID, DelStyle:"1" };
+                            DelLdCar(param);
+                        }
+                        else {
+                            var param = { carId: row.CAR_ID, terGuid: row.TER_GUID, DelStyle: "2" };
+                            DelLdCar(param);
+                        }
+                    });
+                }
+                else {     //有线设备就全部解绑
+                    window.parent.$.messager.defaults = { ok: "确定", cancel: "取消" };
+                    window.parent.$.messager.confirm('确定', '该设备为有线联动设备，是否全部解绑？', function (t) {
+                        if (t) {
+                            var param = { carId: row.CAR_ID, terGuid: row.TER_GUID, DelStyle: "1" };
+                            DelLdCar(param);
+                        }
+                    });
+                }
+            }
+            else {
+                window.parent.$.messager.defaults = { ok: "确定", cancel: "取消" };
+                window.parent.$.messager.confirm('确定', '该车已绑定终端，是否解除绑定？', function (t) {
+                    if (t) {
+                        var param = { carId: row.CAR_ID, terGuid: row.TER_GUID };
+                        RealDelCar(param);
+                    }
+                });
+            }
+        } else {
+            window.parent.$.messager.show({
+                title: '提示',
+                msg: "请选择要删除的车辆！",
+                timeout: 2000,
+            });
+        }
+    }
+
+    //普通解绑
+    function RealDelCar(param) {
+        $.post("/CarInfo/DelCarInfo", param, function (e) {
+            if (e == "true") {
+                window.parent.$.messager.show({
+                    title: '提示',
+                    msg: "删除成功！",
+                    timeout: 2000
+                });
+                QrgTable.datagrid('reload');
+                GetCarCount();
+            }
+            else {
+                window.parent.$.messager.show({
+                    title: '提示',
+                    msg: "删除失败！",
+                    timeout: 2000
+                });
+            }
+        });
+    }
+
+    //联动解绑
+    function DelLdCar(param)
+    {
+        $.post("/CarInfo/DelWxLdTer", param, function (e) {
+            if (e == "true") {
+                window.parent.$.messager.show({
+                    title: '提示',
+                    msg: "删除成功！",
+                    timeout: 2000
+                });
+                QrgTable.datagrid('reload');
+                GetCarCount();
+            }
+        });
+    }
+
+    function LoadCarInfoalList(Nid) {
+        QrgTable = $('#CarOrgTable').datagrid({
+            url: encodeURI("/CarInfo/GetCarList"),
+            //columns: [[
+            //    { field: 'CAR_ID', title: '车辆ID', width:100, hidden: true },
+            //    { field: 'CAR_NO', title: '车牌号', width: 70, align: 'center' },
+            //    { field: 'TYPE_NAME', title: '车辆类型', width: 70, align: 'center' },
+            //    { field: 'CAR_COLOR', title: '车辆颜色', width: 70, align: 'center' },
+            //    { field: 'TER_NO', title: '终端编号', width: 70, align: 'center' },
+            //    { field: 'BUSINESSDIVISIONNAME', title: '所属企业', width: 120, align: 'center' },
+            //    { field: 'CAR_ADMINNAME', title: '车主姓名', width: 120, align: 'center' },
+            //    { field: 'CAR_ADMINCARDID', title: '身份证号', width: 180, align: 'center' },
+            //    { field: 'OWERADDRESS', title: '车主地址', width: 180, align: 'center' }
+            //]],
+            striped: true,
+            singleSelect: true,
+            //fitColumns: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: 'EMPLOYEEID',
+            //sortOrder: 'asc',//desc,asc
+            pageList: [15, 30, 45],
+            onSelect: function (rowIndex, rowData) {
+            },
+            onLoadSuccess:function(data)
+            {
+                if (data.total == 0)
+                {
+                    var dv2 = $(".datagrid-view2");
+                    dv2.children(".datagrid-body").html("<div style='width:3760px;border:solid 0px;height:1px;'></div>");
+                }
+            },
+            //width:"100%",
+            toolbar: "#tb"
+        });
+    };
+</script>

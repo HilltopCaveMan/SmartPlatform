@@ -1,0 +1,281 @@
+﻿<div class="tabcontant">
+    <div id="audit_polluteManager_list_searchPanel"
+         style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+         class="easyui-panel" iconcls="icon-search" title="机型搜索"
+         collapsible="true" minimizable="false" maximizable="false"
+         closable="false">
+        <form id="audit_polluteManager_list_searchForm" method="post">
+            <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        车机类别：
+                    </td>
+                    <td>
+                        <select name="operatestatus" class="easyui-combobox" style="width:150px;height:20px;"
+                                id="audit_polluteManager_list_searchInput_operatestatus">
+                            <option value="">--请选择--</option>
+                            <option value="01">挖掘机</option>
+                            <option value="02">装载机</option>
+                            <option value="03">公务车</option>
+                            <option value="04">收割机</option>
+                            <option value="05">农机系类</option>
+                        </select>
+                    </td>
+                    <td style="padding-left: 15px;">
+                        机型：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        车机编号：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                   
+                    <td style="padding-left:30px;" rowspan="2" align="center">
+                        <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                        <a class="easyui-linkbutton" icon="icon-search"
+                           href="javascript:audit_polluteManager_list_searchForm_submit();">查询</a> &nbsp;&nbsp;
+                    </td>
+                </tr>
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        市场部：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    
+                    <td style="padding-left: 15px;">
+                        经销商：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        最终用户：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+
+                </tr>
+
+            </table>
+        </form>
+    </div>
+
+
+    <table id="TankSetTable" data-options="rownumbers:true,singleSelect:true,toolbar:toolbar" class="easyui-datagrid" style="height:auto"></table>
+</div>
+<div id="dg"></div>
+
+@*总机型设置*@
+<div id="TankSetPage" style="display:none">
+    <table>
+        <tr margin-left ="40">
+            <td colspan="2" align="center">
+               设置机型油箱容积
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr >
+            <td>类型：</td>
+            <td>
+             <select name="operatestatus" class="easyui-combobox" style="width:150px;height:20px;"
+                    id="audit_polluteManager_list_searchInput_operatestatus">
+                <option value="">--请选择--</option>
+                <option value="01">挖掘机</option>
+                <option value="02">装载机</option>
+                <option value="03">公务车</option>
+                <option value="04">收割机</option>
+                <option value="05">农机系类</option>
+              </select>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>机型：</td>
+            <td>
+               <select name="operatestatus" class="easyui-combobox" style="width:150px;height:20px;"
+                        id="audit_polluteManager_list_searchInput_operatestatus">
+                    <option value="">--请选择--</option>
+                    <option value="01">FR1234</option>
+                    <option value="02">FR5678</option>
+                    <option value="03">KW1245</option>
+                    <option value="04">CT9876</option>
+                    <option value="05">CR3289</option>
+                    <option value="06">ER3245</option>
+                    <option value="07">RM3214</option>
+                    <option value="08">CM1234</option>
+                    <option value="09">CC4567</option>
+                    <option value="10">RP098</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>油箱容积（L）：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="0" /></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                <a class="easyui-linkbutton" icon="icon-cut"
+                   href="#">确认修改</a> &nbsp;&nbsp;
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+@*//单条修改*@
+<div id="TankEditPage" style="display:none">
+    <table>
+        <tr margin-left="40">
+            <td colspan="2" align="center">
+                设置机型油箱容积
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>类型：</td>
+            <td>
+                挖掘机
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>机型：</td>
+            <td>
+                FR2218
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>油箱容积（L）：</td>
+            <td><input name="polluteaccidentnameString" class="easyui-textbox" type="text" style="width:150px;height:20px;" value="0" /></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                <a class="easyui-linkbutton" icon="icon-cut"
+                   href="#">确认修改</a> &nbsp;&nbsp;
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script type="text/javascript">
+    //表头工具栏
+    var toolbar = [{
+        text: '机型油箱容积设置',
+        iconCls: 'icon-cut',
+        handler: function () { OpenSet() }
+    }];
+    //机型容积设置方法
+    function OpenSet() {
+        $('#TankSetPage').dialog({
+            title: '请输入油箱容积参数',
+            width: 300,
+            height: 300,
+            closed: true,
+            cache: false,
+            modal: true
+        });
+        $('#TankSetPage').dialog('open')
+        $('#TankSetPage').css('display','block')
+
+    }
+    //修改单条信息
+    function OpenTankEdit() {
+        $('#TankEditPage').dialog({
+            title: '请输入该机型油箱容积参数',
+            width: 300,
+            height: 300,
+            closed: true,
+            cache: false,
+            modal: true
+        });
+        $('#TankEditPage').dialog('open')
+        $('#TankEditPage').css('display', 'block')
+
+    }
+
+    $(function () {
+       var dg= $('#TankSetTable').datagrid({
+            data: [
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' },
+                { f1: 'FR2218', f2: '挖掘机', f3: '华北大区', f4: '廊坊市机械有限公司', f5: '北京市场部', f6: '吉林机械科技有限公司', f9: '<a href="#" onclick="OpenTankEdit()">修改</a>' }
+                
+            ],
+            columns: [[
+                //{ field: 'ck', checkbox: true },
+                { field: 'f1', title: '车机机型', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: '车机类别', width: 60, align: 'center' },
+                { field: 'f3', title: '大区', width: 80, align: 'center' },
+                { field: 'f4', title: '经销商', width: 40, align: 'center' },
+                { field: 'f5', title: '市场部', width: 100, align: 'center' },
+                { field: 'f6', title: '经销商', width: 80, align: 'center' },
+                { field: 'f9', title: '操做', width: 80, align: 'center' }
+            ]],
+            //view: detailview,
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true
+  
+        });
+       dg.datagrid('enableFilter', []);
+    });
+
+
+
+</script>

@@ -1,0 +1,105 @@
+﻿@model GModel.RoleRight.RoleInfo
+@using (Ajax.BeginForm("AddRoleForm", "RoleInfo", null, new AjaxOptions()))
+{
+    <div class="stdform" style="padding:20px 70px 10px 60px">
+        <p>
+            <label><i>*</i>所属企业：</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.DeptId, new { @class = "textbox", panelheight = "150", @style = "height:30px;" })
+                <b>
+                    @Html.ValidationMessageFor(model => model.RoleName)
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>角色名</label>
+            <div class="field">
+               @Html.TextBoxFor(m => m.RoleName, new { @class = "textbox"})
+                <b>
+                    @Html.ValidationMessageFor(model => model.RoleName)
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>角色描述</label>
+            <div class="field">
+                @Html.TextBoxFor(m => m.RoleRemark, new { @class = "textbox"})
+                <b>
+
+                </b>
+            </div>
+        </p>
+    </div>
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" type="submit" onclick="return validate()">确定</button>
+        <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+    </div>
+    <div>
+        @*@Html.ValidationSummary(true, "")*@
+    </div>
+}
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("input, textarea, select").uniform();
+        $("#DeptId").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#DeptId'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#DeptId').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#DeptId').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+
+    });
+
+    function validate()
+    {
+        var deptid = $("#DeptId").combotree('getValue');
+        if (deptid == "" || deptid == null)
+        {
+            alert("所属企业不能为空！");
+            return false;
+        }
+        var rolename = $("#RoleName").val();
+        if(rolename=="")
+        {
+            alert("角色名称不能为空！");
+            return false;
+        }
+    }
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close')
+    };
+
+    function submitFormSucceed() {
+        var ifr = window.parent.document.getElementById('/RoleInfo/RoleIndex');
+        var win = ifr.window || ifr.contentWindow;
+        win.$('#RoleInfoTable').datagrid('reload');
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "添加成功！",
+            timeout: 2000,
+        });
+    };
+    function submitFormError() {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "添加失败！",
+            timeout: 2000,
+        });
+    };
+</script>

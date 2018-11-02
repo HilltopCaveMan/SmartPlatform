@@ -1,0 +1,36 @@
+﻿@*<div style="width: 100%; text-align: center; overflow-y: auto;">*@
+    <table id="ActData" style="height:100%"></table>
+@*</div>*@
+    <script type="text/javascript">
+        $(function () {
+            $('#ActData').datagrid({
+                url: '@Url.Action("GetActData", "Terminal")',
+                columns: [[
+                    { field: 'ProState', title: '激活前状态', width: 200, align: 'center'},
+                    {
+                        field: 'ActTime', title: '激活时间', width: 220, align: 'center', sortable: true , formatter: function (value, row) {
+                            switch (value) {
+                                case "0001-01-01 00:00:00":
+                                    return "";
+                                default:
+                                    return value;
+                            }
+                        }
+                    }
+                ]],
+                striped: true,
+                rownumbers: true, //是否加行号
+                pagination: false, //是否显式分页
+                pageSize: 20, //页容量，必须和pageList对应起来，否则会报错
+                pageNumber: 1, //默认显示第几页
+                sortName: 'ActTime',
+                sortOrder: 'desc',
+                multiSort: true,
+                remoteSort: false,
+                pageList: [15, 30, 50],
+                queryParams: { TerNo: '@ViewBag.TerNo' },//查询参数
+                pagination: false,
+                singleSelect: true
+            });
+        });
+    </script>

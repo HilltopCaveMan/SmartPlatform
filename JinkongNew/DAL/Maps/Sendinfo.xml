@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="Sendinfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="Sendinfo" type="GModel.InterFace.Sendinfo" />
+</alias>
+<resultMaps>
+	<resultMap id="SendinfoResult" class="Sendinfo">
+		<result property="Id" column="Id" type="double" dbType="Real"/>
+		<result property="DeviceId" column="DeviceId" type="string" dbType="varchar"/>
+		<result property="CarinfoSim" column="CarinfoSim" type="string" dbType="varchar"/>
+		<result property="SendinfoCommand" column="SendinfoCommand" type="string" dbType="varchar"/>
+		<result property="SendinfoPtime" column="SendinfoPtime" type="DateTime" dbType="DateTime"/>
+		<result property="SendinfoStatus" column="SendinfoStatus" type="double" dbType="Real"/>
+		<result property="SendinfoUserid" column="SendinfoUserid" type="string" dbType="varchar"/>
+		<result property="SendinfoDescription" column="SendinfoDescription" type="string" dbType="varchar"/>
+		<result property="ReceiptFlag" column="ReceiptFlag" type="string" dbType="varchar"/>
+		<result property="ReceiptTime" column="ReceiptTime" type="DateTime" dbType="DateTime"/>
+		<result property="ReceiptSuccflag" column="ReceiptSuccflag" type="string" dbType="varchar"/>
+		<result property="Wanguan" column="Wanguan" type="string" dbType="varchar"/>
+		<result property="Sendmethod" column="Sendmethod" type="string" dbType="varchar"/>
+		<result property="Resultstr" column="Resultstr" type="string" dbType="varchar"/>
+		<result property="Formvalue" column="Formvalue" type="string" dbType="varchar"/>
+		<result property="Isonline" column="Isonline" type="double" dbType="Real"/>
+		<result property="Sendtotime" column="Sendtotime" type="DateTime" dbType="DateTime"/>
+		<result property="Sendtocmd" column="Sendtocmd" type="string" dbType="varchar"/>
+		<result property="Setcount" column="Setcount" type="double" dbType="Real"/>
+		<result property="Type" column="Type" type="double" dbType="Real"/>
+		<result property="Comandtype" column="Comandtype" type="string" dbType="varchar"/>
+    <result property="SendGuid" column="SendGuid" type="string" dbType="varchar"/>
+  </resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectSendinfo" parameterClass="string" resultMap="SendinfoResult">
+    SELECT SENDGUID as SendGuid,ID AS Id,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+    FROM SENDINFO WHERE ID=#value#
+  </select>
+	<select id="SelectSendinfoPage" parameterClass="map" resultMap="SendinfoResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT SENDGUID as SendGuid,ID AS Id,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+    FROM SENDINFO
+    <isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectSendinfoCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM SENDINFO  
+	</select>
+	<insert id="InsertSendinfo" parameterClass="Sendinfo">
+    INSERT INTO SENDINFO
+    (ID,DEVICE_ID,CARINFO_SIM,SENDINFO_COMMAND,SENDINFO_PTIME,SENDINFO_STATUS,SENDINFO_USERID,SENDINFO_DESCRIPTION,RECEIPT_FLAG,RECEIPT_TIME,RECEIPT_SUCCFLAG,WANGUAN,SENDMETHOD,RESULTSTR,FORMVALUE,ISONLINE,SENDTOTIME,SENDTOCMD,SETCOUNT,TYPE,COMANDTYPE,SENDGUID)
+    VALUES(sendinfo_seq.nextval,#DeviceId#,#CarinfoSim#,#SendinfoCommand#,#SendinfoPtime:DateTime:1/1/0001 12:00:00 AM#,#SendinfoStatus#,#SendinfoUserid#,#SendinfoDescription#,#ReceiptFlag#,#ReceiptTime:DateTime:1/1/0001 12:00:00 AM#,#ReceiptSuccflag#,#Wanguan#,#Sendmethod#,#Resultstr#,#Formvalue#,#Isonline#,#Sendtotime:DateTime:1/1/0001 12:00:00 AM#,#Sendtocmd#,#Setcount#,#Type#,#Comandtype#,#SendGuid#)
+  </insert>
+	<update id="UpdateSendinfo" parameterClass="Sendinfo">
+    UPDATE SENDINFO
+    SET SENDINFO_STATUS=#SendinfoStatus#,SENDTOTIME=sysdate,SENDTOCMD=#Sendtocmd#
+    WHERE ID = #Id#
+  </update>
+	<delete id="DeleteSendinfo" parameterClass="string">
+		DELETE FROM SENDINFO 
+		WHERE 1=1 and $value$ 
+	</delete>
+
+
+  <update id="UpdateSendinfoStatus" parameterClass="Sendinfo">
+    UPDATE SENDINFO
+    SET RECEIPT_TIME=sysdate,SENDINFO_STATUS=#SendinfoStatus#,RESULTSTR=#Resultstr# 
+    WHERE ID = #Id#
+  </update>
+  <update id="UpdateSendinfoFail" parameterClass="Sendinfo">
+    UPDATE SENDINFO
+    SET SENDINFO_STATUS=#SendinfoStatus#,SENDTOTIME=sysdate,RESULTSTR=#Resultstr#
+    WHERE ID = #Id#
+  </update>
+  
+    <update id="UpdateSendinfoTable" parameterClass="Sendinfo">
+    UPDATE SENDINFO
+    SET SENDINFO_STATUS=#SendinfoStatus#,RESULTSTR=#Resultstr#
+    WHERE ID = #Id#
+  </update>
+
+  <select id="SelectSendInfoTable_Devid" parameterClass="string" resultMap="SendinfoResult">
+    select * from (select op_a.*, rownum rn from (
+    SELECT SENDGUID as SendGuid,ID AS Id,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+    FROM SENDINFO  WHERE SENDINFO_COMMAND LIKE '%'||#SendinfoCommand#||'%' AND DEVICE_ID = #DeviceId# ORDER BY SENDINFO_PTIME DESC
+    ) op_a) op_b Where op_b.rn=1
+  </select>
+  <update id="UpdateSendInfoTable_Devid" parameterClass="Sendinfo">
+    UPDATE SENDINFO
+    SET SENDINFO_STATUS=#SendinfoStatus#,RESULTSTR=#Resultstr# 
+    WHERE ID = #Id#
+  </update>
+
+  <select id="SelectSendinfoPageByDeviceId" parameterClass="string" resultMap="SendinfoResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT SENDGUID as SendGuid,ID AS Id,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+    FROM SENDINFO WHERE  DEVICE_ID=#value#
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+
+
+  <select id="SelectSendinfoPageNewest" parameterClass="string" resultMap="SendinfoResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT SENDGUID as SendGuid,RESULTSTR AS Resultstr,    DEVICE_ID AS DeviceId,    SENDINFO_USERID AS SendinfoUserid,    SENDINFO_STATUS AS SendinfoStatus,
+    SENDINFO_PTIME AS SendinfoPtime,  RECEIPT_TIME AS ReceiptTime,SENDINFO_DESCRIPTION AS SendinfoDescription,SENDMETHOD AS Sendmethod
+    FROM SENDINFO  WHERE SENDINFO_PTIME IN (SELECT MAX(SENDINFO_PTIME) AS SendinfoPtime
+    FROM SENDINFO    WHERE DEVICE_ID IN ('$value$')    GROUP BY DEVICE_ID)
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+
+
+  <update id="UpdateSendInfoStatus6" parameterClass="Sendinfo">
+    UPDATE SENDINFO
+    SET SENDINFO_STATUS=6 WHERE SENDINFO_STATUS=0 AND DEVICE_ID=#DeviceId#
+  </update>
+  <select id="SelectSendinfoStatus1" parameterClass="string" resultMap="SendinfoResult">
+    select * from (select op_a.*, rownum rn from (
+    SELECT SENDGUID as SendGuid,ID AS Id,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype from SENDINFO
+    where DEVICE_ID=#value# AND SENDINFO_STATUS=0 ORDER BY SENDINFO_PTIME DESC
+    ) op_a) op_b WHERE op_b.rn=1
+  </select>
+  <!--根据终端编号查询历史命令-->
+  <select id="SelectSendinfoListByTerNo" parameterClass="Sendinfo" resultMap="SendinfoResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT SI.ID                   AS Id,
+    SI.DEVICE_ID            AS DeviceId,
+    SI.SENDINFO_DESCRIPTION AS SendinfoDescription,
+    SI.SENDINFO_STATUS AS SendinfoStatus,
+    SI.CARINFO_SIM      AS CarinfoSim,
+    SI.SENDINFO_COMMAND AS SendinfoCommand,
+    SI.SENDINFO_PTIME   AS SendinfoPtime,
+    UI.USER_NAME  AS SendinfoUserid,
+    SI.RECEIPT_FLAG     AS ReceiptFlag,
+    SI.RECEIPT_TIME     AS ReceiptTime,
+    SI.RECEIPT_SUCCFLAG AS ReceiptSuccflag,
+    SI.WANGUAN          AS Wanguan,
+    SI.SENDMETHOD       AS Sendmethod,
+    SI.RESULTSTR        AS Resultstr,
+    SI.FORMVALUE        AS Formvalue,
+    SI.ISONLINE         AS Isonline,
+    SI.SENDTOTIME       AS Sendtotime,
+    SI.SENDTOCMD        AS Sendtocmd,
+    SETCOUNT         AS Setcount,
+    SI.TYPE             AS Type,
+    SI.COMANDTYPE       AS Comandtype,
+    SI.SENDGUID        as SendGuid
+    FROM SENDINFO SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID
+    AND SI.DEVICE_ID=#DeviceId#
+    ORDER BY SI.SENDINFO_PTIME DESC
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+  <!--根据终端编号查询发送命令数量-->
+  <select id="SelectSendinfoCountByTerNo" parameterClass="string" resultClass="int">
+    SELECT count(*)
+    FROM SENDINFO SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID AND SI.DEVICE_ID=#value#
+  </select>
+
+  <!--根据多个终端编号查询历史命令-->
+  <select id="SelectSendinfoListByTerNos" parameterClass="Sendinfo" resultMap="SendinfoResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT SI.ID                   AS Id,
+    SI.DEVICE_ID            AS DeviceId,
+    SI.SENDINFO_DESCRIPTION AS SendinfoDescription,
+    SI.SENDINFO_STATUS AS SendinfoStatus,
+    SI.CARINFO_SIM      AS CarinfoSim,
+    SI.SENDINFO_COMMAND AS SendinfoCommand,
+    SI.SENDINFO_PTIME   AS SendinfoPtime,
+    UI.USER_NAME  AS SendinfoUserid,
+    SI.RECEIPT_FLAG     AS ReceiptFlag,
+    SI.RECEIPT_TIME     AS ReceiptTime,
+    SI.RECEIPT_SUCCFLAG AS ReceiptSuccflag,
+    SI.WANGUAN          AS Wanguan,
+    SI.SENDMETHOD       AS Sendmethod,
+    SI.RESULTSTR        AS Resultstr,
+    SI.FORMVALUE        AS Formvalue,
+    SI.ISONLINE         AS Isonline,
+    SI.SENDTOTIME       AS Sendtotime,
+    SI.SENDTOCMD        AS Sendtocmd,
+    SETCOUNT         AS Setcount,
+    SI.TYPE             AS Type,
+    SI.COMANDTYPE       AS Comandtype,
+    SI.SENDGUID as SendGuid
+    FROM SENDINFO SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID
+    AND SI.DEVICE_ID in ($DeviceId$)
+    ORDER BY SENDINFO_PTIME DESC
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+  
+  <!--根据多个终端编号查询发送命令数量-->
+  <select id="SelectSendinfoCountByTerNos" parameterClass="string" resultClass="int">
+    SELECT count(*)
+    FROM SENDINFO SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID AND SI.DEVICE_ID in ($value$)
+  </select>
+
+  <select id="SelectSendinfoListNeweastByTerNos" parameterClass="Sendinfo" resultMap="SendinfoResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT SI.ID                   AS Id,
+    SI.DEVICE_ID            AS DeviceId,
+    SI.SENDINFO_DESCRIPTION AS SendinfoDescription,
+    SI.SENDINFO_STATUS AS SendinfoStatus,
+    SI.CARINFO_SIM      AS CarinfoSim,
+    SI.SENDINFO_COMMAND AS SendinfoCommand,
+    SI.SENDINFO_PTIME   AS SendinfoPtime,
+    UI.USER_NAME  AS SendinfoUserid,
+    SI.RECEIPT_FLAG     AS ReceiptFlag,
+    SI.RECEIPT_TIME     AS ReceiptTime,
+    SI.RECEIPT_SUCCFLAG AS ReceiptSuccflag,
+    SI.WANGUAN          AS Wanguan,
+    SI.SENDMETHOD       AS Sendmethod,
+    SI.RESULTSTR        AS Resultstr,
+    SI.FORMVALUE        AS Formvalue,
+    SI.ISONLINE         AS Isonline,
+    SI.SENDTOTIME       AS Sendtotime,
+    SI.SENDTOCMD        AS Sendtocmd,
+    SETCOUNT         AS Setcount,
+    SI.TYPE             AS Type,
+    SI.COMANDTYPE       AS Comandtype,
+    SI.SENDGUID as SendGuid
+    FROM SENDINFO SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID
+    AND SI.ID IN (
+    SELECT MAX(ID) FROM SENDINFO T WHERE T.DEVICE_ID IN($DeviceId$) GROUP BY T.DEVICE_ID
+    )
+    ORDER BY SI.SENDINFO_PTIME DESC
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+  <select id="SelectSendinfoNeweastCountByTerNos" parameterClass="string" resultClass="int">
+    SELECT count(*)
+    FROM SENDINFO SI JOIN USER_INFO UI ON SI.SENDINFO_USERID =UI.USER_ID
+    AND SI.ID IN (
+    SELECT MAX(ID) FROM SENDINFO T WHERE T.DEVICE_ID IN($value$) GROUP BY T.DEVICE_ID
+    )
+  </select>
+
+
+  
+</statements>
+</sqlMap>

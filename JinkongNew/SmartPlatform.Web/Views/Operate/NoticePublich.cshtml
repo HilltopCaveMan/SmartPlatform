@@ -1,0 +1,83 @@
+﻿<head>
+    <style type="text/css">
+
+        #Notice {
+            
+            width: 450px;
+            height:250px;
+            font-size:20px;
+        }
+
+
+
+
+    </style>
+
+
+</head>
+<div class="tabcontant">
+    <div id="audit_polluteManager_list_searchPanel"
+         style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+         class="easyui-panel" iconcls="icon-search" title="车辆保养情况总览"
+         collapsible="true" minimizable="false" maximizable="false"
+         closable="false">
+
+        <h2>请在此输入您要发布的公告信息：</h2>
+        <form id="audit_polluteManager_list_searchForm" method="post">
+            <table align="center" cellpadding="1" cellspacing="1" border="0" width="50%">
+                <tr style="height:35px; margin-left:200px">
+                    <td style="padding-left: 15px;">
+                       公告主题：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:30px; font-size:28px" />
+
+                    </td>
+                </tr>
+                
+                <tr style="height:35px;">
+
+                    <td style="padding-left: 15px;">
+                        发布人：
+                    </td>
+                    <td>
+                        当前用户【Lovol】
+                    </td>
+                </tr>
+           
+                <tr style="height:35px;">
+
+                <td style="padding-left: 15px;">
+                        公告内容：
+                </td>
+                 <td>
+                        <textarea id="Notice"></textarea>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                
+                    <td  align="center" style="padding-left: 15px;" colspan="2">
+                        <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                        <a class="easyui-linkbutton" icon="icon-add" onclick="MessageAdd()"
+                           href="#">发布公告　</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+<script type="text/javascript">
+
+
+    function MessageAdd() {
+        $
+        alert("发布成功")
+    }
+
+
+</script>

@@ -1,0 +1,354 @@
+﻿@model System.Collections.Generic.IList<GModel.Basic.UserFields>
+
+@using (Html.BeginForm("CarInfoForm", "CarInfo", FormMethod.Post))
+{
+    <div id="TabSubmit" class="stdform" style="padding:20px 70px 10px 60px; height:330px; overflow:auto">
+        <input type="hidden" value="" name="Hid_FieldsVal" id="Hid_FieldsVal" />
+        <input type="hidden" value="" name="TypeName" id="TypeName" />
+        <input type="hidden" value="" name="TerGuid" id="TerGuid" />
+        <p>
+            <label><i>*</i>车牌号</label>
+            <div class="field">
+                <input name="CarNo" id="CarNo" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车主姓名</label>
+            <div class="field">
+                <input name="CarAdminName" id="CarAdminName" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>身份证号</label>
+            <div class="field">
+                <input name="CarAdminCardid" id="CarAdminCardid" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车辆颜色</label>
+            <div class="field">
+                <input name="CarColor" id="CarColor" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>车辆类型</label>
+            <div class="field">
+                <input name="TypeId" id="TypeId" class="textbox" type="text" style="height:30px; " panelheight="150" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>所属企业</label>
+            <div class="field">
+                <input name="Businessdivisionid" id="CarDeptAdd" class="textbox" type="text" style="height:30px;" panelheight="150" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label><i>*</i>绑定终端</label>
+            <div class="field">
+                <input id="DdlTerBind" class="textbox" type="text" style="height: 30px; width: 215px; float: left;" panelheight="150" />
+                <button onclick="SearchTerBtn()" class="easyui-linkbutton" iconcls="icon-search" type="button">检索</button>
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车主地址</label>
+            <div class="field">
+                <input name="OwerAddress" id="OwerAddress" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车主电话</label>
+            <div class="field">
+                <input name="OwerPhone" id="OwerPhone" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装人</label>
+            <div class="field">
+                <input name="InstallName" id="InstallName" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装位置</label>
+            <div class="field">
+                <input name="InstallAddress" id="InstallAddress" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装人联系电话</label>
+            <div class="field">
+                <input name="InstallPhone" id="InstallPhone" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装地点</label>
+            <div class="field">
+                <input name="InstallPlace" id="InstallPlace" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>安装时间</label>
+            <div class="field">
+                <input name="InstallTime" id="InstallTime" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>录入人</label>
+            <div class="field">
+                <input name="EntryName" id="EntryName" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>录入人电话</label>
+            <div class="field">
+                <input name="EntryPhone" id="EntryPhone" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>合同号</label>
+            <div class="field">
+                <input name="ContractNum" id="ContractNum" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>保险单号</label>
+            <div class="field">
+                <input name="SafeOrder" id="SafeOrder" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>融资金额</label>
+            <div class="field">
+                <input name="LoanMoney" id="LoanMoney" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>贷款年限</label>
+            <div class="field">
+                <input name="LoanYear" id="LoanYear" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车辆型号</label>
+            <div class="field">
+                <input name="CarModel" id="CarModel" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>发动机号</label>
+            <div class="field">
+                <input name="EngineNumber" id="EngineNumber" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>车架号</label>
+            <div class="field">
+                <input name="CarFrame" id="CarFrame" class="textbox" type="text" />
+                <b>
+                </b>
+            </div>
+        </p>
+        <p>
+            <label>备注</label>
+            <div class="field">
+                <textarea name="Description" id="Description" class="textbox" style="height:55px;width:260px"></textarea>
+                <b>
+                </b>
+            </div>
+        </p>
+    </div>
+
+    <div class="formfooter">
+        <button class="stdbtn btn_blue" onclick="return validate();" type="submit">确定</button>
+        <button class="stdbtn btn_default" type="button" onclick="clearForm()">取消</button>
+    </div>
+}
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script type="text/javascript">
+    function validate() {
+        var msg = [];
+        var carno = $('#CarNo').val();
+        if (carno == "") {
+            msg.push("车牌号不能为空！");
+        }
+        //var caradminname = $('#CarAdminName').val();
+        //if (caradminname == "") {
+        //    msg.push("车主姓名不能为空！");
+        //}
+        //var caradmincardid = $('#CarAdminCardid').val();
+        //if (caradmincardid == "") {
+        //    msg.push("身份证号不能为空！");
+        //}
+        //else {
+        //    var reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+        //    if (reg.test(caradmincardid) == false) {
+        //        msg.push("身份证号不合法！");
+        //    }
+        //}
+        var cartype = $('#TypeId').combobox('getText');
+        if (cartype == "") {
+            msg.push("车辆类型不能为空！");
+        }
+        $("#TypeName").val(cartype);
+        var deptId = $('#CarDeptAdd').combotree('getValue');
+        if (deptId == "" || deptId == null) {
+            msg.push("所属企业不能为空！");
+        }
+        $("#TerGuid").val($('#DdlTerBind').combotree('getValues'));
+        var terid = $('#DdlTerBind').combotree('getValues');
+        var terno = $('#DdlTerBind').combotree('getText');
+        if (terno == "" || terno == null || terno == "--请选择要绑定的终端--") {
+            msg.push("终端号不能为空！");
+        }
+        if (terid == "" || terid == null || terid == "--请选择要绑定的终端--")
+        {
+            msg.push("绑定终端时,请单击设备号之前的复选框来选择所需终端号！");
+        }
+        if (msg.length > 0) {
+            window.parent.$.messager.alert('提示', msg.join("\r\n"), 'info');
+            return false;
+        }
+    }
+
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    }
+
+    $(function () {
+        $("input, textarea, select").uniform();
+        $('#TypeId').combobox({
+            url: '/CarType/GetCarTypeList?DeptId=' + '@ViewBag.DeptId',
+            valueField: 'TypeId',
+            textField: 'TypeName',
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) > -1;
+            },
+            onLoadSuccess: function () {
+                var data = $('#TypeId').combobox('getData');
+                if (data.length > 0) {
+                    $('#TypeId').combobox('select', data[0].TypeId);
+                }
+            }
+        });
+
+        $("#CarDeptAdd").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            onSelect: function (node) {
+                BindTer(node.id);
+            },
+            onLoadSuccess: function () {
+                $('#CarDeptAdd').combotree('setValue', '@ViewBag.DeptId');
+                BindTer('@ViewBag.DeptId');
+            }
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#CarDeptAdd'));
+
+
+        var fval = "";
+        $("#TabSubmit input").each(function (index, item) {
+            if ($(this).attr("name") != null
+                 && $(this).attr("name").indexOf("Field_") > -1) {
+                fval += $(this).attr("name") + ",";
+            }
+        })
+        $("#Hid_FieldsVal").val(fval);
+
+        //$(".textbox-text")
+        //.attr("title","输入关键字，进行检索。")
+        //.bind("input keydown", function (e) {
+        //    $('#DdlTerBind').combotree('tree').tree("search", $(this).val());
+        //    if ($(this).val() == "" || $(this).val() == null) {
+        //        $('#DdlTerBind').combotree('tree').tree("collapseAll");
+        //    }
+        //});
+    });
+
+    function BindTer(DeptId) {
+        //绑定终端
+        $('#DdlTerBind').combotree({
+            url: '/Terminal/GetNotBindTerListTree?DeptId=' + DeptId,
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) > -1;
+            },
+            editable: true,
+            onSelect: function () { },
+            multiple: true,
+            value: '--请选择要绑定的终端--'
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#DdlTerBind'));
+    }
+
+    function SearchTerBtn() {
+        if ($(".textbox-text").length > 0) {
+            var cur_obj = $(".textbox-text")[2];
+            if (cur_obj != null
+                && cur_obj.parentNode != null
+                && cur_obj.parentNode.previousSibling != null) {
+                if (cur_obj.parentNode.previousSibling.id == $('#DdlTerBind').attr("id")) {
+                    var keyword = $(cur_obj).val();
+                    if (keyword != "" && keyword != null && keyword != "--请选择要绑定的终端--") {
+                        $('#DdlTerBind').combotree('setValue', keyword);
+                        $('#DdlTerBind').combotree('reload', '/Terminal/GetNotBindTerListTree?DeptId=' + $('#CarDeptAdd').combotree('getValue') + '&TerNo=' + keyword);
+                        $('#DdlTerBind').combotree('showPanel');
+                    }
+                    else {
+                        $('#DdlTerBind').combotree('setValue', "--请选择要绑定的终端--");
+                        $('#DdlTerBind').combotree('reload', '/Terminal/GetNotBindTerListTree?DeptId=' + $('#CarDeptAdd').combotree('getValue'));
+                        $('#DdlTerBind').combotree('hidePanel');
+                    }
+                }
+            }
+        }
+    }
+</script>
+

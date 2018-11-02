@@ -1,0 +1,119 @@
+﻿<div class="tabcontant">
+    <table id="menuInfoTable"></table>
+</div>
+<script type="text/javascript">
+    var MenuManager = [];
+    var AddMenuVal = '@ViewBag.AddMenu';
+    var EditMenuVal = '@ViewBag.EditMenu';
+    var DelMenuVal = '@ViewBag.DelMenu';
+    if (AddMenuVal == "true") {
+        var AddMenuBtn = {
+            text: '添加',
+            iconCls: 'icon-add',
+            handler: function () { window.parent.$.DialogOpen('/MenuInfo/AddMenuForm', { title: "添加菜单", width: 450, height: 380 }); }
+        };
+        MenuManager.push(AddMenuBtn);
+    }
+
+    if (EditMenuVal == "true") {
+        var EditMenuBtn = {
+            text: '修改',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = $('#menuInfoTable').datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                }
+                else {
+                    var id = rows[0].MenuId;
+                    window.parent.$.DialogOpen('/MenuInfo/EditMenuInfo?MenuId=' + id, { title: "修改菜单", width: 450, height: 380 });
+                }
+            }
+        };
+        MenuManager.push(EditMenuBtn);
+    }
+
+    if (DelMenuVal == "true") {
+        var DelMenuBtn = {
+            text: '删除',
+            iconCls: 'icon-remove',
+            handler: function () {
+                var rows = $('#menuInfoTable').datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                }
+                else {
+                    var id = rows[0].MenuId;
+                    window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+
+                        if (t) {
+                            $.ajax({
+                                url: '/MenuInfo/DelMenuInfo?MenuId=' + id,
+                                type: "post",
+                                //dataType: 'json',
+                                success: function (r) {
+                                    if (r == "删除成功！") {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除成功！",
+                                            timeout: 2000,
+                                        });
+                                        $('#menuInfoTable').datagrid('reload');
+                                    } else {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除失败！",
+                                            timeout: 2000,
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+        };
+        MenuManager.push(DelMenuBtn);
+    }
+
+
+
+    $(function () {
+        $('#menuInfoTable').height($(document.body).height() - 20);
+        var menuInfoTable = $('#menuInfoTable').datagrid({
+            url: '@Url.Action("GetMenuData", "MenuInfo")',
+            columns: [[
+                  { field: 'MenuId', title: '', width: 0, align: 'center', hidden: true },
+                  { field: 'MenuName', title: '菜单名', width: 150, align: 'center' },
+                  {
+                      field: 'MenuType', title: '权限类型', width: 150, align: 'center', formatter: function (value, row, index) {
+                          if (value == 1) {
+                              return "菜单";
+                          }
+                          else if (value == 2) {
+                              return "按钮";
+                          }
+                          else { return ""; }
+                      }
+                  },
+                  { field: 'MenuUrl', title: 'URL', width: 200, align: 'center' },
+                  { field: 'MenuIcon', title: '图标', width: 200, align: 'center' },
+                  { field: 'Fmenuname', title: '父菜单名', width: 150, align: 'center' }
+            ]],
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortOrder: 'asc',//desc,asc
+            //sortName: 'M.MENUID',
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            fitColumns: true,
+            pagination: true,
+            singleSelect: true,
+            toolbar: MenuManager
+           
+        });
+    });
+</script>

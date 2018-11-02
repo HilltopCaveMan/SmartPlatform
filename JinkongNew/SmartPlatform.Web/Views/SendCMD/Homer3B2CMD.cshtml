@@ -1,0 +1,463 @@
+﻿@{
+    ViewBag.Title = "Homer3B2CMD";
+}
+<ul id="slidercontent">
+    <li>
+        <div class="slide_wrap">
+            <input type="hidden" id="veList" name="veList" value='@ViewData["Ter_ID"].ToString()' />
+            <div class="one_half">
+                <ul class="toplist">
+                    <li>
+                        <div>
+                            <span class="three_fifth">
+                                <span class="left">
+                                    <input type="text" name="dwcs" id="dshjValue" style="width: 120px;height:20px;" />&nbsp;&nbsp;秒
+                                </span><!--left-->
+                            </span><!--three_fourth-->
+                            <span class="two_fifth last">
+                                <span class="right hover" id="dshj" style="padding: 14px 10px;cursor:pointer;">
+                                    <span class="h3" style="font-size:16px;">定时呼叫</span>
+                                </span><!--right-->
+                            </span><!--one_fourth-->
+                            <br clear="all" />
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <span class="three_fifth">
+                                <span class="left">
+                                    <input type="text" name="dwcs" id="djlhjValue" style="width: 120px;height:20px;" />&nbsp;&nbsp;米
+                                </span><!--left-->
+                            </span><!--three_fourth-->
+                            <span class="two_fifth last">
+                                <span class="right hover" id="djlhj" style="padding: 14px 10px;cursor:pointer;">
+                                    <span class="h3" style="font-size:16px;">定距离呼叫</span>
+                                </span><!--right-->
+                            </span><!--one_fourth-->
+                            <br clear="all" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="one_half last ">
+                <ul class="toplist">
+                    <li>
+                        <div>
+                            <span class="three_fifth">
+                                <span class="left">
+                                    <input type="text" name="dwcs" id="hcjgValue" style="width: 120px;height:20px;" />&nbsp;&nbsp;秒
+                                </span><!--left-->
+                            </span><!--three_fourth-->
+                            <span class="two_fifth last">
+                                <span class="right hover" id="hcjg" style="padding: 14px 10px;cursor:pointer;">
+                                    <span class="h3" style="font-size:16px;">设置回传间隔</span>
+                                </span><!--right-->
+                            </span><!--one_fourth-->
+                            <br clear="all" />
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <span class="three_fifth">
+                                <span class="left">
+                                    <input type="text" name="dwcs" id="cjxsValue" style="width: 120px;height:20px;" />&nbsp;&nbsp;km/h
+                                </span><!--left-->
+                            </span><!--three_fourth-->
+                            <span class="two_fifth last">
+                                <span class="right hover" id="cjxs" style="padding: 14px 10px;cursor:pointer;">
+                                    <span class="h3" style="font-size:16px;">车机限速</span>
+                                </span><!--right-->
+                            </span><!--one_fourth-->
+                            <br clear="all" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div style="width:100%;text-align:center;">
+                <button class="stdbtn btn_default" id="tzbj" type="button"><span>停止报警</span></button>
+                <button class="stdbtn btn_lime " id="dchj" type="button"><span>单次呼叫</span></button>
+                <button class="stdbtn btn_lime " id="tzhj" type="button"><span>停止呼叫</span></button>
+                <button class="stdbtn btn_blue" id="xsjl" type="button"><span>行驶距离</span></button>
+                <button class="stdbtn btn_default" id="xh" type="button"><span>熄火</span></button>
+                <button class="stdbtn btn_lime " id="sd" type="button"><span>上电</span></button>
+                <input type="hidden" id="hid_PointVal" />
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="slide_wrap">
+            <table id="SendCMDListTable"></table>
+        </div>
+    </li>
+</ul>
+<script>
+    var TerNo =  "@ViewData["Ter_ID"]";
+    var TerminalData;
+    var backstatu;
+    var strcmd = "";
+
+    $(function () {
+
+        $("input, textarea, select").uniform();
+        //content slider
+        jQuery('#slidercontent').bxSlider({
+            prevText: '',
+            nextText: '',
+            buildPager: function (slideIndex) {
+                switch (slideIndex) {
+                    case 0:
+                        return '命令操作';
+                    case 1:
+                        loadSendListTable();
+                        return '命令记录';
+                }
+            }
+        });
+        //定时呼叫
+        $('#dshj').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            var dshjValue = $('#dshjValue').val();
+            send('dshj', dshjValue);
+
+        });
+        //定距离呼叫
+        $('#djlhj').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            var djlhjValue = $('#djlhjValue').val();
+            send('djlhj', djlhjValue);
+            //if (backstatu == "true") {
+            //    var count = 20;
+            //    var countdown = setInterval(CountDown, 1000);
+            //}
+            //function CountDown() {
+            //    $("#djlhj").find('span.h3').attr("disabled", true);
+            //    $("#djlhj").find('span.h3').text("请等待" + count + " 秒");
+            //    if (count == 0) {
+            //        $("#djlhj").find('span.h3').text("定距离呼叫").removeAttr("disabled");
+            //        clearInterval(countdown);
+            //        GetIfSuccess(strcmd);
+            //    }
+            //    count--;
+            //}
+        });
+        //设置回传间隔
+        $('#hcjg').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            var hcjgValue = $('#hcjgValue').val();
+            send('hcjg', hcjgValue);
+            //if (backstatu == "true") {
+            //    var count = 20;
+            //    var countdown = setInterval(CountDown, 1000);
+            //}
+            //function CountDown() {
+            //    $("#hcjg").find('span.h3').attr("disabled", true);
+            //    $("#hcjg").find('span.h3').text("请等待" + count + " 秒");
+            //    if (count == 0) {
+            //        $("#hcjg").find('span.h3').text("设置回传间隔").removeAttr("disabled");
+            //        clearInterval(countdown);
+            //        GetIfSuccess(strcmd);
+            //    }
+            //    count--;
+            //}
+        });
+        //车机限速
+        $('#cjxs').click(function () {
+            backstatu = "true";
+            strcmd = 'false';
+            var cjxsValue = $('#cjxsValue').val();
+            send('cjxs', cjxsValue);
+            //if (backstatu == "nomal") {
+            //    var count = 20;
+            //    var countdown = setInterval(CountDown, 1000);
+            //}
+            //function CountDown() {
+            //    $("#cjxs").find('span.h3').attr("disabled", true);
+            //    $("#cjxs").find('span.h3').text("请等待" + count + " 秒");
+            //    if (count == 0) {
+            //        $("#cjxs").find('span.h3').text("车机限速").removeAttr("disabled");
+            //        clearInterval(countdown);
+            //        GetIfSuccess(strcmd);
+            //    }
+            //    count--;
+            //}
+        });
+        //停止报警
+        $('#tzbj').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            send('tzbj', '0');
+            //if (backstatu == "true") {
+            //    var count = 20;
+            //    var countdown = setInterval(CountDown, 1000);
+            //}
+            //function CountDown() {
+            //    $("#tzbj").attr("disabled", true);
+            //    $("#tzbj").text("请等待" + count + " 秒");
+            //    if (count == 0) {
+            //        $("#tzbj").text("停止报警").removeAttr("disabled");
+            //        clearInterval(countdown);
+            //        GetIfSuccess(strcmd);
+            //    }
+            //    count--;
+            //}
+        });
+        //单次呼叫
+        $('#dchj').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            send('dchj', '0');
+            //if (backstatu == "true") {
+            //    var count = 20;
+            //    var countdown = setInterval(CountDown, 1000);
+            //}
+            //function CountDown() {
+            //    $("#dchj").attr("disabled", true);
+            //    $("#dchj").text("请等待" + count + " 秒");
+            //    if (count == 0) {
+            //        $("#dchj").text("单次呼叫").removeAttr("disabled");
+            //        clearInterval(countdown);
+            //        GetIfSuccess(strcmd);
+            //    }
+            //    count--;
+            //}
+        });
+        //停止呼叫
+        $('#tzhj').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            send('tzhj', '0');
+            //if (backstatu == "true") {
+            //    var count = 20;
+            //    var countdown = setInterval(CountDown, 1000);
+            //}
+            //function CountDown() {
+            //    $("#tzhj").attr("disabled", true);
+            //    $("#tzhj").text("请等待" + count + " 秒");
+            //    if (count == 0) {
+            //        $("#tzhj").text("停止呼叫").removeAttr("disabled");
+            //        clearInterval(countdown);
+            //        GetIfSuccess(strcmd);
+            //    }
+            //    count--;
+            //}
+        });
+        //行驶距离
+        $('#xsjl').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            $.DialogOpen('/SendCMD/MapSelect?str=' + TerNo, { title: false, width: 860, height: 460 });
+
+        });
+        //熄火
+        $('#xh').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            send('xh', '0');
+        });
+        //上电
+        $('#sd').click(function () {
+            backstatu = "nomal";
+            strcmd = 'false';
+            send('sd', '0');
+        });
+        function xsjl() {
+            var latlag = $('#hid_PointVal').val();
+            send('xsjl', latlag);
+            //if (backstatu == "true") {
+            //    var count = 20;
+            //    var countdown = setInterval(CountDown, 1000);
+            //}
+            //function CountDown() {
+            //    $("#xsjl").attr("disabled", true);
+            //    $("#xsjl").text("请等待" + count + " 秒");
+            //    if (count == 0) {
+            //        $("#xsjl").text("行驶距离").removeAttr("disabled");
+            //        clearInterval(countdown);
+            //        GetIfSuccess(strcmd);
+            //    }
+            //    count--;
+            //}
+        }
+        var msg;
+        function send(cmd, strparam) {
+
+            switch (cmd) {
+                case 'dshj':
+                    msg = "定时呼叫";
+                    break;
+                case 'djlhj':
+                    msg = "定距离呼叫";
+                    break;
+                case 'hcjg':
+                    msg = "设置回传间隔";
+                    break;
+                case 'cjxs':
+                    msg = "车机限速";
+                    break;
+                case 'tzbj':
+                    msg = "停止报警";
+                    break;
+                case 'dchj':
+                    msg = "单次呼叫";
+                    break;
+                case 'xh':
+                    msg = "熄火";
+                    break;
+                case 'sd':
+                    msg = "上电";
+                    break;
+                case 'tzhj':
+                    msg = "停止呼叫";
+                    break;
+                case 'xsjl':
+                    msg = "行驶距离";
+                    break;
+                default:
+                    break;
+            }
+            window.parent.$.messager.confirm('确定', '您确定发送' + msg + '指令吗？', function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '@Url.Content("~/SendCMD/Homer3B2CMD")',
+                        type: 'POST',
+                        async: false,//取消异步请求
+                        //dataType: 'json',
+                        data: "{'devid':'" + TerNo + "','cmd':'" + cmd + "','strparam':'" + strparam + "'}",
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+                            var aa = data.split(";");
+                            var countdown;
+                            if (aa[0].toString() == "true") {
+                                strcmd = aa[1].toString();
+                                backstatu = "true";
+                                var count = 20;
+                                countdown = setInterval(CountDown, 1000);
+                            }
+                            else {
+                                backstatu = "false"
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "命令发送失败",
+                                    timeout: 2000,
+                                });
+                            }
+                            function CountDown() {
+                                $("#" + cmd + "").find('span').attr("disabled", true);
+                                $("#" + cmd + "").find('span').text("请等待" + count + " 秒");
+                                if (count == 0) {
+                                    $("#" + cmd + "").find('span').text(msg).removeAttr("disabled");
+                                    clearInterval(countdown);
+                                    GetIfSuccess(strcmd);
+                                }
+                                count--;
+                            }
+
+                        },
+                        error: function (data) {
+                            window.parent.$.messager.alert('提示', '系统错误！', 'error');
+                        }
+                    });
+                }
+            })
+
+        };
+        function GetIfSuccess(strcmd)
+        {
+            $.ajax({
+                url: '@Url.Content("~/SendCMD/IfSendSuccess")',
+                type: 'POST',
+                //dataType: 'json',
+                data: "{'devid':'" + TerNo + "','sendCMD':'" + strcmd + "'}",
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data == "true") {
+                        window.parent.$.messager.show({
+                            title: '提示',
+                            msg: "命令发送成功",
+                            timeout: 2000,
+                        });
+                    }
+                    else {
+                        backstatu = "false"
+                        window.parent.$.messager.show({
+                            title: '提示',
+                            msg: "命令发送失败",
+                            timeout: 2000,
+                        });
+                    }
+                },
+                error: function (data) {
+                    window.parent.$.messager.alert('提示', '系统错误！', 'error');
+                }
+            });
+        }
+    });
+
+    function loadSendListTable() {
+        TerminalData = $('#SendCMDListTable').datagrid({
+            url: '@Url.Action("GetSendCMDyxList", "SendCMD")',
+            height: 380,
+                columns: [[
+                    //{ field: 'TerGuid', title: '', width: 0, hidden: true },
+                    { field: 'DeviceId', title: '终端编号', width: 80, align: 'center' },
+                    //{ field: 'DeptId', title: '', width: 0, hidden: true },
+                    { field: 'SendinfoDescription', title: '命令信息', width: 530, align: 'center' },
+                    {
+                        field: 'SendinfoStatus', title: '执行状态', width: 140, align: 'center', formatter: function (value, row) {
+                            switch (value) {
+                                case 0.0:
+                                    return "待发送";
+                                case 1.0:
+                                    return "待定";
+                                case 2.0:
+                                    return "已发送，未执行";
+                                case 3.0:
+                                    return "发送成功，命令执行成功";
+                                case 6.0:
+                                    return "命令失效";
+                                case 9.0:
+                                    return "执行失败";
+                                default:
+                                    return "";
+                            }
+                        }
+                    },
+                    { field: 'SendinfoUserid', title: '操作人员', width: 80, align: 'center' },
+                     {
+                         field: 'SendinfoPtime', title: '设置时间', width: 150, align: 'center', formatter: function (value, row) {
+                             switch (value) {
+
+                                 case "0001-01-01 00:00:00":
+                                     return "";
+                                 default:
+                                     return value;
+                             }
+                         }
+                     },
+                      {
+                          field: 'ReceiptTime', title: '执行成功时间', width: 150, align: 'center', formatter: function (value, row) {
+                              switch (value) {
+
+                                  case "0001-01-01 00:00:00":
+                                      return "";
+                                  default:
+                                      return value;
+                              }
+                          }
+                      }
+                ]],
+                //fitColumns: true,
+                striped: true,
+                rownumbers: true, //是否加行号
+                pagination: true, //是否显式分页
+                pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+                pageNumber: 1, //默认显示第几页
+                pageList: [15, 30, 45],
+                queryParams: { "DeviceId": '@ViewData["Ter_ID"]' },//查询参数
+                pagination: true
+            });
+        }
+</script>

@@ -1,0 +1,485 @@
+﻿<div id="contentwrapper" class="contentwrapper withrightpanel">
+    <div id="MapContainer">
+        <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+        <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+    </div>
+    <div id="div_BaiduMap" style="height:550px;"></div>
+</div><!--contentwrapper-->
+<div class="rightpanel12">
+    <div class="rightpanelinner">
+        <div class="widgetbox uncollapsible">
+            <div class="title"><h4>围栏名称</h4></div>
+            <div class="widgetcontent nopadding">
+                <div class="chatsearch">
+                    <input id="search" type="text" value="终端号(为空时,点回车显示全部)..." onblur="javascript: $('#search').val('终端号(为空时,点回车显示全部)...');" onfocus="javascript: $('#search').val('');" alt="搜索框为空时,点回车显示全部" />
+                </div>
+                <div class="box-scroll">
+                    <div style="height:auto;">
+                        <a href="#" class="easyui-linkbutton" onclick="DelRail()" iconcls="icon-remove" plain="true">删除</a>
+                        <a href="#" class="easyui-linkbutton" onclick="DeleteOverly()" iconcls="icon-search" plain="true">清除地图覆盖物</a>
+                        @*<a href="#" class="easyui-linkbutton" onclick="SelectCar()" iconcls="icon-add" plain="true">选择车辆</a>
+                          <a href="#" class="easyui-linkbutton" onclick="LookCar()" iconcls="icon-search" plain="true">查看车辆</a>*@
+                    </div>
+                    <ul id="RailList" class="contactlist">
+                        @*<li class="online"><a href=""><img src="~/assets/images/05.png" /> <span>围栏一</span></a><span class="msgcount">3</span></li>
+                          <li class="online"><a href=""><img src="~/assets/images/05.png" /> <span>围栏二</span></a><span class="msgcount">1</span></li>*@
+                    </ul>
+                </div>
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
+    </div><!--rightpanelinner-->
+</div><!--rightpanel-->
+<input type="hidden" id="hid_PointVal" />
+<input type="hidden" id="hid_Type" />
+<input type="hidden" id="hid_AreaId" />
+<input type="hidden" id="hid_TerNoStr">
+<input type="hidden" id="hid_AreaMaptype" value="1" />
+<input type="hidden" id="hid_CenterloglatZoom" />
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=3xyzXPzwlGKFZWULrsKdioWb"></script>
+<link href="~/assets/BMapLib/DrawingManager_min.css" rel="stylesheet" />
+<link href="~/assets/BMapLib/SearchInfoWindow_min.css" rel="stylesheet" />
+<script src="~/assets/BMapLib/SearchInfoWindow_min.js"></script>
+<script src="~/assets/BMapLib/DrawingManager.js"></script>
+<script src="~/assets/javascripts/DrawingManager_min.js"></script>
+<script src="~/assets/javascripts/DistanceTool_min.js"></script>
+<script src="~/assets/javascripts/TextIconOverlay_min.js"></script>
+<script src="~/assets/javascripts/MarkerClusterer_min.js"></script>
+<script src="~/assets/javascripts/GeoUtils.js"></script>
+<script type="text/javascript" language="javascript">
+    var data = null;
+
+    // 百度地图API功能
+    var BmarkerClusterer = null;
+    var map = new BMap.Map("div_BaiduMap");
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 8);
+    var navigation = new BMap.NavigationControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT });
+    map.addControl(navigation);
+    var mapType2 = new BMap.MapTypeControl({ anchor: BMAP_ANCHOR_TOP_LEFT });
+    map.addControl(mapType2);
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+    var opts = {
+        enableMessage: false//设置不允许信息窗发送短息
+    };
+    var styleOptions = {
+        strokeColor: "red",    //边线颜色。
+        fillColor: "red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+        strokeWeight: 1,       //边线的宽度，以像素为单位。
+        strokeOpacity: 0.6,	   //边线透明度，取值范围0 - 1。
+        fillOpacity: 0.4,      //填充的透明度，取值范围0 - 1。
+        strokeStyle: 'solid'   //边线的样式，solid或dashed。
+    }
+    //实例化鼠标绘制工具
+    var BDdrawingManager = new BMapLib.DrawingManager(map, {
+        enableDrawingTool: true, //是否显示工具栏
+        isOpen: true, //是否开启绘制模式
+        drawingToolOptions: {
+            anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+            offset: new BMap.Size(305,5), //偏离值
+            drawingTypes: [
+                  BMAP_DRAWING_MARKER,
+                  BMAP_DRAWING_CIRCLE,
+                  BMAP_DRAWING_POLYGON,
+                  BMAP_DRAWING_RECTANGLE
+            ],
+            drawingModes: [BMAP_DRAWING_CIRCLE, BMAP_DRAWING_RECTANGLE, BMAP_DRAWING_POLYGON], //,BMAP_DRAWING_POLYGON, BMAP_DRAWING_RECTANGLE
+            scale: 0.8 //工具栏缩放比例
+        },
+        circleOptions: styleOptions, //圆的样式,
+        polygonOptions: styleOptions, //多边形样式
+        rectangleOptions: styleOptions //四方形样式
+    });
+    BDdrawingManager.close();
+
+
+    var SomeOverlay;
+    var CenterPoint;
+    BDdrawingManager.addEventListener("overlaycomplete", function (e, overlay) {
+        if (e.drawingMode == BMAP_DRAWING_CIRCLE) {
+            SomeOverlay = e.overlay;
+            CenterPoint = e.overlay.getCenter();
+            var radius = e.overlay.getRadius();
+            var PointArr = "(" + CenterPoint.lat + "," + CenterPoint.lng + ")";
+            $("#hid_PointVal").val(PointArr + "$" + radius);
+            $("#hid_CenterloglatZoom").val(CenterPoint.lng + "," + CenterPoint.lat+","+map.getZoom());
+            $("#hid_Type").val("1");
+            map.removeOverlay(e.overlay);
+            parent.$.DialogOpen('/RailManager/TaMap', { title: "添加车辆", width: 900, height: 600 });
+        }
+        else if (e.drawingMode == BMAP_DRAWING_RECTANGLE) {
+            SomeOverlay = e.overlay;
+            CenterPoint = e.overlay.getBounds().getCenter();
+            var SWpoint = e.overlay.getBounds().getSouthWest();
+            var NEpoint = e.overlay.getBounds().getNorthEast();
+            var PointArr = "((" + SWpoint.lat + "," + SWpoint.lng + "),(" + NEpoint.lat + "," + NEpoint.lng + "))";
+            $("#hid_PointVal").val(PointArr);
+            $("#hid_CenterloglatZoom").val(CenterPoint.lng + "," + CenterPoint.lat + "," + map.getZoom());
+            $("#hid_Type").val("0");
+            map.removeOverlay(e.overlay);
+            parent.$.DialogOpen('/RailManager/TaMap', { title: "添加车辆", width: 900, height: 600 });
+        }
+        else if (e.drawingMode == BMAP_DRAWING_POLYGON) {
+            SomeOverlay = e.overlay;
+            CenterPoint = e.overlay.getBounds().getCenter();
+            var PointArr = e.overlay.getPath();
+            var PolygonVal = "";
+            if (PointArr != null) {
+                if (PointArr.length > 100) {
+                    $.messager.alert('警告', '多边形不能超过100个折点', 'error');
+                    map.removeOverlay(e.overlay);
+                    return;
+                }
+                else {
+                    for (var i = 0; i < PointArr.length; i++) {
+                        PolygonVal += "(" + PointArr[i].lat + "," + PointArr[i].lng + ")";
+                    }
+                    $("#hid_PointVal").val(PolygonVal);
+                    $("#hid_CenterloglatZoom").val(CenterPoint.lng + "," + CenterPoint.lat + "," + map.getZoom());
+                    $("#hid_Type").val("2");
+                }
+            }
+            map.removeOverlay(e.overlay);
+            parent.$.DialogOpen('/RailManager/TaMap', { title: "添加车辆", width: 900, height: 600 });
+        }
+    });
+
+    function AddAreaInfo() {
+        var SelectTerNoStr = $("#hid_TerNoStr").val();
+        var Areatype = $("#hid_Type").val();
+        var AreaData = $("#hid_PointVal").val();
+        var AreaMaptype = $("#hid_AreaMaptype").val();
+        var CenterloglatZoom = $("#hid_CenterloglatZoom").val();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/RailManager/AddCarIdstr',
+            data: { SelectTerNoStr: SelectTerNoStr, AreaType: Areatype, AreaData: AreaData, AreaMaptype: AreaMaptype, CenterloglatZoom: CenterloglatZoom },
+            success: function (data) {
+                if (data == "成功") {
+                    window.parent.$.messager.alert('提示', '添加成功', 'info');
+                    map.clearOverlays();
+                    Refresh();
+                } else {
+                    $.messager.alert('提示', data, 'info');
+                }
+            }
+        });
+    };
+
+    function deletePoint() {
+        map.removeOverlay(SomeOverlay);
+    };
+
+    //在百度地图上加载覆盖物
+    function InitBaiduMap(data) {
+        var markers = [];
+        var panel = $('#RailList');
+        panel.empty();
+        if (data == null) {
+            return;
+        }
+        for (var a = 0; a < data.length; a++) {
+            //列表
+            var img = $('<img />');
+            $(img).attr({ "src": "../assets/images/05.png" });
+            var span = $('<span></span>');
+            $(span).text(data[a].Area_Terno);
+            var aTag = $('<a href="#" AreaId="' + data[a].AreaId + '"></a>');
+            $(aTag).append(img);
+            $(aTag).append(span);
+
+            var li = $('<li class="online" onclick="ShowBdMarker('+a+')"></li>');
+            $(li).append(aTag);
+            $(panel).append(li);
+            $(aTag).click(function () {
+                $(this).parent().parent().find('a').removeClass('active');
+                $(this).addClass('active');
+                $("#hid_AreaId").val($(this).attr('AreaId'));
+                return true;
+            });
+        }
+    }
+
+    //调用百度地图
+    function BaiDuMap() {
+        window.location.href = '/RailManager/BDRailIndex';
+    }
+
+    //调用谷歌地图
+    function GoogleMap() {
+        window.location.href = '/RailManager/RailIndex';
+    }
+
+    //删除
+    function DelRail() {
+        var AreaId = $("#hid_AreaId").val();
+        if (AreaId == "") {
+            $.messager.alert('警告', '您没有选择', 'error');
+        }
+        else {
+            $.messager.confirm('确定', '您确定要删除吗', function (t) {
+                if (t) {
+                    $.ajax({
+                        url: '/RailManager/Delete?AreaId=' + AreaId,
+                        type: "post",
+                        async: false,
+                        success: function (r) {
+                            $.messager.alert('提示', r, 'info');
+                            //window.location.reload();
+                            map.clearOverlays();
+                            Refresh();
+                        }
+                    });
+                }
+            })
+        }
+    }
+
+    ////选择车辆
+    //function SelectCar() {
+    //    var RailId = $("#hid_RailId").val();
+    //    if (RailId == "") {
+    //        $.messager.alert('警告', '您没有选择', 'error');
+    //    }
+    //    else {
+    //        $.DialogOpen('/RailManager/TaMap?Rid=' + RailId, { title: '选择车辆', width: 900, height: 600 });
+    //    }
+    //}
+
+    ////查看车辆
+    //function LookCar() {
+    //    var RailId = $("#hid_RailId").val();
+    //    if (RailId == "") {
+    //        $.messager.alert('警告', '您没有选择', 'error');
+    //    }
+    //    else {
+    //        $.DialogOpen('/RailManager/LoadCarOnmap?Rid=' + RailId, { title: '查看车辆', width: 900, height: 600 });
+    //    }
+    //}
+
+    //清除地图覆盖物
+    function DeleteOverly()
+    {
+        map.clearOverlays();
+    }
+
+    //百度点击显示区域
+    function ShowBdMarker(i) {
+        //var m = eval(data[i].RailCenter);
+        //var pt = new BMap.Point(m[0].y, m[0].x);
+        //map.centerAndZoom(pt,8);
+        //var infoHtml = '<div class="info"><h2>' + data[i].RailRname + '</h2></div>';
+        //var infoWindow = new BMap.InfoWindow(infoHtml, pt);
+        //map.openInfoWindow(infoWindow, pt); //开启信息窗口
+        map.clearOverlays();
+        if (data[i].Area_Type == 0) {
+            //var areaName = data[a].RailRname;//区域名称
+            var PointsArr = [];
+            var Points = data[i].Area_Data.split('|');
+            var Pstart = new BMap.Point(Points[0].split(',')[0], Points[0].split(',')[1]);
+            var Pend = new BMap.Point(Points[1].split(',')[0], Points[1].split(',')[1]);
+            PointsArr.push(new BMap.Point(Pstart.lng, Pstart.lat));
+            PointsArr.push(new BMap.Point(Pend.lng, Pstart.lat));
+            PointsArr.push(new BMap.Point(Pend.lng, Pend.lat));
+            PointsArr.push(new BMap.Point(Pstart.lng, Pend.lat));
+            var rectangle = new BMap.Polygon(PointsArr, styleOptions);  //创建矩形
+            map.addOverlay(rectangle); //增加四边形
+            map.setCenter(rectangle.getBounds().getCenter());
+            //var opts = {
+            //    position: rectangle.getBounds().getCenter(), //指定文本标注所在的地理位置
+            //    offset: new BMap.Size(1, -20)    //设置文本偏移量
+            //}
+            //var label = new BMap.Label(areaName, opts);  // 创建文本标注对象
+            //label.setStyle({
+            //    color: "red",
+            //    fontSize: "12px",
+            //    height: "20px",
+            //    lineHeight: "20px",
+            //    fontFamily: "微软雅黑"
+            //});
+            //map.addOverlay(label);
+            ////显示围栏内车辆
+            //ShowRailCar(markers,a, rectangle.getBounds());
+        }
+        else if (data[i].Area_Type == 1) {
+            var m = data[i].Area_Data.split('|');
+            Latitude = m[0].split(',')[1];//区域纬度
+            Longitude = m[0].split(',')[0];//区域经度
+            Radius = m[1];//区域半径
+            //areaName = data[a].RailRname;//区域名称
+            var circle = new BMap.Circle(new BMap.Point(Longitude, Latitude), Radius, styleOptions); //创建圆
+            map.addOverlay(circle);
+            map.setCenter(new BMap.Point(Longitude, Latitude));
+            //var opts = {
+            //    position: new BMap.Point(Longitude, Latitude),    // 指定文本标注所在的地理位置
+            //    offset: new BMap.Size(1, -20)    //设置文本偏移量
+            //}
+            //var label = new BMap.Label(areaName, opts);  // 创建文本标注对象
+            //label.setStyle({
+            //    color: "red",
+            //    fontSize: "12px",
+            //    height: "20px",
+            //    lineHeight: "20px",
+            //    fontFamily: "微软雅黑"
+            //});
+            //map.addOverlay(label);
+            ////显示围栏内车辆
+            //ShowRailCar(markers,a,circle);
+        }
+        else if (data[i].Area_Type == 2) {
+            //var areaName = data[a].RailRname;//区域名称
+            var PointsArr = new Array();
+            var Points = data[i].Area_Data.split('|');
+            for (n = 0; n < Points.length; n++) {
+                var Point = Points[n];
+                PointsArr.push(new BMap.Point(parseFloat(Point.split(',')[0]), parseFloat(Point.split(',')[1])));
+            }
+            var polygon = new BMap.Polygon(PointsArr, styleOptions);
+            map.addOverlay(polygon); //增加多边形
+            map.setCenter(polygon.getBounds().getCenter());
+            //var opts = {
+            //    position: polygon.getBounds().getCenter(),// 指定文本标注所在的地理位置
+            //    offset: new BMap.Size(1, -20)    //设置文本偏移量
+            //}
+            //var label = new BMap.Label(areaName, opts);  // 创建文本标注对象
+            //label.setStyle({
+            //    color: "red",
+            //    fontSize: "12px",
+            //    height: "20px",
+            //    lineHeight: "20px",
+            //    fontFamily: "微软雅黑"
+            //});
+            //map.addOverlay(label);
+            ////显示围栏内车辆
+            //ShowRailCar(markers,a, polygon);
+        }
+        return true;
+    }
+
+    //显示围栏内的车
+    function ShowRailCar(markers,i, m)
+    {
+        var RailType = data[i].RailShapetype;
+        var RailName = data[i].RailRname;
+        if (data[i].RailCaridstr != "" && data[i].RailCaridstr != null) {
+            $.ajax({
+                type: 'post',
+                async: false,
+                url: '/RailManager/getRailCarList',
+                data: { CaridStr: data[i].RailCaridstr },
+                dataType: 'json',
+                success: function (data) {
+                    if (data != "" && data != "[]") {
+                        var PointData = eval(data);
+                        for (var index = 0; index < PointData.length; index++) {
+                            if (PointData[index].BAIDU_LATITUDE != 0 && PointData[index].BAIDU_LONGITUDE != 0) {
+                                var pt = new BMap.Point(PointData[index].BAIDU_LONGITUDE, PointData[index].BAIDU_LATITUDE);
+                                var state = "";
+                                if (RailType == 0) {
+                                    if (BMapLib.GeoUtils.isPointInCircle(pt, m)) {
+                                        state = "正常";
+                                        var myIcon = new BMap.Icon("/assets/images/06.png", new BMap.Size(24, 24));
+                                    }
+                                    else {
+                                        state = "超出围栏";
+                                        var myIcon = new BMap.Icon("/assets/images/02.png", new BMap.Size(24, 24));
+                                    }
+                                }
+                                else if(RailType == 1)
+                                {
+                                    if (BMapLib.GeoUtils.isPointInPolygon(pt, m)) {
+                                        state = "正常";
+                                        var myIcon = new BMap.Icon("/assets/images/06.png", new BMap.Size(24, 24));
+                                    }
+                                    else {
+                                        state = "超出围栏";
+                                        var myIcon = new BMap.Icon("/assets/images/02.png", new BMap.Size(24, 24));
+                                    }
+                                }
+                                else if (RailType == 2)
+                                {
+                                    if (BMapLib.GeoUtils.isPointInRect(pt, m)) {
+                                        state = "正常";
+                                        var myIcon = new BMap.Icon("/assets/images/06.png", new BMap.Size(24, 24));
+                                    }
+                                    else {
+                                        state = "超出围栏";
+                                        var myIcon = new BMap.Icon("/assets/images/02.png", new BMap.Size(24, 24));
+                                    }
+                                }
+                                var marker = new BMap.Marker(pt,{ icon: myIcon });
+                                markers.push(marker);
+                                var infoHtml = '<div class="info"><table><tr><td>车牌号码：</td><td>' + PointData[index].CAR_NO + '</td><td>终端编号：</td><td>' + PointData[index].TER_NO + '</td></tr><tr><td>所属围栏：</td><td>' + RailName + '</td><td>车辆状态：</td><td>' + state + '</td></tr></table></div>';
+                                addClickHandler(infoHtml, marker);
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    //百度地图 标记点击事件
+    function addClickHandler(sContent, marker) {
+        marker.addEventListener("click", function (e) {
+            openInfo(sContent, e)
+        });
+    };
+
+    //信息窗口
+    function openInfo(sContent, e) {
+        var p = e.target;
+        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+        var infoWindow = new BMap.InfoWindow(sContent, opts);  // 创建信息窗口对象
+        map.openInfoWindow(infoWindow, point); //开启信息窗口
+    };
+
+    //刷新
+    function Refresh()
+    {
+        $.post("/RailManager/getBDRailList", { Area_Terno: $("#search").val() == null ? "" : $("#search").val() }, function (e) {
+            data = eval(e);
+            InitBaiduMap(data);
+        });
+    }
+
+    $(function () {
+        Refresh();
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                Refresh();
+            }
+        });
+    })
+</script>
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 5px;
+        right:300px;
+        border: 1px solid #999;
+    }
+
+    #MapContainer div {
+        width: 75px;
+        float: left;
+        text-align: center;
+    }
+
+    #BaiDuMap {
+        color: #fff;
+        cursor: pointer;
+        background: #0094ff;
+    }
+
+    #GoogleMap {
+        background: #ffffff;
+        color: #797070;
+        cursor: pointer;
+    }
+</style>

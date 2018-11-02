@@ -1,0 +1,32 @@
+﻿<script type="text/javascript" language="javascript">
+    var result = "@ViewBag.Result";
+    if (result == "true") {
+        var currTab = window.parent.$('#tabs').tabs('getSelected');  // get selected panel
+        window.parent.$('#tabs').tabs('update', {
+            tab: currTab,
+            options: {
+                content: '<iframe scrolling="auto" frameborder="0"  src="/CarType/CarTypeIndex" style="width:100%;height:100%;"></iframe>',
+            }
+        });
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "添加成功！",
+            timeout: 2000
+        });
+    } else if (result == "false") {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: "添加失败！",
+            timeout: 2000
+        });
+    } else {
+        window.parent.$(".dialog").dialog('close');
+        window.parent.$.messager.show({
+            title: '提示',
+            msg: result+",添加失败！",
+            timeout: 2000
+        });
+    }
+</script>

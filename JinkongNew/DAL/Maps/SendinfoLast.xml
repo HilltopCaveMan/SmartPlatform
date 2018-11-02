@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="SendinfoLast" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+<alias>
+	<typeAlias alias="SendinfoLast" type="GModel.InterFace.SendinfoLast" />
+</alias>
+<resultMaps>
+	<resultMap id="SendinfoLastResult" class="SendinfoLast">
+		<result property="Id" column="Id" type="double" dbType="Real"/>
+		<result property="SendinfoId" column="SendinfoId" type="double" dbType="Real"/>
+		<result property="DeviceId" column="DeviceId" type="string" dbType="varchar"/>
+		<result property="CarinfoSim" column="CarinfoSim" type="string" dbType="varchar"/>
+		<result property="SendinfoCommand" column="SendinfoCommand" type="string" dbType="varchar"/>
+		<result property="SendinfoPtime" column="SendinfoPtime" type="DateTime" dbType="DateTime"/>
+		<result property="SendinfoStatus" column="SendinfoStatus" type="double" dbType="Real"/>
+		<result property="SendinfoUserid" column="SendinfoUserid" type="string" dbType="varchar"/>
+		<result property="SendinfoDescription" column="SendinfoDescription" type="string" dbType="varchar"/>
+		<result property="ReceiptFlag" column="ReceiptFlag" type="string" dbType="varchar"/>
+		<result property="ReceiptTime" column="ReceiptTime" type="DateTime" dbType="DateTime"/>
+		<result property="ReceiptSuccflag" column="ReceiptSuccflag" type="string" dbType="varchar"/>
+		<result property="Wanguan" column="Wanguan" type="string" dbType="varchar"/>
+		<result property="Sendmethod" column="Sendmethod" type="string" dbType="varchar"/>
+		<result property="Resultstr" column="Resultstr" type="string" dbType="varchar"/>
+		<result property="Formvalue" column="Formvalue" type="string" dbType="varchar"/>
+		<result property="Isonline" column="Isonline" type="double" dbType="Real"/>
+		<result property="Sendtotime" column="Sendtotime" type="DateTime" dbType="DateTime"/>
+		<result property="Sendtocmd" column="Sendtocmd" type="string" dbType="varchar"/>
+		<result property="Setcount" column="Setcount" type="double" dbType="Real"/>
+		<result property="Type" column="Type" type="double" dbType="Real"/>
+		<result property="Comandtype" column="Comandtype" type="string" dbType="varchar"/>
+    <result property="OldId" column="OldId" type="double" dbType="Real"/>
+    <result property="SendGuid" column="SendGuid" type="string" dbType="varchar"/> 
+	</resultMap>
+</resultMaps>
+<statements>
+	
+	<select id="SelectSendinfoLast" parameterClass="SendinfoLast" resultMap="SendinfoLastResult">
+    SELECT SENDGUID as SendGuid,OLD_ID AS OldId, ID AS Id,SENDINFO_ID AS SendinfoId,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+    FROM SENDINFO_LAST where ID = #Id#
+  </select>
+  
+  	<select id="SelectSendinfoLastByOldId" parameterClass="string" resultMap="SendinfoLastResult">
+      SELECT SENDGUID as SendGuid,OLD_ID AS OldId, ID AS Id,SENDINFO_ID AS SendinfoId,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+      FROM SENDINFO_LAST where OLD_ID = #value#
+    </select>
+  
+    
+      
+      
+	<select id="SelectSendinfoLastPage" parameterClass="map" resultMap="SendinfoLastResult">
+		<isGreaterThan property="EndData" compareValue="0">
+		 select * from (select op_a.*, rownum rn from (
+		</isGreaterThan>
+    SELECT SENDGUID as SendGuid,OLD_ID AS OldId,ID AS Id,SENDINFO_ID AS SendinfoId,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+    FROM SENDINFO_LAST
+    <isGreaterThan property="EndData" compareValue="0">
+			) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+		</isGreaterThan>
+	</select>
+	<select id="SelectSendinfoLastCount" parameterClass="string" resultClass="int">
+		SELECT count(*) 
+		FROM SENDINFO_LAST 
+	</select>
+  
+	<insert id="InsertSendinfoLast" parameterClass="SendinfoLast">
+    INSERT INTO SENDINFO_LAST
+    (ID,SENDINFO_ID,DEVICE_ID,CARINFO_SIM,SENDINFO_COMMAND,SENDINFO_PTIME,SENDINFO_STATUS,SENDINFO_USERID,SENDINFO_DESCRIPTION,RECEIPT_FLAG,RECEIPT_TIME,RECEIPT_SUCCFLAG,WANGUAN,SENDMETHOD,RESULTSTR,FORMVALUE,ISONLINE,SENDTOTIME,SENDTOCMD,SETCOUNT,TYPE,COMANDTYPE)
+    VALUES(sendinfo_seq.nextval,#SendinfoId#,#DeviceId#,#CarinfoSim#,#SendinfoCommand#,#SendinfoPtime:DateTime:1/1/0001 12:00:00 AM#,#SendinfoStatus#,#SendinfoUserid#,#SendinfoDescription#,#ReceiptFlag#,#ReceiptTime:DateTime:1/1/0001 12:00:00 AM#,#ReceiptSuccflag#,#Wanguan#,#Sendmethod#,#Resultstr#,#Formvalue#,#Isonline#,#Sendtotime:DateTime:1/1/0001 12:00:00 AM#,#Sendtocmd#,#Setcount#,#Type#,#Comandtype#)
+  </insert>
+
+  <insert id="InsertSendinfoLastNew" parameterClass="SendinfoLast">
+    INSERT INTO SENDINFO_LAST
+    (OLD_ID, ID,SENDINFO_ID,DEVICE_ID,CARINFO_SIM,SENDINFO_COMMAND,SENDINFO_PTIME,SENDINFO_STATUS,SENDINFO_USERID,SENDINFO_DESCRIPTION,RECEIPT_FLAG,RECEIPT_TIME,RECEIPT_SUCCFLAG,WANGUAN,SENDMETHOD,RESULTSTR,FORMVALUE,ISONLINE,SENDTOTIME,SENDTOCMD,SETCOUNT,TYPE,COMANDTYPE,SENDGUID)
+    VALUES(#OldId#,sendinfo_seq.nextval,#SendinfoId#,#DeviceId#,#CarinfoSim#,#SendinfoCommand#,#SendinfoPtime:DateTime:1/1/0001 12:00:00 AM#,#SendinfoStatus#,#SendinfoUserid#,#SendinfoDescription#,#ReceiptFlag#,#ReceiptTime:DateTime:1/1/0001 12:00:00 AM#,#ReceiptSuccflag#,#Wanguan#,#Sendmethod#,#Resultstr#,#Formvalue#,#Isonline#,#Sendtotime:DateTime:1/1/0001 12:00:00 AM#,#Sendtocmd#,#Setcount#,#Type#,#Comandtype#,#SendGuid#)
+  </insert>
+	<update id="UpdateSendinfoLast" parameterClass="SendinfoLast">
+    UPDATE SENDINFO_LAST
+    SET SENDINFO_STATUS=#SendinfoStatus#,SENDTOTIME=sysdate,SENDTOCMD=#Sendtocmd#
+    WHERE ID = #Id#
+  </update>
+  
+  	<update id="UpdateSendinfoLastByOldid" parameterClass="SendinfoLast">
+    UPDATE SENDINFO_LAST
+    SET SENDINFO_STATUS=#SendinfoStatus#,SENDTOTIME=sysdate,SENDTOCMD=#Sendtocmd#
+    WHERE OLD_ID = #OldId#
+  </update>
+    
+    
+    
+  <update id="UpdateSendinfoLastFail" parameterClass="SendinfoLast">
+    UPDATE SENDINFO_LAST
+    SET  SENDINFO_STATUS=#SendinfoStatus#,RECEIPT_TIME=sysdate,RESULTSTR=#Resultstr#
+    WHERE ID = #Id#
+  </update>
+
+  <update id="UpdateSendinfoLastFailByOldId" parameterClass="SendinfoLast">
+    UPDATE SENDINFO_LAST
+    SET  SENDINFO_STATUS=#SendinfoStatus#,RECEIPT_TIME=sysdate,RESULTSTR=#Resultstr#
+    WHERE OLD_ID = #Id#
+  </update>
+  
+
+
+
+  <update id="UpdateSendinfoLastAll" parameterClass="SendinfoLast">
+    UPDATE SENDINFO_LAST
+    SET SENDINFO_ID=#SendinfoId#,DEVICE_ID=#DeviceId#,CARINFO_SIM=#CarinfoSim#,SENDINFO_COMMAND=#SendinfoCommand#,SENDINFO_PTIME=#SendinfoPtime#,SENDINFO_STATUS=#SendinfoStatus#,SENDINFO_USERID=#SendinfoUserid#,SENDINFO_DESCRIPTION=#SendinfoDescription#,RECEIPT_FLAG=#ReceiptFlag#,RECEIPT_TIME=#ReceiptTime#,RECEIPT_SUCCFLAG=#ReceiptSuccflag#,WANGUAN=#Wanguan#,SENDMETHOD=#Sendmethod#,RESULTSTR=#Resultstr#,FORMVALUE=#Formvalue#,ISONLINE=#Isonline#,SENDTOTIME=#Sendtotime#,SENDTOCMD=#Sendtocmd#,SETCOUNT=#Setcount#,TYPE=#Type#,COMANDTYPE=#Comandtype#,SENDGUID=#SendGuid#
+    WHERE DEVICE_ID = #DeviceId# and SENDINFO_STATUS = '0'
+  </update>
+  
+  <delete id="DeleteSendinfoLast" parameterClass="string">
+		DELETE FROM SENDINFO_LAST 
+		WHERE id= #value# 
+	</delete>
+  <delete id="DeleteSendinfoLastByOldId" parameterClass="string">
+    DELETE FROM SENDINFO_LAST
+    WHERE OLD_ID= #value#
+  </delete>
+  <!--获取发送的命令-->
+  <select id="SelectSendinfoLastCmd" parameterClass="string" resultMap="SendinfoLastResult">
+    select *
+    from (SELECT op_a.*, rownum rn
+    from (
+    SELECT SENDGUID as SendGuid,OLD_ID AS OldId, ID AS Id,SENDINFO_ID AS SendinfoId,DEVICE_ID AS DeviceId,CARINFO_SIM AS CarinfoSim,SENDINFO_COMMAND AS SendinfoCommand,SENDINFO_PTIME AS SendinfoPtime,SENDINFO_STATUS AS SendinfoStatus,SENDINFO_USERID AS SendinfoUserid,SENDINFO_DESCRIPTION AS SendinfoDescription,RECEIPT_FLAG AS ReceiptFlag,RECEIPT_TIME AS ReceiptTime,RECEIPT_SUCCFLAG AS ReceiptSuccflag,WANGUAN AS Wanguan,SENDMETHOD AS Sendmethod,RESULTSTR AS Resultstr,FORMVALUE AS Formvalue,ISONLINE AS Isonline,SENDTOTIME AS Sendtotime,SENDTOCMD AS Sendtocmd,SETCOUNT AS Setcount,TYPE AS Type,COMANDTYPE AS Comandtype
+    FROM SENDINFO_LAST  WHERE  DEVICE_ID = #value#
+    AND (SENDINFO_STATUS = '0' or SENDINFO_STATUS = '2')
+    order by SENDINFO_PTIME DESC
+    ) op_a) op_b
+    Where op_b.rn = 1
+  </select>
+<!--删除SendinfoLast中所有时间大于5的状态=2的此设备的数据-->
+  <delete id="DeleteSendinfoLastStu2T5" parameterClass="string">
+    DELETE FROM SENDINFO_LAST
+    WHERE (sysdate-SENDINFO_PTIME)>5 AND SENDINFO_STATUS = '2' AND DEVICE_ID = #value# 
+  </delete>
+<!--查询待发送命令-->
+  <select id="SelectSendinfoLastPageByTerNos" parameterClass="SendinfoLast" resultMap="SendinfoLastResult">
+    <isGreaterThan property="EndData" compareValue="0">
+      select * from (select op_a.*, rownum rn from (
+    </isGreaterThan>
+    SELECT SL.SENDGUID as SendGuid,SL.OLD_ID AS OldId,SL.ID AS Id,SL.SENDINFO_ID AS SendinfoId,    SL.DEVICE_ID AS DeviceId,
+    SL.CARINFO_SIM AS CarinfoSim,    SL.SENDINFO_COMMAND     AS SendinfoCommand,    SL.SENDINFO_PTIME AS SendinfoPtime,
+    SL.SENDINFO_STATUS      AS SendinfoStatus,    UI.USER_LNAME      AS SendinfoUserid,    SL.SENDINFO_DESCRIPTION AS SendinfoDescription,
+    SL.RECEIPT_FLAG         AS ReceiptFlag,    SL.RECEIPT_TIME         AS ReceiptTime,    SL.RECEIPT_SUCCFLAG     AS ReceiptSuccflag,
+    SL.WANGUAN              AS Wanguan,    SL.SENDMETHOD           AS Sendmethod,    SL.RESULTSTR  AS Resultstr,    SL.FORMVALUE  AS Formvalue,
+    SL.ISONLINE             AS Isonline,    SL.SENDTOTIME           AS Sendtotime,    SL.SENDTOCMD            AS Sendtocmd,
+    SL.SETCOUNT             AS Setcount,    SL.TYPE                 AS Type,    SL.COMANDTYPE           AS Comandtype
+    FROM SENDINFO_LAST SL JOIN USER_INFO UI ON SL.SENDINFO_USERID=UI.USER_ID
+    AND SL.DEVICE_ID IN ($DeviceId$) AND SL.SENDINFO_STATUS = #SendinfoStatus#  ORDER BY SL.SENDINFO_PTIME DESC
+    <isGreaterThan property="EndData" compareValue="0">
+      ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+    </isGreaterThan>
+  </select>
+
+  <!--查询待发送命令总条数-->
+<select id="SelectSendinfoLastCountByTerNos" parameterClass="SendinfoLast" resultClass="int">
+  SELECT count(*)
+  FROM SENDINFO_LAST SL JOIN USER_INFO UI ON SL.SENDINFO_USERID=UI.USER_ID
+  AND SL.DEVICE_ID IN ($DeviceId$) AND SL.SENDINFO_STATUS = #SendinfoStatus#  ORDER BY SL.SENDINFO_PTIME DESC
+  <!--SELECT count(*)
+  FROM SENDINFO_LAST WHERE DEVICE_ID in($DeviceId$) and SENDINFO_STATUS= #SendinfoStatus# ORDER BY SENDINFO_PTIME DESC-->
+</select>
+
+  
+</statements>
+</sqlMap>

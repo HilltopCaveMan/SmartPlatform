@@ -1,0 +1,299 @@
+﻿@{
+    ViewBag.Title = "MapSelect";
+}
+<div id="MapContainer">
+    <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+    <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+</div> 
+<div id="ceju"><input type="checkbox" name="check1" id="Location" /><span>测距</span></div>
+<div id="map" style="height:412px;width:100%;"></div>
+<div id="BDMap" style="height:412px;width:100%; display:none;"></div>
+<div class="formfooter">
+    <button class="stdbtn btn_blue" onclick="confire()">确定</button>
+    <button class="stdbtn btn_default" onclick="clearForm()" type="button">取消</button>
+</div>
+
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=3xyzXPzwlGKFZWULrsKdioWb"></script>
+<link href="~/assets/BMapLib/DrawingManager_min.css" rel="stylesheet" />
+<link href="~/assets/BMapLib/SearchInfoWindow_min.css" rel="stylesheet" />
+<script src="~/assets/BMapLib/SearchInfoWindow_min.js"></script>
+<script src="~/assets/BMapLib/DrawingManager.js"></script>
+<script src="~/assets/javascripts/DistanceTool_min.js"></script>
+
+<script src="http://maps.google.cn/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=false&language=zh-CN&libraries=drawing"></script>
+<script src="~/assets/javascripts/NameOverlay.js"></script>
+<script type="text/javascript" language="javascript">
+    var RailMap = {};
+    RailMap.pics = null;//数据
+    RailMap.Rails = [];//面状图元
+    RailMap.map = null;//地图
+    //RailMap.markerClusterer = null;
+    RailMap.markers = [];//标注
+    RailMap.infoWindow = null;
+    var data = null;
+
+    //测距
+    RailMap.polyline;
+    RailMap.polylinesArray = [];
+    RailMap.lenArray = [];
+    RailMap.Overlay = [];
+    function initRailMap() {
+        var latlng = new google.maps.LatLng(39.91, 116.38);
+        var options = {
+            'zoom': 2,
+            'center': latlng,
+            'mapTypeId': google.maps.MapTypeId.ROADMAP,
+
+        };
+        RailMap.map = new google.maps.Map(document.getElementById('map'), options);
+        //var drawingManager = new google.maps.drawing.DrawingManager({
+        //    drawingMode: 0,
+        //    drawingControl: false,
+        //    drawingControlOptions: {
+        //        position: google.maps.ControlPosition.TOP_CENTER,
+        //        drawingModes: [
+        //          google.maps.drawing.OverlayType.RECTANGLE
+        //        ]
+        //    },
+        //    markerOptions: {
+        //        icon: 'images/beachflag.png'
+        //    },
+        //    circleOptions: {
+        //        fillColor: '#ffff00',
+        //        fillOpacity: 1,
+        //        strokeWeight: 5,
+        //        clickable: false,
+        //        editable: false,
+        //        zIndex: 1
+        //    }
+        //});
+        //drawingManager.setMap(RailMap.map);
+        //google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
+        //    var PointArr;
+        //    CurrentShape = event.overlay;
+        //    if (event.type == google.maps.drawing.OverlayType.RECTANGLE) {
+
+        //        PointArr = event.overlay.getBounds();
+        //        window.parent.$('#hid_PointVal').val(PointArr);
+        //        window.parent.xsjl();
+        //        //if (PointArr != null) {
+        //        // RailMap.infowindow.setPosition(PointArr.getNorthEast());
+        //        // }
+        //        // $("#hid_PointVal").val(PointArr);
+        //        // $("#hid_Type").val("2");
+        //    }
+        //});
+        var lineSymbol = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            scale: 5,
+            strokeColor: '#c0392b'
+        };
+
+        var lineSymbol1 = {
+            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 2
+        };
+        RailMap.polyline = new google.maps.Polyline({
+            path: [],
+            icons: [{
+                icon: lineSymbol,
+                offset: '0%'
+            }, {
+                icon: lineSymbol1,
+                offset: '100%',
+            }],
+            map: RailMap.map
+        });
+    }
+    function confire() {
+        window.parent.$(".dialog").dialog('close');
+    };
+    function clearForm() {
+        window.parent.$(".dialog").dialog('close');
+    };
+
+    //百度地图
+    var map = new BMap.Map("BDMap");
+    map.centerAndZoom("北京", 10);
+    map.addControl(new BMap.NavigationControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));
+    map.addControl(new BMap.MapTypeControl({ anchor: BMAP_ANCHOR_TOP_LEFT }));
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    var myDis = new BMapLib.DistanceTool(map); 
+    
+    $(function () {
+        $("#Location").change(function () {
+            if ($('#Location').attr("checked") == 'checked') {
+                //谷歌操作
+                google.maps.event.addListener(RailMap.map, "click", function (event) {
+                    addMarker(event.latLng);
+                });
+                google.maps.event.addListener(RailMap.map, "dblclick", function (event) {
+                    addMarker(event.latLng);
+                });
+                //百度操作
+                myDis.open();
+            } else {
+                //谷歌操作
+                for (var i = 0; i < RailMap.lenArray.length; i++) {
+                    RailMap.lenArray[i].setMap(null);
+                }
+                RailMap.lenArray = [];
+                for (var k = 0; k < RailMap.Overlay.length; k++) {
+                    RailMap.Overlay[k].setMap(null);
+                }
+                RailMap.Overlay = [];
+                RailMap.polyline.setPath([]);
+                google.maps.event.clearListeners(RailMap.map);
+                //百度操作
+                myDis.close();
+            }
+        });
+        initRailMap();
+    });
+
+    //测距显示图标
+    function SetIcon() {
+        var icons = RailMap.polyline.get('icons');
+        icons[0].offset = '100%';
+        RailMap.polyline.set('icons', icons);
+    }
+    
+    //添加新标记
+    function addMarker(location) {
+
+        var path = RailMap.polyline.getPath();
+        path.push(location);
+
+        SetIcon();
+
+        var icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            strokeColor: "#ff0000 ",
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            scale: 3
+        };
+
+        var myOptions = {
+            position: location,
+            draggable: true,
+            map: RailMap.map,
+            icon: icon
+        };
+
+        polymarker = new google.maps.Marker(myOptions);
+
+        RailMap.lenArray.push(polymarker);
+
+        var dis = (RailMap.polyline.getLength() / 1000).toFixed(3);
+
+        if (RailMap.lenArray.length == 0) {
+            divLay = new NameOverlay(location, "0公里");
+            RailMap.Overlay.push(divLay);
+            divLay.setMap(RailMap.map);
+        }
+        else {
+            divLay = new NameOverlay(location, dis + "公里");
+            RailMap.Overlay.push(divLay);
+            divLay.setMap(RailMap.map);
+        }
+    }
+
+    //距离算法
+    google.maps.LatLng.prototype.distanceFrom = function (latlng) {
+        var lat = [this.lat(), latlng.lat()]
+        var lng = [this.lng(), latlng.lng()] //var R = 6371; // km (change this constant to get miles)
+        var R = 6378137; // In meters
+        var dLat = (lat[1] - lat[0]) * Math.PI / 180;
+        var dLng = (lng[1] - lng[0]) * Math.PI / 180;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat[0] * Math.PI / 180) * Math.cos(lat[1] * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return Math.round(d);
+    }
+
+    google.maps.Marker.prototype.distanceFrom = function (marker) {
+        return this.getPosition().distanceFrom(marker.getPosition());
+    }
+
+    google.maps.Polyline.prototype.getLength = function () {
+        var d = 0;
+        var path = this.getPath();
+        var latlng;
+        for (var i = 0; i < path.getLength() - 1; i++) {
+            latlng = [path.getAt(i), path.getAt(i + 1)];
+            d += latlng[0].distanceFrom(latlng[1]);
+        }
+        return d;
+    }
+
+    //调用百度地图
+    function BaiDuMap() {
+        $("#BDMap").show();
+        $("#map").hide();
+        $("#BaiDuMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#GoogleMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+    //调用谷歌地图
+    function GoogleMap() {
+        $("#BDMapw").hide();
+        $("#map").show();
+        $("#GoogleMap").css({ "background": "#0094ff", "color": "#ffffff" });
+        $("#BaiDuMap").css({ "background": "#ffffff", "color": "#797070" });
+    }
+
+</script>
+
+<style>
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 5px;
+        right: 240px;
+        border: 1px solid #999;
+    }
+
+        #MapContainer div {
+            width: 75px;
+            float: left;
+            text-align: center;
+        }
+
+    #BaiDuMap {
+        background: #ffffff;
+        color: #797070;
+        cursor: pointer;
+    }
+
+    #GoogleMap {
+        color: #fff;
+        cursor: pointer;
+        background: #0094ff;
+    }
+    #ceju {
+        position: absolute;
+        width: 45px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 5px;
+        right: 50px;
+        border: 1px solid #999;
+    }
+        #ceju input {
+            float: left;
+            margin-top:5px;
+            margin-left:3px;
+        }
+        #ceju span{
+            float:left;
+            color:#000000;
+        }
+</style>

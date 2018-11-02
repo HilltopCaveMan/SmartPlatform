@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="CarType" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="CarType" type="GModel.Car.CarType" />
+    <typeAlias alias="CarTypeList" type="GModel.Car.CarTypeList" />
+    <typeAlias alias="CarTypeView" type="GModel.Car.CarTypeView" />
+  </alias>
+  <resultMaps>
+    <resultMap id="CarTypeResult" class="CarType" >
+      <result property="TypeId" column="TypeId" type="string" dbType="varchar"/>
+      <result property="TypeName" column="TypeName"  type="string" dbType="varchar"/>
+      <!--<result property="TypePicture" column="TypePicture" />-->
+      <result property="TypePictype" column="TypePictype" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+    </resultMap>
+    <resultMap id="CarTypeViewResult" class="CarTypeView">
+      <result property="TypeId" column="TypeId" type="string" dbType="varchar"/>
+      <result property="TypeName" column="TypeName" type="string" dbType="varchar"/>
+      <result property="TypePictype" column="TypePictype" type="string" dbType="varchar"/>
+      <result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+    </resultMap>
+    <resultMap id="CarTypeImage" class="Hashtable">
+      <result property="Picture" column="Picture"/>
+      <result property="PicType" column="PicType"/>
+    </resultMap>
+    <resultMap id="CarTypeListResult" class="CarTypeList">
+      <result property="TypeId" column="TypeId" type="string" dbType="varchar"/>
+      <result property="TypeName" column="TypeName" type="string" dbType="varchar"/>
+      <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+    </resultMap>
+  </resultMaps>
+  <statements>
+
+    <select id="SelectCarType" parameterClass="string" resultMap="CarTypeResult">
+      SELECT  TYPE_ID AS TypeId,TYPE_NAME AS TypeName,TYPE_PICTYPE AS TypePictype,DEPT_ID AS DeptId FROM CAR_TYPE WHERE TYPE_ISDEL='0' AND TYPE_ID=#value#
+    </select>
+    
+    <select id="SelectCarTypeNew" parameterClass="map" resultMap="CarTypeResult">
+      SELECT  TYPE_ID AS TypeId,TYPE_NAME AS TypeName,TYPE_PICTYPE AS TypePictype,DEPT_ID AS DeptId FROM CAR_TYPE WHERE TYPE_ISDEL='0' AND TYPE_NAME=#value# and DEPT_ID=#value#
+    </select>
+    
+    <select id="SelectCarTypePage" parameterClass="CarTypeView" resultMap="CarTypeViewResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT TYPE_ID AS TypeId,TYPE_NAME AS TypeName,TYPE_PICTYPE AS TypePictype,BUSINESSDIVISIONID AS Businessdivisionid,BUSINESSDIVISIONNAME AS Businessdivisionname
+      FROM CAR_TYPE_VIEW WHERE  TYPE_ISDEL='0' AND BUSINESSDIVISIONID=#Businessdivisionid#
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    <select id="SelectCarTypeCount" parameterClass="CarType" resultClass="int">
+      SELECT count(*)
+      FROM CAR_TYPE 
+    </select>
+    <insert id="InsertCarType" parameterClass="CarType">
+      INSERT INTO CAR_TYPE
+      (TYPE_ID,TYPE_NAME,TYPE_PICTURE,TYPE_PICTYPE,DEPT_ID, TYPE_ISDEL)
+      VALUES(#TypeId#,#TypeName#,#TypePicture#,#TypePictype#,#DeptId#,'0')
+    </insert>
+    <!--<update id="UpdateCarType" parameterClass="CarType">
+      UPDATE CAR_TYPE
+      SET TYPE_NAME=#TypeName#,TYPE_PICTURE=#TypePicture#,TYPE_PICTYPE=#TypePictype#
+    </update>-->
+    <!--删除-->
+    <delete id="DeleteCarType" parameterClass="string">
+      DELETE FROM CAR_TYPE WHERE TYPE_ID= #value#
+    </delete>
+    <select id="SelectCarTypeImage" parameterClass="CarType" resultMap="CarTypeImage">
+      SELECT t.type_picture AS Picture,t.type_pictype AS PicType FROM CAR_TYPE t WHERE  TYPE_ID=#TypeId#
+    </select>
+    <select id="SelectCarTypeListPage" parameterClass="CarTypeList" resultMap="CarTypeListResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT TYPE_ID AS TypeId,TYPE_NAME AS TypeName,BUSINESSDIVISIONCODE AS Businessdivisioncode
+      FROM CAR_TYPE_LIST WHERE TYPE_ISDEL='0'
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          BUSINESSDIVISIONCODE like #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          BUSINESSDIVISIONID = #Businessdivisionid#
+        </isNotEmpty>
+      </dynamic>
+      UNION
+      SELECT CT.TYPE_ID AS TypeId,
+      DI.BUSINESSDIVISIONNAME || '--' || CT.TYPE_NAME AS TypeName ,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode
+      FROM CAR_TYPE CT
+      JOIN DEPT_INFO DI
+      ON CT.DEPT_ID = DI.BUSINESSDIVISIONID AND DI.BUSINESSDIVISIONNAME='默认企业'
+
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+    <select id="SelectCarTypeSingle" parameterClass="CarType" resultMap="CarTypeResult">
+      SELECT TYPE_ID AS TypeId,TYPE_NAME AS TypeName,TYPE_PICTYPE AS TypePictype,DEPT_ID AS DeptId
+      FROM CAR_TYPE WHERE TYPE_ISDEL='0' AND DEPT_ID=#DeptId# AND TYPE_NAME= #TypeName#
+    </select>
+    
+    
+    
+    
+  </statements>
+</sqlMap>

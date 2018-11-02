@@ -1,0 +1,97 @@
+﻿@model  IEnumerable<GModel.Car.CarTypeView>
+<div class="tabcontant">
+    @if (ViewBag.AddCarType == "true" || ViewBag.DelCarType == "true")
+    {
+        <div class="overviewhead">
+
+            @if (ViewBag.AddCarType == "true")
+            {
+                <button class="stdbtn btn_blue" id="BtnAddCarType">添加</button>
+            }
+            
+            @if (ViewBag.DelCarType == "true")
+            {
+                <button class="stdbtn btn_red" id="BtnRemoveCarType">删除</button>
+            }
+
+        </div>
+    }
+    <br clear="all">
+    <div class="notibar announcement">
+        <a class="close"></a>
+        <h3>温馨提示</h3>
+        <p>添加车辆类型时图片最好选择长宽相同的图片，大小不要超过5M。</p>
+    </div><!-- notification announcement -->
+    <ul class="shortcuts" id="CarTypeList">
+        @foreach (GModel.Car.CarTypeView c in Model)
+        {
+            <li><a rel="@c.TypeId" href=""><img src="@Url.Action("GetCarTypeImage", "CarType", new { c.TypeId })" style="height:100%" /><span>@c.TypeName</span></a></li>
+        }
+    </ul>
+</div>
+<script type="text/javascript">
+    var TypeId = "";
+    $(function () {
+        BinFun();
+        $("ul#CarTypeList li a").click(function () {
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+                $(this).parent().removeClass("in");
+            } else {
+                $("ul#CarTypeList li").removeClass("in");
+                $("ul#CarTypeList li a").removeClass("active");
+                TypeId = $(this).attr("rel");
+                $(this).addClass("active");
+                $(this).parent().addClass("in");
+            }
+            return false;
+        });
+        $("#BtnRemoveCarType").click(function () {
+            if (TypeId != "") {
+                window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+                    if (t) {
+                        $.post("/CarType/DelCarType", { TypeId: TypeId }, function (e) {
+                            if (e == "true") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "删除成功！",
+                                    timeout: 2000,
+                                });
+                                $("#CarTypeList li").remove(".in");
+                            } else if(e=="false"){
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "删除失败！",
+                                    timeout: 2000,
+                                });
+                            } else if (e == "ExistCar") {
+                                window.parent.$.messager.show({
+                                    title: '提示',
+                                    msg: "此类型下有车，不能删除！",
+                                    timeout: 2000,
+                                });
+                            }
+                        })
+                    }
+                })
+
+            } else {
+                window.parent.$.messager.alert('提示', '请选择需要删除的车辆类型！', 'info');
+            }
+        });
+        ///// NOTIFICATION CLOSE BUTTON /////
+
+        jQuery('.notibar .close').click(function () {
+            jQuery(this).parent().fadeOut(function () {
+                jQuery(this).remove();
+            });
+        });
+    })
+
+    function BinFun() {
+        $("#BtnAddCarType").click(function () {
+            window.parent.$.DialogOpen('/CarType/AddCarType', { title: "添加车辆类型", width: 450, height: 400 })
+        });
+    }
+</script>
+

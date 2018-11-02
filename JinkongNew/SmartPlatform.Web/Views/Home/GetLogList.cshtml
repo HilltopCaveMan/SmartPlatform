@@ -1,0 +1,141 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" line-height:26px; background: #fafafa;padding:5px;">
+        
+        <table style="margin-top:5px;">
+            <tr>
+                <td id="td_ksrq" style="padding-left: 15px;">
+                    开始时间:
+                </td>
+                <td>
+                    <input id="KSRQ" name="KSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                </td>
+
+                <td id="td_jsrq" style="padding-left: 15px;">
+                    结束时间:
+                </td>
+                <td>
+                    <input id="JSRQ" name="JSRQ" type="text" class="easyui-datebox" style="width:150px; height:30px;" />
+                </td>
+
+                <td style="padding-left: 15px;">
+                    日志类型:
+                </td>
+                <td>
+                    <input id="LogTypeSel" name="ObjTypeSel" type="text" class="easyui-combobox" style="width:100px; height:30px;" panelheight="110" />
+                </td>
+
+                <td colspan="4">
+                    &nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="search" onclick="Btn_GetTerList()">查询</a>
+                    @*&nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="upLoad" onclick="Btn_LoadExcel()">导出</a>*@
+                </td>
+
+            </tr>
+        </table>
+    </div>
+    <table id="LoadDataTable"></table>
+</div>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 50,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+
+        $("input, textarea, select").uniform();
+
+        //日期段
+        $("#KSRQ").datebox("setValue", "@ViewBag.KSRQ");
+        $("#JSRQ").datebox("setValue", "@ViewBag.JSRQ");
+
+        //用户表格高度
+        $("#LoadDataTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+
+        //终端类型下拉框
+        InitTerTypeSel();
+
+        InitDeptSel();
+
+        InitCarTerTypeSel();
+
+        //设置部门默认值 5bfde218-b359-47ec-889d-3c206a605866
+        $('#TerDeptSel').combotree('setValue', '@ViewBag.DeptId');
+
+        //加载表格数据
+        InitLoadDataTable();
+
+        InitUISize();
+
+    });
+
+    var TerManager = [];
+
+    function InitLoadDataTable() {
+
+        $('#LoadDataTable').datagrid({
+
+            url: '@Url.Action("GetData_LCTJ", "CarReport")',
+
+            columns: [[
+
+                { field: 'TerNo', title: '终端编号', width: 120, align: 'center' },
+                { field: 'CarNo', title: '车牌号', width: 120, align: 'center' },
+                { field: 'LCTJ', title: '里程数', width: 120, align: 'center' }
+
+            ]],
+
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+
+            pageList: [15, 30, 50],
+
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+
+            pagination: true,
+
+            toolbar: TerManager
+        });
+    }
+
+    //加载数据
+    function Btn_GetTerList() {
+        $("#LoadDataTable").datagrid("load", GetArgs());
+    }
+
+    //导出excel
+    function Btn_LoadExcel() {
+        $.post("GetData_LCTJ_ToExcel",
+            GetArgs(),
+            function (e) {
+                if (e.indexOf("Files") > 0) {
+                    window.location.href = e;
+                }
+                else {
+                    alert("导出失败，请重新导出！");
+                }
+            }
+        );
+    }
+
+    window.onresize = function () {
+        InitUISize();
+    }
+
+</script>
+

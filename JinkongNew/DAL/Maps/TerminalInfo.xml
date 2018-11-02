@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="TerminalInfo" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SqlMap.xsd">
+  <alias>
+    <typeAlias alias="TerminalInfo" type="GModel.Car.TerminalInfo" />
+    <typeAlias alias="GetterpositionView" type="GModel.Car.GetterpositionView" />
+    <typeAlias alias="TerminalBind" type="GModel.Car.TerminalBind" />
+    <typeAlias alias="TercensusData" type="GModel.Location.TercensusData" />
+  </alias>
+  <resultMaps>
+    <resultMap id="TerminalInfoResult" class="TerminalInfo">
+      <result property="TerGuid" column="TerGuid" type="string" dbType="varchar"/>
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+      <result property="TerSoftver" column="TerSoftver" type="string" dbType="varchar"/>
+      <result property="TerHardver" column="TerHardver" type="string" dbType="varchar"/>
+      <result property="TerState" column="TerState" type="string" dbType="varchar"/>
+      <result property="CarId" column="CarId" type="string" dbType="varchar"/>
+      <result property="TerTypeid" column="TerTypeid" type="string" dbType="varchar"/>
+      <result property="TerInnettime" column="TerInnettime" type="DateTime" dbType="DateTime"/>
+      <result property="TerSimcard" column="TerSimcard" type="string" dbType="varchar"/>
+      <result property="Activetime" column="Activetime" type="DateTime" dbType="DateTime"/>
+      <result property="TerDeptcode" column="TerDeptcode" type="string" dbType="varchar"/>
+      <result property="TerCarno" column="TerCarno" type="string" dbType="varchar"/>
+      <result property="TerOvertime" column="TerOvertime" type="DateTime" dbType="DateTime"/>
+    </resultMap>
+    <resultMap id="GetterpositionViewResult" class="GetterpositionView">
+      <result property="TerGuid" column="TerGuid" type="string" dbType="varchar"/>      
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="TerSimcard" column="TerSimcard" type="string" dbType="varchar"/> 
+      <result property="ProVersion" column="ProVersion" type="string" dbType="varchar"/>
+      <result property="ProId" column="ProId" type="string" dbType="varchar"/>
+      <result property="ProName" column="ProName" type="string" dbType="varchar"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+      <result property="Businessdivisionid" column="Businessdivisionid" type="string" dbType="varchar"/>
+      <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+      <result property="Worktime" column="Worktime" type="double" dbType="Real"/>
+      <result property="Rtime" column="Rtime" type="DateTime" dbType="DateTime"/>
+      <result property="Protocolversion" column="Protocolversion" type="string" dbType="varchar"/>
+      <result property="Positioningtime" column="Positioningtime" type="DateTime" dbType="DateTime"/>
+      <result property="Workstate" column="Workstate" type="string" dbType="varchar"/>
+      <result property="TerModel" column="TerModel" type="string" dbType="varchar"/>
+      <result property="TerStatrtimes" column="TerStatrtimes" type="string" dbType="varchar"/>
+      <result property="Blinddatanum" column="Blinddatanum" type="string" dbType="varchar"/>
+      <result property="Totalworktime" column="Totalworktime" type="double" dbType="Real"/>
+      <result property="TerVbatt" column="TerVbatt" type="string" dbType="varchar"/>
+      <result property="Ntervalltime" column="Ntervalltime" type="string" dbType="varchar"/>
+      <result property="Sleeptime" column="Sleeptime" type="string" dbType="varchar"/>
+      <result property="TerInnettime" column="TerInnettime" type="DateTime" dbType="DateTime"/>
+      <result property="TerSoftver" column="TerSoftver" type="string" dbType="varchar"/>
+      <result property="TerHardver" column="TerHardver" type="string" dbType="varchar"/>
+      <result property="Position" column="Position" type="string" dbType="varchar"/>
+      <result property="TerStatus" column="TerStatus" type="string" dbType="varchar"/>
+    </resultMap>
+    <resultMap id="TerminalBindResult" class="TerminalBind">
+      <result property="TerGuid" column="TerGuid" type="string" dbType="varchar"/>
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+      <result property="TerSimcard" column="TerSimcard" type="string" dbType="varchar"/>
+      <result property="Businessdivisionname" column="Businessdivisionname" type="string" dbType="varchar"/>
+      <result property="Businessdivisioncode" column="Businessdivisioncode" type="string" dbType="varchar"/>
+      <result property="TerTypeid" column="TerTypeid" type="string" dbType="varchar"/>
+      <result property="ProModel" column="ProModel" type="string" dbType="varchar"/>
+      <result property="ProName" column="ProName" type="string" dbType="varchar"/>
+      <result property="CarNo" column="CarNo" type="string" dbType="varchar"/>
+      <result property="CarId" column="CarId" type="string" dbType="varchar"/>
+      <result property="TypeId" column="TypeId" type="string" dbType="varchar"/>
+      <result property="TypeName" column="TypeName" type="string" dbType="varchar"/>
+    </resultMap>
+    <resultMap id="TercensusDataResult" class="TercensusData">
+      <result property="Id" column="Id" type="string" dbType="varchar"/>
+      <result property="TerNo" column="TerNo" type="string" dbType="varchar"/>
+      <result property="DeptId" column="DeptId" type="string" dbType="varchar"/>
+      <result property="DeptCode" column="DeptCode" type="string" dbType="varchar"/>
+      <result property="DeptName" column="DeptName" type="string" dbType="varchar"/>
+      <result property="TerTypeid" column="TerTypeid" type="string" dbType="varchar"/>
+      <result property="TerTypename" column="TerTypename" type="string" dbType="varchar"/>
+      <result property="Programverson" column="Programverson" type="string" dbType="varchar"/>
+      <result property="TerStatus" column="TerStatus" type="string" dbType="varchar"/>
+      <result property="CensusTime" column="CensusTime" type="DateTime" dbType="DateTime"/>
+      <result property="NewRtime" column="NewRtime" type="DateTime" dbType="DateTime"/>
+      <result property="NotrtimeDay" column="NotrtimeDay" type="string" dbType="varchar"/>
+      <result property="TerVbatt" column="TerVbatt" type="string" dbType="varchar"/>
+      <result property="TerStatrtimes" column="TerStatrtimes" type="string" dbType="varchar"/>
+      <result property="PostbackTimes" column="PostbackTimes" type="string" dbType="varchar"/>
+      <result property="TotalworkTime" column="TotalworkTime" type="string" dbType="varchar"/>
+      <result property="Ntervalltime" column="Ntervalltime" type="string" dbType="varchar"/>
+      <result property="AnalysisResult" column="AnalysisResult" type="string" dbType="varchar"/>
+      <result property="CuralarmState" column="CuralarmState" type="string" dbType="varchar"/>
+      <result property="StandardScale" column="StandardScale" type="string" dbType="varchar"/>
+      <result property="PreciseScale" column="PreciseScale" type="string" dbType="varchar"/>
+      <result property="ChasecarScale" column="ChasecarScale" type="string" dbType="varchar"/>
+    </resultMap>
+    
+  </resultMaps>
+  <statements>
+
+    <select id="SelectTerminalInfo" parameterClass="string" resultMap="TerminalInfoResult">
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,TER_SOFTVER AS TerSoftver,TER_HARDVER AS TerHardver,TER_STATE AS TerState,CAR_ID AS CarId,TER_TYPEID AS TerTypeid,TER_INNETTIME AS TerInnettime,TER_SIMCARD AS TerSimcard,ACTIVETIME AS Activetime,TER_DEPTCODE as TerDeptcode,TER_CARNO as TerCarno,TER_OVERTIME AS TerOvertime
+      FROM TERMINAL_INFO WHERE  TER_GUID=#value#
+    </select>
+    <select id="SelectTerminalInfoByTerNo" parameterClass="string" resultMap="TerminalInfoResult">
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,TER_SOFTVER AS TerSoftver,TER_HARDVER AS TerHardver,TER_STATE AS TerState,CAR_ID AS CarId,TER_TYPEID AS TerTypeid,TER_INNETTIME AS TerInnettime,TER_SIMCARD AS TerSimcard,ACTIVETIME AS Activetime,TER_DEPTCODE as TerDeptcode,TER_CARNO as TerCarno,TER_OVERTIME AS TerOvertime
+      FROM TERMINAL_INFO WHERE TER_NO=#value#
+    </select>
+    <select id="SelectTerminalInfoByCarId" parameterClass="string" resultMap="TerminalInfoResult">
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,TER_SOFTVER AS TerSoftver,TER_HARDVER AS TerHardver,TER_STATE AS TerState,CAR_ID AS CarId,TER_TYPEID AS TerTypeid,TER_INNETTIME AS TerInnettime,TER_SIMCARD AS TerSimcard,ACTIVETIME AS Activetime,TER_DEPTCODE as TerDeptcode,TER_CARNO as TerCarno,TER_OVERTIME AS TerOvertime
+      FROM TERMINAL_INFO WHERE CAR_ID=#value#
+    </select>
+    <select id="SelectTerminalInfoByDeptId" parameterClass="string" resultMap="TerminalInfoResult">
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,TER_SOFTVER AS TerSoftver,TER_HARDVER AS TerHardver,TER_STATE AS TerState,CAR_ID AS CarId,TER_TYPEID AS TerTypeid,TER_INNETTIME AS TerInnettime,TER_SIMCARD AS TerSimcard,ACTIVETIME AS Activetime,TER_DEPTCODE as TerDeptcode,TER_CARNO as TerCarno,TER_OVERTIME AS TerOvertime
+      FROM TERMINAL_INFO WHERE DEPT_ID=#DeptId#
+    </select>
+    <select id="SelectTerminalInfoCount" parameterClass="TerminalInfo" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO
+    </select>
+    <select id="SelectTerminalInfoCountByDeptId" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO WHERE  DEPT_ID=#value#
+    </select>
+    <insert id="InsertTerminalInfo" parameterClass="TerminalInfo">
+      INSERT INTO TERMINAL_INFO
+      (TER_GUID,TER_NO,DEPT_ID,TER_SOFTVER,TER_HARDVER,TER_STATE,CAR_ID,TER_TYPEID,TER_INNETTIME,TER_SIMCARD,ACTIVETIME,TER_DEPTCODE,TER_CARNO)
+      VALUES(#TerGuid#,#TerNo#,#DeptId#,#TerSoftver#,#TerHardver#,#TerState#,#CarId#,#TerTypeid#,#TerInnettime#,#TerSimcard#,#Activetime:DateTime:1/1/0001 12:00:00 AM#,#TerDeptcode#,#TerCarno#)
+    </insert>
+    <update id="UpdateTerminalInfo" parameterClass="TerminalInfo">
+      UPDATE TERMINAL_INFO
+      SET TER_NO=#TerNo#,DEPT_ID=#DeptId#,TER_TYPEID=#TerTypeid#,TER_SIMCARD=#TerSimcard#,TER_DEPTCODE=#TerDeptcode#
+      WHERE TER_GUID = #TerGuid#
+    </update>
+    <delete id="DeleteTerminalInfo" parameterClass="string">
+      DELETE FROM TERMINAL_INFO
+      WHERE TER_GUID =#value#
+    </delete>
+
+    <update id="BindTerCar" parameterClass="TerminalInfo">
+      UPDATE TERMINAL_INFO
+      SET CAR_ID =#CarId#,TER_CARNO=#TerCarno#,DEPT_ID=#DeptId#,TER_DEPTCODE=#TerDeptcode#
+      WHERE TER_GUID=#TerGuid#
+    </update>
+
+    <update id="UpdateTerCarNo" parameterClass="TerminalInfo">
+      UPDATE TERMINAL_INFO
+      SET TER_CARNO=#TerCarno#
+      WHERE CAR_ID =#CarId#
+    </update>
+    
+    <select id="GetterpositionViewPage" parameterClass="GetterpositionView" resultMap="GetterpositionViewResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT TI.TER_GUID        AS TerGuid,
+      TI.TER_NO        AS TerNo,
+      TI.TER_SIMCARD   AS TerSimcard,
+      PI.PRO_VERSION          AS ProVersion,
+      PI.PRO_ID               AS ProId,
+      PI.PRO_NAME             AS ProName,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONID AS Businessdivisionid,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      RD.WORKTIME             AS Worktime,
+      RD.RTIME                AS Rtime,
+      RD.PROTOCOLVERSION      AS Protocolversion,
+      RD.POSITIONINGTIME      AS Positioningtime,
+      RD.WORKSTATE            AS Workstate,
+      RD.TER_MODEL            AS TerModel,
+      RD.TER_STATRTIMES       AS TerStatrtimes,
+      RD.BLINDDATANUM         AS Blinddatanum,
+      RD.TOTALWORKTIME        AS Totalworktime,
+      RD.TER_VBATT            AS TerVbatt,
+      RD.NTERVALLTIME         AS Ntervalltime,
+      RD.SLEEPTIME            AS Sleeptime,
+      TI.TER_INNETTIME        AS TerInnettime,
+      TI.TER_SOFTVER          AS TerSoftver,
+      TI.TER_HARDVER          AS TerHardver,
+      RD.TER_STATUS           AS TerStatus,
+      RD.POSITION             AS Position
+      FROM TERMINAL_INFO TI
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      JOIN PRODUCTS_INFO PI
+      ON TI.TER_TYPEID = PI.PRO_ID
+      LEFT JOIN REALTIME_DATA RD
+      ON TI.TER_NO = RD.TER_NO WHERE 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TI.TER_NO like '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DI.BUSINESSDIVISIONID= #Businessdivisionid#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE LIKE  #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ProId">
+          PI.PRO_ID =  #ProId#
+        </isNotEmpty>
+        <isNotEqual property="TerStatus" compareValue="0">
+          <isNotEqual property="TerStatus" compareValue="6">
+            <isNotEmpty prepend="AND" property="TerStatus">
+              RD.TER_STATUS=#TerStatus#
+            </isNotEmpty>
+          </isNotEqual>
+          <isEqual property="TerStatus" compareValue="6">
+            AND (RD.TER_STATUS is null or RD.TER_STATUS='')
+          </isEqual>
+        </isNotEqual>
+      </dynamic>
+      ORDER BY TI.TER_NO ASC
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+    <select id="GetterpositionViewCount" parameterClass="GetterpositionView" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO TI
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      JOIN PRODUCTS_INFO PI
+      ON TI.TER_TYPEID = PI.PRO_ID
+      LEFT JOIN REALTIME_DATA RD
+      ON TI.TER_NO = RD.TER_NO WHERE 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TI.TER_NO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisionid">
+          DI.BUSINESSDIVISIONID= #Businessdivisionid#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          DI.BUSINESSDIVISIONCODE LIKE  #Businessdivisioncode#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="ProId">
+          PI.PRO_ID =  #ProId#
+        </isNotEmpty>
+        <isNotEqual property="TerStatus" compareValue="0">
+          <isNotEqual property="TerStatus" compareValue="6">
+            <isNotEmpty prepend="AND" property="TerStatus">
+              RD.TER_STATUS=#TerStatus#
+            </isNotEmpty>
+          </isNotEqual>
+          <isEqual property="TerStatus" compareValue="6">
+            AND (RD.TER_STATUS is null or RD.TER_STATUS='')
+          </isEqual>
+        </isNotEqual>
+      </dynamic>
+    </select>
+
+    <!--根据企业ID查询该企业下的终端数量，包括所有子企业-->
+    <select id="SelectTerminalCountByDeptId" parameterClass="string" resultClass="int">
+      SELECT COUNT(*)
+      FROM TERMINAL_INFO TI
+      WHERE TI.DEPT_ID IN
+      (
+      SELECT TA.BUSINESSDIVISIONID
+      FROM DEPT_INFO TA
+      JOIN (SELECT DI.BUSINESSDIVISIONCODE
+      FROM DEPT_INFO DI
+      WHERE DI.BUSINESSDIVISIONID = #value#) TB
+      ON TA.BUSINESSDIVISIONCODE LIKE TB.BUSINESSDIVISIONCODE || '%'
+      AND TA.ISDEL = '0')
+    </select>
+
+    <!--查询车辆绑定信息-->
+    <select id="SelectTerminalBindPage" parameterClass="TerminalBind" resultMap="TerminalBindResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+      SELECT TER_GUID AS TerGuid,TER_NO AS TerNo,DEPT_ID AS DeptId,TER_SIMCARD AS TerSimcard,BUSINESSDIVISIONNAME AS Businessdivisionname,
+      BUSINESSDIVISIONCODE AS Businessdivisioncode,TER_TYPEID AS TerTypeid,PRO_MODEL AS ProModel,PRO_NAME AS ProName,CAR_NO AS CarNo,CAR_ID AS CarId,TYPE_ID AS TypeId,TYPE_NAME AS TypeName
+      FROM TERMINAL_BIND where 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="CarNo">
+          CAR_NO LIKE '%'||#CarNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TypeId">
+          TYPE_ID=#TypeId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TerNo">
+          TER_NO=#TerNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TerTypeid">
+          TER_TYPEID=#TerTypeid#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          DEPT_ID = #DeptId#
+        </isNotEmpty>
+      </dynamic>
+      ORDER BY TER_NO ASC
+      <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b WHERE op_b.rn &lt; #EndData# AND op_b.rn &gt;= #StartData#
+      </isGreaterThan>
+    </select>
+
+    <select id="SelectTerminalBindCount" parameterClass="TerminalInfo" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_BIND WHERE 1=1
+      <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="CarNo">
+          CAR_NO LIKE '%'||#CarNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TypeId">
+          TYPE_ID=#TypeId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TerNo">
+          TER_NO=#TerNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="TerTypeid">
+          TER_TYPEID=#TerTypeid#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          DEPT_ID = #DeptId#
+        </isNotEmpty>
+      </dynamic>
+    </select>
+
+
+    <select id="SelectTerminalCountByCarId" parameterClass="string" resultClass="int">
+      SELECT count(*)
+      FROM TERMINAL_INFO WHERE CAR_ID=#value#
+    </select>
+
+    <select id="SelectTerminalCountByTerNo" parameterClass="string" resultClass="int">
+      select count(*) from TERMINAL_INFO WHERE TER_NO=#value#
+    </select>
+
+    <select id="SelectCarIdByTerGuid" parameterClass="string" resultClass="string">
+      select car_id from TERMINAL_INFO WHERE TER_GUID=#value#
+    </select>
+    
+    <!--解除绑定多个-->
+    <update id="TerminalRemoveBind" parameterClass="string">
+      UPDATE TERMINAL_INFO
+      SET CAR_ID ='',TER_CARNO=''
+      WHERE CAR_ID=#value#
+    </update>
+    <!--解除绑定单台-->
+    <update id="TerminalRemoveBindByGuid" parameterClass="string">
+      UPDATE TERMINAL_INFO
+      SET CAR_ID ='',TER_CARNO=''
+      WHERE TER_GUID=#value#
+    </update>
+    <!--车辆企业流转-->
+    <update id="CarExChange" parameterClass="TerminalInfo">
+      UPDATE CAR_INFO
+      SET BUSINESSDIVISIONID=#DeptId#,CAR_DEPTCODE=#TerDeptcode#
+      WHERE CAR_ID IN (SELECT CAR_ID FROM TERMINAL_INFO WHERE TER_GUID IN ($TerGuid$))
+    </update>
+    <!--终端企业流转-->
+    <update id="TerExChange" parameterClass="TerminalInfo">
+      UPDATE TERMINAL_INFO
+      SET DEPT_ID =#DeptId#,TER_DEPTCODE=#TerDeptcode#,TER_OVERTIME=#TerOvertime#
+      WHERE TER_GUID IN ($TerGuid$)
+    </update>
+    <update id="SetReplyRealdata" parameterClass="TerminalInfo">
+      UPDATE REALTIME_DATA
+      SET REPLYDATACODE ='',REPLYDATANAME=''
+      WHERE TER_NO IN ($TerNo$)
+    </update>
+    
+    <select id="SelectTerminalByCarId" parameterClass="string" resultMap="GetterpositionViewResult">
+      SELECT TI.TER_GUID        AS TerGuid,
+      TI.TER_NO        AS TerNo,
+      TI.TER_SIMCARD   AS TerSimcard,
+      PI.PRO_VERSION          AS ProVersion,
+      PI.PRO_ID               AS ProId,
+      PI.PRO_NAME             AS ProName,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONID AS Businessdivisionid,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      RD.WORKTIME             AS Worktime,
+      RD.RTIME                AS Rtime,
+      RD.PROTOCOLVERSION      AS Protocolversion,
+      RD.POSITIONINGTIME      AS Positioningtime,
+      RD.WORKSTATE            AS Workstate,
+      RD.TER_MODEL            AS TerModel,
+      RD.TER_STATRTIMES       AS TerStatrtimes,
+      RD.BLINDDATANUM         AS Blinddatanum,
+      RD.TOTALWORKTIME        AS Totalworktime,
+      RD.TER_VBATT            AS TerVbatt,
+      RD.NTERVALLTIME         AS Ntervalltime,
+      RD.SLEEPTIME            AS Sleeptime,
+      TI.TER_INNETTIME        AS TerInnettime,
+      TI.TER_SOFTVER          AS TerSoftver,
+      TI.TER_HARDVER          AS TerHardver,
+      RD.POSITION             AS Position,
+      RD.TER_STATUS           AS TerStatus
+      FROM TERMINAL_INFO TI
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID
+      JOIN CAR_INFO CI
+      ON TI.CAR_ID=CI.CAR_ID AND TI.CAR_ID =#value#
+      JOIN PRODUCTS_INFO PI
+      ON TI.TER_TYPEID = PI.PRO_ID
+      JOIN REALTIME_DATA RD
+      ON TI.TER_NO = RD.TER_NO
+    </select>
+
+
+    <select id="SelectTerminalByTerNo" parameterClass="string" resultMap="GetterpositionViewResult">
+      SELECT TI.TER_GUID        AS TerGuid,
+      TI.TER_NO        AS TerNo,
+      TI.TER_SIMCARD   AS TerSimcard,
+      PI.PRO_VERSION          AS ProVersion,
+      PI.PRO_ID               AS ProId,
+      PI.PRO_NAME             AS ProName,
+      DI.BUSINESSDIVISIONNAME AS Businessdivisionname,
+      DI.BUSINESSDIVISIONID AS Businessdivisionid,
+      DI.BUSINESSDIVISIONCODE AS Businessdivisioncode,
+      RD.WORKTIME             AS Worktime,
+      RD.RTIME                AS Rtime,
+      RD.PROTOCOLVERSION      AS Protocolversion,
+      RD.POSITIONINGTIME      AS Positioningtime,
+      RD.WORKSTATE            AS Workstate,
+      RD.TER_MODEL            AS TerModel,
+      RD.TER_STATRTIMES       AS TerStatrtimes,
+      RD.BLINDDATANUM         AS Blinddatanum,
+      RD.TOTALWORKTIME        AS Totalworktime,
+      RD.TER_VBATT            AS TerVbatt,
+      RD.NTERVALLTIME         AS Ntervalltime,
+      RD.SLEEPTIME            AS Sleeptime,
+      TI.TER_INNETTIME        AS TerInnettime,
+      TI.TER_SOFTVER          AS TerSoftver,
+      TI.TER_HARDVER          AS TerHardver,
+      RD.POSITION             AS Position,
+      RD.TER_STATUS           AS TerStatus
+      FROM TERMINAL_INFO TI
+      JOIN DEPT_INFO DI
+      ON TI.DEPT_ID = DI.BUSINESSDIVISIONID AND TI.TER_NO=#value#
+      JOIN PRODUCTS_INFO PI
+      ON TI.TER_TYPEID = PI.PRO_ID
+      JOIN REALTIME_DATA RD
+      ON TI.TER_NO = RD.TER_NO
+    </select> 
+ 
+  <select id="GetTercensusData" parameterClass="map" resultMap="TercensusDataResult">
+      <isGreaterThan property="EndData" compareValue="0">
+        select * from (select op_a.*, rownum rn from (
+      </isGreaterThan>
+    SELECT TC.ID as Id,TC.TERNO as TerNo,TC.DEPTID as DeptId,TC.DEPTCODE as DeptCode,DI.BUSINESSDIVISIONNAME as DeptName,
+    TC.TER_TYPEID as TerTypeid,PI.PRO_NAME as TerTypename,TC.PROGRAMVERSON as Programverson,
+    TC.TER_STATUS as TerStatus,
+    TC.CENSUSTIME as CensusTime,TC.NEWRTIME as NewRtime,TC.NOTRTIMEDAY as NotrtimeDay,
+    TC.TER_VBATT as TerVbatt,TC.TER_STATRTIMES as TerStatrtimes,TC.POSTBACKTIMES as PostbackTimes, TC.TOTALWORKTIME as TotalworkTime,
+    TC.NTERVALLTIME as Ntervalltime,TC.ANALYSISRESULT as AnalysisResult,TC.CURALARMSTATE as CuralarmState,TC.STANDARDSCALE as StandardScale,
+    TC.PRECISESCALE as PreciseScale, TC.CHASECARSCALE as ChasecarScale FROM TERCENSUS TC left join
+    PRODUCTS_INFO PI on TC.TER_TYPEID=PI.PRO_ID left join DEPT_INFO DI on TC.DEPTID=DI.BUSINESSDIVISIONID where 1=1
+    <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TC.TERNO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          TC.DEPTID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          TC.DEPTCODE LIKE #Businessdivisioncode#||'%'
+        </isNotEmpty>
+      </dynamic>
+    ORDER BY TC.DEPTCODE ASC,TC.NEWRTIME desc
+    <isGreaterThan property="EndData" compareValue="0">
+        ) op_a) op_b Where op_b.rn &lt; #EndData# And op_b.rn &gt;= #StartData# 
+      </isGreaterThan>
+    </select>
+
+    <select id="GetTercensusDataCount" parameterClass="map" resultClass="int">
+       SELECT count(*) FROM TERCENSUS TC left join 
+      PRODUCTS_INFO PI on TC.TER_TYPEID=PI.PRO_ID 
+      left join DEPT_INFO DI on TC.DEPTID=DI.BUSINESSDIVISIONID where 1=1
+       <dynamic prepend="AND">
+        <isNotEmpty prepend="AND" property="TerNo">
+          TC.TERNO LIKE '%'||#TerNo#||'%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="DeptId">
+          TC.DEPTID = #DeptId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Businessdivisioncode">
+          TC.DEPTCODE LIKE #Businessdivisioncode#||'%'
+        </isNotEmpty>
+      </dynamic>
+    </select>
+    
+  </statements>
+</sqlMap>

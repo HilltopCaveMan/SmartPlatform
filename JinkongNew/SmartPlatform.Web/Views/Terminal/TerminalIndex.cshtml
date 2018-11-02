@@ -1,0 +1,425 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    终端编号：
+                </td>
+                <td>
+                    <input id="TerNoSel" type="text" style="width:100px;height:20px">
+                </td>
+                <td style="padding-left: 15px;">
+                    车主姓名：
+                </td>
+                <td>
+                    <input id="CarAdminName" type="text" style="width:100px;height:20px">
+                </td>
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input id="TerDeptSel" class="easyui-combobox" style="width:200px; height:30px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    终端类型：
+                </td>
+                <td>
+                    <input id="TerTypeSel" type="text" class="easyui-combobox" style="width:140px; height:30px;" panelheight="110" />
+                </td>
+            </tr>
+            <tr><td colspan="8" style="height:5px;"></td></tr>
+            <tr>
+                <td style="padding-left: 15px;">
+                    绑定类型：
+                </td>
+                <td>
+                    <input id="TerBindType" class="easyui-combobox" style="width:110px; height:30px" panelheight="84" />
+                </td>
+
+                <td colspan="5">
+                    &nbsp;&nbsp;<input type="checkbox" id="ChildrenDept" name="check2" ><label for="ChildrenDept">查询子企业</label>
+                    &nbsp;&nbsp;<input type="checkbox" id="GetCheckTernos" name="check2"><label for="GetCheckTernos">累计搜索查询</label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetTerList()">查询</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-search" id="upLoad" onclick="upLoadTer()">导出</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<a class="easyui-linkbutton" icon="icon-smlz" id="terchange" onclick="terchange()">扫码流转</a>
+                </td>
+
+                <td style="padding-left: 15px;">
+                    
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="TerminalTable"></table>
+</div>
+
+<script src="~/assets/javascripts/Common.js"></script>
+
+<script type="text/javascript">
+    var TerminalData;
+    var TerManager = [];
+    var IsCheckNos = "false";
+    var CheckTernos =[];
+    var AddTerVal = '@ViewBag.AddTer';
+    var EditTerVal = '@ViewBag.EditTer';
+    var DelTerVal = '@ViewBag.DelTer';
+    var ExChangeVal = '@ViewBag.ExChange';
+    var Setpct = '@ViewBag.SetPct';
+    var Sendcmd = '@ViewBag.SendCmd';
+    if (AddTerVal == "true") {
+        var AddTer = {
+            text: '添加',
+            iconCls: 'icon-add',
+            handler: function () { window.parent.$.DialogOpen('/Terminal/addTerminal', { title: "添加终端", width: 450, height: 350 }); }
+        };
+        TerManager.push(AddTer);
+    }
+
+    if (EditTerVal == "true") {
+        var EditTer = {
+            text: '修改',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else if (rows.length > 1) {
+                    window.parent.$.messager.alert('警告', '只能同时选择一个终端进行修改！', 'error');
+                } else {
+                    var id = rows[0].TerGuid;
+                    window.parent.$.DialogOpen('/Terminal/EditTerminal?TerGuid=' + id, { title: "修改终端信息", width: 450, height: 350 });
+                }
+            }
+        };
+        TerManager.push(EditTer);
+    }
+
+    if (DelTerVal == "true") {
+        var DelTer = {
+            text: '删除',
+            iconCls: 'icon-remove',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择要删除的终端', 'error');
+                }
+                else {
+                    var id = "";
+                    for (var i = 0; i < rows.length; i++) {
+                        id += rows[i].TerGuid+",";
+                    }
+
+                    window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+                        if (t) {
+                            $.ajax({
+                                url: '/Terminal/DeleteTer?TerGuid=' + id,
+                                type: "post",
+                                success: function (r) {
+                                    if (r == "true") {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除成功！",
+                                            timeout: 2000,
+                                        });
+                                        TerminalData.datagrid('reload');
+                                    } else {
+                                        window.parent.$.messager.show({
+                                            title: '提示',
+                                            msg: "删除失败！",
+                                            timeout: 2000,
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        };
+        TerManager.push(DelTer);
+    }
+    if (ExChangeVal == "true") {
+        var ExChange = {
+            text: '终端流转',
+            iconCls: 'icon-add',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择要流转的终端', 'error');
+                }
+                else {
+                    var id = "";
+                    for (var i = 0; i < rows.length; i++) {
+                        id += rows[i].TerGuid + ",";
+                    }
+                    var DeptId = rows[0].DeptId;
+                    window.parent.$.DialogOpen('/Terminal/TerExChange?TerGuid=' + id + '&DeptId=' + DeptId, { title: "终端销售流转", width: 650, height: 350 });
+                }
+            }
+        };
+        TerManager.push(ExChange);
+    }
+
+    if (Setpct == "true") {
+        var SetPct = {
+            text: '设置里程',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                }
+                else {
+                    var flag = true;
+                    var TerNos = "";
+                    for (var i = 0; i < rows.length; i++) {
+                        var ProId = rows[i].ProId;
+                        var TerNo = rows[i].TerNo;
+                        if (ProId == "0" || ProId == "1" || ProId == "4") {
+                            flag = false;
+                            break;
+                        }
+                        else {
+                            TerNos += TerNo + ",";
+                        }
+                    }
+                    if (flag == false) {
+                        window.parent.$.messager.alert('警告', '请去除选择的无线设备,里程设置只针对有线设备!', 'error');
+                    }
+                    else {
+                        window.parent.$.DialogOpen('/Terminal/TerPct?TerNos=' + TerNos, { title: "设置里程", width: 300, height: 200 });
+                    }
+                }
+            }
+        };
+        TerManager.push(SetPct);
+    }
+    if (Sendcmd == "true") {
+        var SendCMDBtn = {
+            text: '发送命令',
+            iconCls: 'icon-add',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else if (rows.length > 1) {
+                    window.parent.$.messager.alert('警告', '只能同时选择一个终端发送命令！', 'error');
+                }
+                else {
+                    var ProId = rows[0].ProId;
+                    var TerNo = rows[0].TerNo;
+                    if (ProId == "0") {  //一代无线GPS
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ProId == "1") { //二代无线GPS
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD_New?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ProId == "2") { //Homer3M
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ProId == "3") { //Homer3B-2
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ProId == "4") { //五代无线GPS
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD_Wudai?str=' + TerNo, { title: TerNo, width: 900, height: 500 });
+                    }
+                    if (ProId == "5") { //五代有线GPS
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=false', { title: TerNo, width: 860, height: 500 });
+                    }
+                }
+            }
+        };
+        TerManager.push(SendCMDBtn);
+    }
+    $(function () {
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 80,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+        $("input, textarea, select").uniform();
+        //终端用户表格高度
+        $("#TerminalTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+        loadTerminalTable();
+
+        //终端类型下拉框
+        $('#TerTypeSel').combobox({
+            //url: '@Url.Action("GetTerTypeList", "TerType")',
+            url: '/TerType/GetTerTypeList?TypeMode=true',
+            filter: function (q, row) {
+                var opts = $(this).combobox('options');
+                return row[opts.textField].indexOf(q) == 0;
+            },
+            valueField: 'ProId',
+            textField: 'ProName'
+        });
+
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" }
+            @*onLoadSuccess: function () {
+                $('#parentid').combotree('setValue', '@ViewBag.FatherID');
+            }*@
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown",
+            function (e) {
+                if (e.keyCode == "13") {
+                    $('#TerDeptSel').combotree('tree').tree("search", $(this).val());
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        $('#TerDeptSel').combotree('tree').tree("collapseAll");
+                    }
+                }
+        });
+        */
+
+        var data = [
+            { "id": "1", "text": "全部" },
+            { "id": "2", "text": "已绑定" },
+            { "id": "3", "text": "未绑定" }
+        ];
+
+        $('#TerBindType')
+            .combobox({
+                textField: "text",
+                valueField: "id",
+                editable: false,
+                onLoadSuccess: function () {
+                    $('#TerBindType').combobox('setValue', 1);
+                }
+            })
+            .combobox("loadData", data);
+    });
+   
+    //累计选择查询
+    $("#GetCheckTernos").change(function () {
+        if ($("#GetCheckTernos").attr("checked") == "checked") {
+            IsCheckNos = "true";
+            CheckTernos = [];
+            var rows = TerminalData.datagrid('getRows');
+            if (rows.length <= 100) {
+                for (var i = 0; i < rows.length; i++) {
+                    var TerNo = rows[i].TerNo;
+                    CheckTernos.push(TerNo);
+                }
+            }
+        }
+        else {
+            IsCheckNos = "false";
+            CheckTernos = [];
+        }
+    });
+
+
+    function loadTerminalTable() {
+        TerminalData = $('#TerminalTable').datagrid({
+            url: '@Url.Action("GetTerList", "Terminal")',
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'TerGuid', title: '', width: 0, hidden: true },
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center' },
+                //{ field: 'ProModel', title: '终端型号', width: 90, align: 'center' },
+                { field: 'ProName', title: '终端类型', width: 90, align: 'center' },
+                { field: 'DeptId', title: '', width: 0, hidden: true },
+                { field: 'Businessdivisionname', title: '所属企业', width: 120, align: 'center' },
+                { field: 'TerSimcard', title: 'SIM卡', width: 90, align: 'center' },
+                { field: 'TerInnettime', title: '入网时间', width: 120, align: 'center' },
+                { field: 'CarNo', title: '车牌号', width: 120, align: 'center' },
+                { field: 'CarAdminName', title: '车主姓名', width: 120, align: 'center' },
+                {
+                    field: 'TerPctline', title: '里程标准(公里)', width: 120, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "不工作":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                }
+            ]],
+            fitColumns: true,
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: 'USERNAME',
+            //sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [50, 100, 150],
+            //queryParams: { "LOGINNAME": loginname, "USERNAME": UserName, "DEALERID": DealerID },//查询参数
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true,
+            onLoadSuccess: function (data)
+            {
+                if ($("#GetCheckTernos").attr("checked") == "checked") {
+                    if (CheckTernos.length <= 100) {
+                        CheckTernos = [];
+                        if (data.rows.length > 0 && data.rows.length <= 100) {
+                            for (var i = 0; i < data.rows.length; i++) {
+                                if (CheckTernos.indexOf(data.rows[i].TerNo) < 0) {
+                                    CheckTernos.push(data.rows[i].TerNo);
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            toolbar: TerManager
+        });
+    }
+   
+    //为表格增加参数重载数据
+    function GetTerList() {
+        var DeptId = $('#TerDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#ChildrenDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+
+        var param = {
+            TerNo: $("#TerNoSel").val(),
+            CarAdminName:$("#CarAdminName").val(),
+            DeptId: DeptId,
+            ProId: $("#TerTypeSel").combobox('getValue'),
+            ChildrenSel: Children,
+            TerBindType: $('#TerBindType').combobox('getValue'),
+            IsCheckNos: IsCheckNos,
+            CheckTernos:CheckTernos.join(",")
+        };
+        $("#TerminalTable").datagrid("load", param);
+
+
+    }
+
+    function upLoadTer() {
+        var DeptId = $('#TerDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#ChildrenDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var param = { TerNo: $("#TerNoSel").val(), CarAdminName: $("#CarAdminName").val(), DeptId: DeptId, ProId: $("#TerTypeSel").combobox('getValue'), ChildrenSel: Children, TerBindType: $('#TerBindType').combobox('getValue'), IsCheckNos: IsCheckNos, CheckTernos: CheckTernos.join(",") };
+        $.post("/Terminal/GetUpLoadTer", param, function (e) {
+            if (e.indexOf("Files") > 0) {
+                window.location.href = e;
+            } else {
+                window.parent.$.messager.alert("提示","导出失败，请重新导出！","info");
+            }
+        })
+    }
+
+    function terchange()
+    {
+        window.parent.$.DialogOpen('/Terminal/TerChange', { title:'扫码流转', width: 650, height:550 });
+    }
+</script>

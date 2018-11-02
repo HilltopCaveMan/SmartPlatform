@@ -1,0 +1,136 @@
+﻿<div class="tabcontant">
+    <table id="tableWarn"></table>
+</div>
+<script type="text/javascript">
+    var FieldTable;
+    var WarnManager = [];
+    var AddWarningVal = '@ViewBag.AddWarningVal';
+    var EditWarningVal = '@ViewBag.EditWarningVal';
+    @*var DelFieldVal = '@ViewBag.DelFields';*@
+    //if (AddFieldVal == "true") {
+    //    var AddFieldBtn = {
+    //        text: '添加',
+    //        iconCls: 'icon-add',
+    //        handler: function () { window.parent.$.DialogOpen('/Field/addField', { title: "添加字段", width: 450, height: 250 }); }
+    //    };
+    //    WarnManager.push(AddFieldBtn);
+    //}
+
+    if (EditWarningVal == "true") {
+        var EditFieldBtn = {
+            text: '修改',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = FieldTable.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    $.messager.alert('警告', '您没有选择', 'error');
+                } else if (rows.length > 1) {
+                    $.messager.alert('错误', '只能选择一条数据进行编辑！', 'error');
+                } else {
+                    var id = rows[0].UfId;
+                    window.parent.$.DialogOpen('/Field/EditFields?UfId=' + id, { title: "修改字段", width: 450, height: 250 });
+                }
+            }
+        };
+        WarnManager.push(EditFieldBtn);
+    }
+
+    //if (DelFieldVal == "true") {
+    //    var DelFieldBtn = {
+    //        text: '删除',
+    //        iconCls: 'icon-remove',
+    //        handler: function () {
+    //            var rows = FieldTable.datagrid('getSelections');
+    //            if (rows.length <= 0) {
+    //                window.parent.$.messager.alert('警告', '您没有选择', 'error');
+    //            }
+
+    //            else {
+    //                var id = rows[0].UfId;
+    //                window.parent.$.messager.confirm('确定', '您确定要删除吗', function (t) {
+    //                    if (t) {
+    //                        $.ajax({
+    //                            url: '/Field/DeleteFields?UfId=' + id,
+    //                            type: "post",
+    //                            success: function (r) {
+    //                                if (r > 0) {
+    //                                    window.parent.$.messager.show({
+    //                                        title: '提示',
+    //                                        msg: "删除成功！",
+    //                                        timeout: 2000,
+    //                                    });
+    //                                    FieldTable.datagrid('reload');
+    //                                } else {
+    //                                    window.parent.$.messager.show({
+    //                                        title: '提示',
+    //                                        msg: "删除失败！",
+    //                                        timeout: 2000,
+    //                                    });
+    //                                }
+    //                            }
+    //                        });
+    //                    }
+    //                })
+    //            }
+    //        }
+    //    };
+    //    WarnManager.push(DelFieldBtn);
+    //}
+
+    $(function () {
+        //终端用户表格高度
+        $("#tableWarn").height($(document.body).height() - 20);
+        loadEndUserTable();
+    });
+    function loadEndUserTable() {
+        FieldTable = $('#tableWarn').datagrid({
+            url: '@Url.Action("GetWarnParam", "WarningSet")',
+            columns: [[
+                  { field: 'UfId', title: '', width: 0, hidden: true },
+                  { field: 'MenuName', title: '所属企业', width: 150, align: 'center' },
+                  { field: 'MenuType', title: '在线离线时间', width: 150, align: 'center' },
+                  { field: 'MenuUrl', title: '是否电子围栏报警', width: 200, align: 'center' }
+                  
+            ]],
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortOrder: 'asc',//desc,asc
+            //sortName: 'M.MENUID',
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            fitColumns: true,
+            pagination: true,
+            singleSelect: true,
+            toolbar: WarnManager
+        });
+    }
+
+
+    function succeed() {
+        $(".dialog").dialog('close');
+        $.messager.alert("提示", "操作成功")
+        FieldTable.datagrid('reload');
+    }
+    function error() {
+        $(".dialog").dialog('close');
+        $.messager.alert("警告", "操作失败")
+    }
+    function exist() {
+        $(".dialog").dialog('close');
+        $.messager.show({
+            title: '提示',
+            msg: '登录名重复',
+            showType: 'fade',
+            timeout: 200,
+            style: {
+                right: '',
+                bottom: ''
+            }
+        });
+        FieldTable.datagrid('reload');
+    }
+
+</script>

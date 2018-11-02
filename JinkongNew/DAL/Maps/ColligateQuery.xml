@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="ColligateQuery" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <alias>
+  </alias>
+  <statements>
+
+      
+    <select id="ProteanQuery" parameterClass="string" >
+      $value$
+    </select>
+    
+    <update id="ProteanUpdate" parameterClass="string" >
+      $value$
+    </update>
+    
+  </statements>
+ 
+</sqlMap>

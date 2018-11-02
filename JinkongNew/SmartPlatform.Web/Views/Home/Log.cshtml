@@ -1,0 +1,69 @@
+﻿<div class="tabcontant">
+    <div id="audit_polluteManager_list_searchPanel"
+         style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+         class="easyui-panel" iconcls="icon-search" 
+         collapsible="true" minimizable="false" maximizable="false"
+         closable="false">
+        <form id="audit_polluteManager_list_searchForm" method="post">
+            <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+                <tr style="height:25px;">
+                    <td style="padding-left: 15px;">
+                        登录名：
+                    </td>
+                    <td>
+                        <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                               style="width:150px;height:20px;" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                        登录时间：
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" style="width:110px">
+                        至: <input class="easyui-datebox" style="width:110px">
+                    </td>
+                   
+                    <td style="padding-left:30px;" rowspan="2" align="center">
+                        <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                        <a class="easyui-linkbutton" icon="icon-search"
+                           href="javascript:audit_polluteManager_list_searchForm_submit();">查询</a> &nbsp;&nbsp;
+                        <a class="easyui-linkbutton" icon="icon-cancel"
+                           href="javascript:audit_polluteManager_list_searchFrom_clear()">清空</a>
+                    </td>
+                </tr>              
+            </table>
+        </form>
+    </div>
+    <table id="Logmanager" class="easyui-datagrid" style="height:380px"></table>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        var dg = $('#Logmanager').datagrid({
+            data: [
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' },
+                { f1: '3F70001AZ-G', f2: 'W303164344', f3: 'FR60', f4: '销售', f5: '北京市场部', f6: '北京雷沃博多', f7: '张岩' }
+            ],
+            columns: [[
+                { field: 'f1', title: '登录名', width: 100, align: 'center', sortable: true },
+                { field: 'f2', title: '用户名', width: 100, align: 'center', sortable: true },
+                { field: 'f3', title: '登陆者IP', width: 120, align: 'center' },
+                { field: 'f4', title: '登录方式', width: 60, align: 'center' },
+                { field: 'f5', title: '操作时间', width: 100, align: 'center' },
+                { field: 'f7', title: '操作内容', width: 160, align: 'center' }             
+            ]],
+            fitColumns: true,
+            pagination: true
+        });       
+    });
+</script>

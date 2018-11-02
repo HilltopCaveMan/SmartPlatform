@@ -1,0 +1,578 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_511.cshtml";
+}
+
+@Html.Partial("_HeaderPartial_511")
+
+@model System.Collections.Generic.IList<GModel.RoleRight.MenuInfo>
+
+<div class="moitorContent" id="moitorContent">
+    <div id="contentwrapper11" class="contentwrapper withrightpanel">
+        <div id="subcontent" class=" subcontent chatcontent">
+            <div id="MapContainer">
+                <div id="GoogleMap" onclick="GoogleMap()">谷歌地图</div>
+                <div id="BaiDuMap" onclick="BaiDuMap()">百度地图</div>
+            </div>
+            <div id="chatmessage" class="chatmessage radius2" style="padding:5px;">
+                <div id="BDMap" style="height:100%;width:100%;"></div><!--chatmessageinner-->
+                <div class="full" id="fullscreen">全屏</div>
+                @*<div  class="Location" id="Location">测距</div>*@
+                <div class="Location"><input type="checkbox" name="check1" id="Location" />测距</div>
+                <div class="mappanel-btn">
+                    <input id="mointerCar" type="checkbox" name="check1" />实时监控
+                </div>
+                <div class="timeout" id="timeReturn"></div>
+
+                <div class="btn_carlist_clc" onclick="btn_carlist_clc_Clk();" id="btn_carlist_clc">超里程车辆</div>
+
+                <div class="panelWrap" id="panelWrap">
+                    <div style="width:20px;height:200px;margin:-100px 0 0 -10px;color:#999;position:absolute;opacity:0.5;top:50%;left:50%;" id="showOverlayInfo">此处用于展示报警车辆信息</div>
+                    <div id="panel" style="position:absolute;"></div>
+                </div>
+
+                @*<a class="intoList down" href="#"></a>*@
+
+            </div><!--chatmessage-->
+        </div><!--subcontent-->
+    </div><!--contentwrapper-->
+    <div class="leftpanel" id="rightpanel">
+        <nav class="headernav headerborder" id="header">
+            <div class="headerleft">
+                <ul id="CUL" class="profile_summary">
+                    <li id="CCLJK"><a href="/CarMonitor/BDMonitorIndex_511" class="active" style="font-size:14px; background:#dddddd;">车辆监控</a></li>
+                    <li id="CTJBB"><a href="/CarReport/Index" style="font-size:14px;">统计报表</a></li>
+                    <li id="CXTGLAN"><a href="/Home/Index" style="font-size:14px;">系统管理</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="rightpanelinner">
+            <div class="widgetbox uncollapsible">
+                <div class="widgetoptions">
+                    <input type="text" class="easyui-combotree" id="DeptSel" panelheight="400" style="width:100%;height:30px" />
+                </div>
+                <div class="widgetcontent userlistwidget nopadding">
+                    <div class="widgetcheck">
+                        <input id="ChkShowAllCar" type="checkbox" name="ChkShowAllCar" title="勾选后列表展示全部数据，默认显示前50条。" /><label title="勾选后列表展示全部数据，默认显示前50条。" style="cursor:pointer; " for="ChkShowAllCar">展示全部</label>
+                        <input id="ChkShowChild" type="checkbox" name="ChkShowChild" title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" /><label title="勾选后查询所选企业/部门及其所有子部门的数据，默认只查询所选企业/部门下的数据。" style="cursor:pointer;" for="ChkShowChild">包含子企业</label>
+                    </div>
+                    <div style="height:30px;width:100%;">
+                        <ul class="BumenTab">
+                            <li><a onclick="showzs()">直属车辆</a></li>
+                            <li><a onclick="showjq()">结清车辆</a></li>
+                        </ul>
+                    </div>
+                    <div class="easyui-tabs" id="CarStatu">
+                        <div title="全部">
+                            <div class="box-scroll" id="box-scroll">
+                                <ul id="MonitorList" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="在线">
+                            <div class="box-scroll" id="box-scroll1">
+                                <ul id="MonitorList1" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="离线">
+                            <div class="box-scroll" id="box-scroll2">
+                                <ul id="MonitorList2" class="contactlist"></ul>
+                            </div>
+                        </div>
+                        <div title="断电报警">
+                            <div class="box-scroll" id="box-scroll3">
+                                <ul id="MonitorList3" class="contactlist"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="CarStatu2" style="border:height:100%;overflow-y:auto;">
+                        <div style="text-align:right;margin-top:3px;">
+                            <a class="easyui-linkbutton" icon="icon-edit" id="btn_mod" onclick="btn_mod_click()">编辑</a>
+                            <a class="easyui-linkbutton" icon="icon-add" id="btn_add" onclick="btn_add_click()">添加</a>
+                        </div>
+                        <ul id="GroupEnterTree" style="margin-top:10px"></ul>
+                    </div>
+                    <div id="car_note" style="height:30px;line-height:30px;text-align:left;">
+                        <img src="../Content/Images/lan.png"   width="12" height="12" style="padding:2px;" /><span>在线</span>
+                        <img src="../Content/Images/cheng.png" width="12" height="12" style="padding:2px;" /><span>报警</span>
+                        <img src="../Content/Images/hui.png"   width="12" height="12" style="padding:2px;" /><span>离线</span>
+                        <img src="../Content/Images/lv.png"    width="12" height="12" style="padding:2px;" /><span>库存</span>
+                        <img src="../Content/Images/zi.png"    width="12" height="12" style="padding:2px;" /><span>到期</span>
+                        <img src="../Content/Images/xm.png"    width="12" height="12" style="padding:2px;" /><span>休眠</span>
+                    </div>
+                    <a id="car_count" class="more" href="#"></a>
+                    @*<a class="more" href="#" onclick="AddShowCar()">查看更多车辆&nbsp;↓</a>*@
+                </div><!--widgetcontent-->
+            </div><!--widgetbox-->
+        </div><!--rightpanelinner-->
+    </div><!--rightpanel-->
+</div>
+
+@Html.Partial("_IndexGridCarListPartial")
+
+<!--超里程统计-->
+<div id="DivCarList_Clctj" class="dialog" style="display:none;">
+    <div id="contentwrapper0" class="contentwrapper">
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="CarListTable_Clctj">
+            <colgroup>
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+                <col class="con1" />
+                <col class="con0" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">回传时间</th>
+                    <th class="head1">车牌号</th>
+                    <th class="head0">终端编号</th>
+                    <th class="head1">里程数</th>
+                    <th class="head1">当前位置</th>
+                </tr>
+            </thead>
+            <tbody @*id="ListData"*@></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="contextMenu" id="GroupMenu">
+    <ul id="GroupDept"></ul>
+</div>
+
+@Html.Partial("_FooterPartial")
+
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=3xyzXPzwlGKFZWULrsKdioWb"></script>
+<link href="~/assets/BMapLib/DrawingManager_min.css" rel="stylesheet" />
+<link href="~/assets/BMapLib/SearchInfoWindow_min.css" rel="stylesheet" />
+<script src="~/assets/BMapLib/SearchInfoWindow_min.js"></script>
+<script src="~/assets/BMapLib/DrawingManager.js"></script>
+<script src="~/assets/javascripts/DrawingManager_min.js"></script>
+<script src="~/assets/javascripts/DistanceTool_min.js"></script>
+<script src="~/assets/javascripts/TextIconOverlay_min.js"></script>
+<script src="~/assets/javascripts/MarkerClusterer_min.js"></script>
+
+<script src="~/assets/javascripts/Index.js"></script>
+<script src="~/assets/javascripts/jquery.contextmenu.r2.js"></script>
+<script type="text/javascript">
+
+    G_Index.G_BaiduOrGoogle = "Baidu";
+
+    var RowNumber = 1;
+    //var SearchFlag = 0;
+    var SearchValue = "";
+    var SearchName = "";
+
+    var CKXQ = '@ViewBag.CKXQ';
+    var CKGJ = '@ViewBag.CKGJ';
+    var FSML = '@ViewBag.FSML';
+    var DZWL = '@ViewBag.DZWL';
+    var CheckTerids = [];
+
+    //当前页面类型（AllCar:实时车辆监控,CXWarning:拆卸报警,DDWarning:断电报警）
+    var MapType = "AllCar";
+
+    var countdown;
+    var count;
+
+    //车辆监控
+    @*var CLJK= '@ViewBag.CLJK';*@
+    //终端监控
+    var ZDJK = '@ViewBag.ZDJK';
+
+    //统计报表
+    @*var TJBB= '@ViewBag.TJBB';*@
+    //系统管理按钮
+    @*var XTGLAN= '@ViewBag.XTGLAN';*@
+
+    var MonitorMap = {};
+    MonitorMap.markers = [];
+
+    var data = null;
+
+    var t;
+    var CarTable;
+    var isPanelShow = false;
+
+    var target = $('#target');
+
+    // 百度地图API功能
+    var BmarkerClusterer = null;
+    var map = new BMap.Map("BDMap");
+    MonitorMap.map = map;
+
+    var userAgent = navigator.userAgent;
+    if (userAgent.indexOf("compatible") > -1
+        && userAgent.indexOf("MSIE") > -1 && !isOpera) {
+        map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);
+    }
+    if (userAgent.indexOf("Chrome") != -1) {
+        map.centerAndZoom(new BMap.Point(116.404, 40.499), 10);
+    }
+
+    map.centerAndZoom(new BMap.Point(116.404, 40.499), 10);
+    map.addControl(new BMap.NavigationControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));
+    map.addControl(new BMap.MapTypeControl({ anchor: BMAP_ANCHOR_TOP_LEFT }));
+
+    map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+
+    //map.addEventListener("moveend", BaiduGoogleMap_BoundsChanged);
+    //map.addEventListener("zoomend", BaiduGoogleMap_BoundsChanged);
+
+    var myDis = new BMapLib.DistanceTool(map);
+
+    var opts = {
+        enableMessage: false//设置不允许信息窗发送短息
+    };
+
+    //==================================================
+    // 地图刷新列表
+    //==================================================
+    //地图区域变动后，调整同步右侧车辆面板列表
+    //function BaiduGoogleMap_BoundsChanged() {
+    //    BaiduGoogleMap_BoundsChanged_Load();
+    //}
+
+    //function BaiduGoogleMap_BoundsChanged_Load() {
+    //    //绑定车辆列表 
+    //    BindCarListUI();
+    //    //更新车辆统计数量
+    //    BindCarOrTerCountUI();
+    //}
+
+    //更新车辆统计数量
+    function BindCarOrTerCountUI() {
+
+        //统计视口内终端数量
+        var bounds = MonitorMap.map.getBounds();
+        if (bounds == undefined) return;
+
+        G_CarOrTerCount.TerDivCnt = G_CarOrTerCount.Count;
+
+        var markers = MonitorMap.markers;
+
+        var mks = new Array();
+        var carterlist = new Array();
+        if (markers != null
+            && markers.length > 0) {
+
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i].BaiduLatitude == 0 && markers[i].BaiduLongitude == 0) {
+                    carterlist.push(markers[i]);
+                }
+                else {
+                    //if (bounds.containsPoint(
+                    //        new BMap.Point(
+                    //                    markers[i].BaiduLongitude,
+                    //                    markers[i].BaiduLatitude)) == true) {
+                        mks.push(markers[i]);
+                    //}
+                }
+            }
+        }
+
+        //if (!G_Index.G_ChkShowAllCar) {
+        //    G_CarOrTerCount.TerDivCnt = (mks.length + carterlist.length > G_Index.TabsPanelRowsCnt ? G_Index.TabsPanelRowsCnt : mks.length + carterlist.length);
+        //}
+
+        //G_CarOrTerCount.TerMapCnt = mks.length;
+
+        //更新列表底部终端数量统计
+        //UpdateCarOrTerCount();
+    }
+
+    //绑定车辆列表 
+    function BindCarListUI() {
+
+        var bounds = MonitorMap.map.getBounds();
+        if (bounds == undefined) return;
+
+        var markers = MonitorMap.markers;
+
+        var mks = new Array();
+
+        if (G_Index.G_ChkShowAllCar) {
+            if (markers != null
+            && markers.length > 0) {
+                for (var i = 0; i < markers.length; i++) {
+                    mks.push(markers[i]);
+                }
+            }
+        }
+        else {
+            var count = markers.length > 50 ? 50 : markers.length;
+            if (markers != null
+                && markers.length > 0) {
+                for (var i = 0; i < count; i++) {
+                    //if (bounds.containsPoint(
+                    //    new BMap.Point(
+                    //                markers[i].BaiduLongitude,
+                    //                markers[i].BaiduLatitude)) == true || (markers[i].BaiduLatitude == 0 && markers[i].BaiduLongitude == 0)) {
+                                mks.push(markers[i]);
+                    //}
+                }
+            }
+        }
+
+        G_RefreshCarListUI(mks);
+    }
+
+    //地图刷新车辆列表
+    function G_RefreshCarListUI(markers) {
+
+        var panel = G_GetPanelByCurMapType();
+        if (panel == null) return;
+
+        var G_Marker_Cnt = 0;
+
+        for (var i = 0; i < markers.length; i++) {
+
+            var obj_marker = markers[i];
+
+            //if (obj_marker.BaiduLatitude != 0
+            //    && obj_marker.BaiduLongitude != 0) {
+
+            //    G_Marker_Cnt++;
+
+            //    if (G_Marker_Cnt <= G_Index.TabsPanelRowsCnt) {
+                    CreateUILiFromMarker(i, panel, obj_marker, null);
+            //    }
+            //    else {
+            //        break;
+            //    }
+            //};
+        }
+    }
+
+    //创建 marker
+    function CreateMarker(obj_marker) {
+
+        var pt = new BMap.Point(obj_marker.BaiduLongitude, obj_marker.BaiduLatitude);
+
+        var marker = new BMap.Marker(pt);
+
+        marker.ObjectId = obj_marker.id;
+
+        return marker;
+    }
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    //点击列表显示信息窗口
+    function SelectCarInfoForId(e) {
+
+        var eventSrc = $("[data-id='on" + e + "']");
+
+        var TerNo = eventSrc.attr("data_TerNo");//获取终端编号
+
+        if (MonitorMap.markers != null
+            && MonitorMap.markers.length > 0) {
+
+            for (var i = 0; i < MonitorMap.markers.length; i++) {
+
+                var obj_marker = MonitorMap.markers[i];
+
+                if (TerNo == obj_marker.TerNo) {
+
+                    if (obj_marker.BaiduLatitude != 0
+                        && obj_marker.BaiduLongitude != 0) {
+
+                        var infoHtml = CreateMarkerPopContent(obj_marker);
+
+                        var point = new BMap.Point(obj_marker.BaiduLongitude, obj_marker.BaiduLatitude);
+
+                        OpenMapInfoWin(point, infoHtml);
+
+                        break;
+                    }
+                    else {
+                        window.parent.$.messager.alert('提示', '该设备无经纬度信息,不能定位!', 'info');
+                    }
+                }
+            }
+        }
+    }
+
+    //百度地图 标记点击事件
+    function addClickHandler(sContent, marker) {
+        marker.addEventListener("click", function (e) {
+            openInfo(sContent, e)
+        });
+    };
+
+    //信息窗口
+    function openInfo(sContent, e) {
+
+        var p = e.target;
+
+        var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+
+        OpenMapInfoWin(point, sContent);
+    };
+
+    //打开信息窗口
+    function OpenMapInfoWin(point, sContent) {
+        var infoWindow = new BMap.InfoWindow(sContent, opts);  // 创建信息窗口对象
+        map.setCenter(point);
+        map.setZoom(15);
+        map.openInfoWindow(infoWindow, point); //开启信息窗口
+    }
+
+    //设置菜单列表
+    function setScroll() {
+        $("#box-scroll").slimScroll({
+            height: '20px',
+            position: 'right',
+            alwaysVisible: true
+        });
+    }
+
+    function GetDistance() {
+        myDis.open();  //开启鼠标测距
+    }
+
+    function DisClear() {
+        myDis.close();
+    }
+    
+    $(function () {
+
+        //绑定终端监控
+        //BindBtnTerUI();
+        
+        InitInnerHeight();
+
+        InitUISize(innerHeight);
+
+        $("input, textarea, select").uniform();
+
+        if ($.browser.msie) {
+            $('input:checkbox').click(function () {
+                this.blur();
+                this.focus();
+            });
+        };
+
+        //实时监控
+        BindRealTimeReLoad();
+
+        //全屏、返回
+        BindQuanPing();
+
+        //初始化部门树控件
+        InitDeptTree('@ViewBag.Deptid');
+
+        //显示子企业的车辆
+        BindChkShowChild();
+        BindChkShowAllCar();
+
+        //绑定单位部门查询事件
+        BindSearchEvent($(".textbox-text"), $('#DeptSel'));
+
+        //绑定车辆列表下载 Excel
+        BindLoadDataTableToExcel();
+
+        //绑定测距功能
+        BindDistance();
+
+        //初始化车辆终端
+        InitCarMonitor("@ViewBag.Deptid");
+
+        //如果存在，则直接弹出列表窗口
+        if ("@ViewBag.Vis_Carlist_clc" == "false") {
+            $("#btn_carlist_clc").css("display", "none");
+        }
+
+        $("#CarStatu").show();
+        $("#CarStatu2").hide();
+
+
+        //屏蔽右键
+        $(document).bind('contextmenu', function (e) {
+            return false;
+        });
+
+        //填充结清部门树和菜单
+        LoadGroupDepartTree();
+        LoadGroupDeptMenu();
+    });
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++
+    // 私有函数
+    //=================================================
+    //清空聚合
+    function ClearOverlays() {
+        map.clearOverlays();
+        if (BmarkerClusterer != null) {
+            BmarkerClusterer.clearMarkers();
+        }
+    }
+    //+++++++++++++++++++++++++++++++++++++++++++++++++
+</script>
+
+<style>
+
+    #MapContainer {
+        position: absolute;
+        width: 150px;
+        height: 21px;
+        background: #fff;
+        opacity: 0.9;
+        z-index: 1;
+        top: 13px;
+        right: 200px;
+        border: 1px solid #999;
+    }
+
+    #MapContainer div {
+        width: 75px;
+        float: left;
+        text-align: center;
+    }
+
+    #BaiDuMap {
+        cursor: pointer;
+        color: #fff;
+        background: #0094ff;
+    }
+
+    #GoogleMap {
+        cursor: pointer;
+        background: #ffffff;
+        color: #797070;
+    }
+
+    .btn_carlist_clc {
+        right: 66px !important;
+        bottom: 17px !important;
+    }
+
+    .infotable {
+        width: 100%;
+    }
+
+    .infotd {
+        width: 80px;
+        text-align: right;
+    }
+
+    .stdbtn {
+        font-size: 12px;
+        padding: 3px;
+        font-weight: normal;
+    }
+
+    .BumenTab li {
+        width: 130px;
+        float: left;
+    }
+
+    .BumenTab li a {
+        cursor: pointer;
+        text-align: center;
+        width: 130px;
+        display: block;
+        font-size: 14px;
+        border: 1px solid #797070;
+    }
+
+    .BumenTab li a:hover {
+        background-color: #dddddd;
+    }
+</style>

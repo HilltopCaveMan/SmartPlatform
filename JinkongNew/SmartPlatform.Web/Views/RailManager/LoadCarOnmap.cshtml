@@ -1,0 +1,97 @@
+﻿<div class="tabcontant">
+    <div id="SearchBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr style="height:25px;">
+                <td style="padding-left: 15px;">
+                    车牌号：
+                </td>
+                <td>
+                    <input id="CarNoSel" class="easyui-textbox" style="width:150px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    车辆类型：
+                </td>
+                <td>
+                    <input id="CarTypeSel" style="width: 150px;" />
+                </td>
+                <td style="padding-left:15px;">
+                    <input type="checkbox" id="DeptSel" name="check2" />&nbsp;&nbsp;<label for="DeptSel">查询子企业 </label>
+                </td>
+                <td style="padding-left:15px;">
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="addParam()">查询</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="vehicleTable"></table>
+</div>
+<script type="text/javascript">
+    var RID = "@ViewBag.RailId";
+    var vehicleTable;
+    var CarNo = "";
+    var CarType = "";
+    var Children = "";
+    var SelectCarIdStr = "";
+    var rows;
+
+    $(function () {
+        //检索框面板
+        $("#SearchBar").panel({
+            height: 45,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+        //车辆表格高度
+        $("#vehicleTable").height($(document.body).height() - $("#SearchBar").height() - 37 - $("#Submit").height());
+        loadvehicleTable();
+    });
+
+    //车辆类型下拉框
+    $('#CarTypeSel').combobox({
+        url: '/CarType/GetCarTypeList?TypeMode=true',
+        filter: function (q, row) {
+            var opts = $(this).combobox('options');
+            return row[opts.textField].indexOf(q) == 0;
+        },
+        valueField: 'TypeId',
+        textField: 'TypeName'
+    });
+
+    function loadvehicleTable() {
+        vehicleTable = $('#vehicleTable').datagrid({
+            url:'/RailManager/GetCarlistByRid?RailId='+RID,
+            columns: [[
+                { field: 'CAR_ID', title: '车辆ID', width: 100, hidden: true },
+                { field: 'CAR_NO', title: '车牌号', width: 100, align: 'center', sortable: true },
+                { field: 'TYPE_NAME', title: '类型', width: 60, align: 'center' },
+                { field: 'TER_NO', title: '终端编号', width: 100, align: 'center', sortable: true },
+                { field: 'TER_SIMCARD', title: 'SIM卡号', width: 100, align: 'center', sortable: true },
+            ]],
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            sortName: 'EMPLOYEEID',
+            sortOrder: 'asc', //desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            queryParams: { "CarNo": CarNo, "TypeId": CarType, "ChildrenSel": Children, "RailId": RID },//查询参数
+            fitColumns: true,
+            pagination: true,
+            singleSelect: false,
+            onClickRow: function (value, rec) {
+            }
+        });
+    };
+
+    //为表格增加参数重载数据
+    function addParam() {
+        CarNo = $("#CarNoSel").val();
+        CarType = $("#CarTypeSel").combobox('getValue');
+        if ($("#DeptSel").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var param = { "CarNo": CarNo, "TypeId": CarType, "ChildrenSel": Children, "RailId": RID };
+        $('#vehicleTable').datagrid("load", param);
+    };
+</script>

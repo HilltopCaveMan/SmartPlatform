@@ -1,0 +1,321 @@
+﻿<head>
+    <title>右下角广告代码</title>
+    <style type="text/css">
+        #msg_win {
+            border: 1px solid #A67901;
+            background: #EAEAEA;
+            width: 300px;
+            position: absolute;
+            right: 2;
+            margin: 0px;
+            display: none;
+            overflow: hidden;
+            z-index: 99;
+        }
+
+            #msg_win .icos {
+                position: absolute;
+                top: 2px;
+                *top: 0px;
+                right: 2px;
+                z-index: 9;
+            }
+
+        .icos a {
+            float: left;
+            color: #833B02;
+            margin: 1px;
+            text-align: center;
+            text-decoration: none;
+            font-family: webdings;
+        }
+
+            .icos a:hover {
+                color: #fff;
+            }
+
+        #msg_title {
+            background: #FECD00;
+            border-bottom: 1px solid #A67901;
+            border-top: 1px solid #FFF;
+            border-left: 1px solid #FFF;
+            color: #000;
+            height: 25px;
+            line-height: 25px;
+            text-indent: 5px;
+        }
+
+        #msg_content {
+            margin: 2px;
+            width: 300px;
+            height: 300px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+    <div class="tabcontant">
+        <div id="audit_polluteManager_list_searchPanel"
+             style="height: auto; background: #fafafa; padding: 5px; margin-bottom: 5px;"
+             class="easyui-panel" iconcls="icon-search" title="N天无显示检索"
+             collapsible="true" minimizable="false" maximizable="false"
+             closable="false">
+            <form id="audit_polluteManager_list_searchForm" method="post">
+                <table align="center" cellpadding="1" cellspacing="1" border="0" width="100%">
+                    <tr style="height:25px;">
+                        <td style="padding-left: 15px;">
+                            车牌号：
+                        </td>
+                        <td>
+                            <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                                   style="width:150px;height:20px;" />
+                        </td>
+                        <td style="padding-left: 15px;">
+                            GPS编号：
+                        </td>
+                        <td>
+                            <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                                   style="width:150px;height:20px;" />
+                        </td>
+
+                        <td style="padding-left: 15px;">
+                            SIM卡号：
+                        </td>
+
+                        <td>
+                            <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                                   style="width:150px;height:20px;" />
+                        </td>
+                        <td style="padding-left: 15px;" rowspan="2">
+                            <div style="width:10px;height:0px;overflow:hidden;"><input type="submit"></div>
+                            <a class="easyui-linkbutton" icon="icon-search"
+                               href="#">搜索</a> &nbsp;&nbsp;
+                        </td>
+                    </tr>
+                    <tr style="height:25px;">
+                        <td style="padding-left: 15px;">
+                            机型：
+                        </td>
+                        <td>
+                            <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                                   style="width:150px;height:20px;" />
+                        </td>
+                        <td style="padding-left: 15px;">
+                            驾驶员名称：
+                        </td>
+                        <td>
+                            <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                                   style="width:150px;height:20px;" />
+                        </td>
+                        <td style="padding-left: 15px;">
+                            驾驶员手机号：
+                        </td>
+                        <td>
+                            <input name="polluteaccidentnameString" class="easyui-textbox" type="text"
+                                   style="width:150px;height:20px;" />
+                        </td>
+                        
+                    </tr>
+
+                </table>
+            </form>
+        </div>
+
+
+        <table id="NDayTable" data-options="rownumbers:true,singleSelect:true,toolbar:toolbar" class="easyui-datagrid" style="height:auto"></table>
+    </div>
+    <div id="NDPage"></div>
+    <div id="CharsPage"></div>
+<p style="height:150px;"></p>
+<div id="msg_win" style=" display:block;top:700px;visibility:visible;opacity:1;">
+    <div class="icos"><a style="display:none" id="msg_min" title="最小化" href="javascript:void 0">_</a><a id="msg_close" title="关闭" href="javascript:void 0">×</a></div>
+    <div id="msg_title">最新消息：</div>
+    <div id="msg_content">
+        <ul>
+            <li><a href="#" onclick="OpenCharts()">[3F70001AZ-G] 车机信息回传　　查看</a></li>
+            <li><a href="#" onclick="OpenCharts()">[4F45632AZ-Z] 车机信息回传　　查看</a></li>
+            <li><a href="#" onclick="OpenCharts()">[5F95601AZ-C] 车机信息回传　　查看</a></li>
+            <li><a href="#" onclick="OpenCharts()">[6F90231AZ-A] 车机信息回传　　查看</a></li>
+        </ul>
+    </div>
+</div>
+    <script type="text/javascript">
+        //表头工具栏
+        var toolbar = [{
+            text: '定义保养模型',
+            iconCls: 'icon-cut',
+            handler: function () { showMessage() }
+        }];
+        //车辆参数设置方法
+        function OpenEdit() {
+            $('#NDPage').dialog({
+                title: '设置车辆参数',
+                width: 300,
+                height: 300,
+                closed: true,
+                cache: false,
+                href: '/Operate/NDayEdit',
+                modal: true
+            });
+            $('#NDPage').dialog('open')
+         
+        }
+        //打开报表
+        function OpenCharts() {
+            $('#CharsPage').dialog({
+                title: '查看[3F70001AZ-G] 车机报表',
+                width: 850,
+                height: 550,
+                closed: true,
+                cache: false,
+                href: '/Operate/NDayCharts',
+                modal: true
+            });
+            $('#CharsPage').dialog('open')
+
+        }
+
+
+        $(function () {
+
+            var dg=$('#NDayTable').datagrid({
+                data: [
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' },
+                    { f1: '3F70001AZ-G', f2: 'FR60', f3: '12345678901', f4: '廊坊市机械有限公司', f5: '品牌', f6: '吴明远', f7: '13256788765', f8: '北京市大兴区北京国药龙立科技有限公司西南89.6003米,北京好景象科技发展有限公司北143.216米;', f9: '<a href="#" onclick="OpenEdit()">修改</a>|' }
+                   
+                ],
+                columns: [[
+                    //{ field: 'ck', checkbox: true },
+                    { field: 'f1', title: '车牌号', width: 100, align: 'center', sortable: true },
+                    { field: 'f2', title: 'GPS编号', width: 60, align: 'center' },
+                    { field: 'f3', title: 'SIM卡号', width: 80, align: 'center' },
+                    { field: 'f4', title: '经销商', width: 40, align: 'center' },
+                    { field: 'f5', title: '品牌', width: 100, align: 'center' },
+                    { field: 'f6', title: '驾驶员名称', width: 80, align: 'center' },
+                    { field: 'f7', title: '驾驶员手机号', width: 80, align: 'center' },
+                    { field: 'f8', title: '最新位置', width: 80, align: 'center' },
+                    { field: 'f9', title: '操做', width: 80, align: 'center' }
+                ]],
+                //view: detailview,
+                detailFormatter: function (index, row) {
+                    return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                    $('#ddv-' + index).append(nav);
+
+                    $('#dg').datagrid('fixDetailRowHeight', index);
+                },
+                pagination: true
+            });
+            dg.datagrid('enableFilter', []);
+            showMessage()
+
+        });
+
+
+        function showMessage() {
+            var Message = {
+                set: function () {//最小化与恢复状态切换
+                    var set = this.minbtn.status == 1 ? [0, 1, 'block', this.char[0], '最小化'] : [1, 0, 'none', this.char[1], '恢复'];
+                    this.minbtn.status = set[0];
+                    this.win.style.borderBottomWidth = set[1];
+                    this.content.style.display = set[2];
+                    this.minbtn.innerHTML = set[3]
+                    this.minbtn.title = set[4];
+                    this.win.style.top = this.getY().top;
+                },
+                close: function () {//关闭
+                    this.win.style.display = 'none';
+                    window.onscroll = null;
+                },
+                setOpacity: function (x) {//设置透明度
+                    var v = x >= 100 ? '' : 'Alpha(opacity=' + x + ')';
+                    this.win.style.visibility = x <= 0 ? 'hidden' : 'visible';//IE有绝对或相对定位内容不随父透明度变化的bug
+                    this.win.style.filter = v;
+                    this.win.style.opacity = x / 100;
+                },
+                show: function () {//渐显
+                    clearInterval(this.timer2);
+                    var me = this, fx = this.fx(0, 100, 0.1), t = 0;
+                    this.timer2 = setInterval(function () {
+                        t = fx();
+                        me.setOpacity(t[0]);
+                        if (t[1] == 0) { clearInterval(me.timer2) }
+                    }, 10);
+                },
+                fx: function (a, b, c) {//缓冲计算
+                    var cMath = Math[(a - b) > 0 ? "floor" : "ceil"], c = c || 0.1;
+                    return function () { return [a += cMath((b - a) * c), a - b] }
+                },
+                getY: function () {//计算移动坐标
+                    var d = document, b = document.body, e = document.documentElement;
+                    var s = Math.max(b.scrollTop, e.scrollTop);
+                    var h = /BackCompat/i.test(document.compatMode) ? b.clientHeight : e.clientHeight;
+                    var h2 = this.win.offsetHeight;
+                    return { foot: s + h + h2 + 2 + 'px', top: s + h - h2 - 2 + 'px' }
+                },
+                moveTo: function (y) {//移动动画
+                    clearInterval(this.timer);
+                    var me = this, a = parseInt(this.win.style.top) || 0;
+                    var fx = this.fx(a, parseInt(y));
+                    var t = 0;
+                    this.timer = setInterval(function () {
+                        t = fx();
+                        me.win.style.top = t[0] + 'px';
+                        if (t[1] == 0) {
+                            clearInterval(me.timer);
+                            me.bind();
+                        }
+                    }, 10);
+                },
+                bind: function () {//绑定窗口滚动条与大小变化事件
+                    var me = this, st, rt;
+                    window.onscroll = function () {
+                        clearTimeout(st);
+                        clearTimeout(me.timer2);
+                        me.setOpacity(0);
+                        st = setTimeout(function () {
+                            me.win.style.top = me.getY().top;
+                            me.show();
+                        }, 600);
+                    };
+                    window.onresize = function () {
+                        clearTimeout(rt);
+                        rt = setTimeout(function () { me.win.style.top = me.getY().top }, 100);
+                    }
+                },
+                init: function () {//创建HTML
+                    function $(id) { return document.getElementById(id) };
+                    this.win = $('msg_win');
+                    var set = { minbtn: 'msg_min', closebtn: 'msg_close', title: 'msg_title', content: 'msg_content' };
+                    for (var Id in set) { this[Id] = $(set[Id]) };
+                    var me = this;
+                    this.minbtn.onclick = function () { me.set(); this.blur() };
+                    this.closebtn.onclick = function () { me.close() };
+                    this.char = navigator.userAgent.toLowerCase().indexOf('firefox') + 1 ? ['_', '::', '×'] : ['0', '2', 'r'];//FF不支持webdings字体
+                    this.minbtn.innerHTML = this.char[0];
+                    this.closebtn.innerHTML = this.char[2];
+                    setTimeout(function () {//初始化最先位置
+                        me.win.style.display = 'block';
+                        me.win.style.top = me.getY().foot;
+                        me.moveTo(me.getY().top);
+                    }, 0);
+                    return this;
+                }
+            };
+            Message.init();
+            $("#msg_win").css("margin-left", $(window).width() - 500);
+        }
+
+
+
+    </script>

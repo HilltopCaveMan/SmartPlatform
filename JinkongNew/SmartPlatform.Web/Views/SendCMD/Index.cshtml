@@ -1,0 +1,175 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    终端编码：
+                </td>
+                <td>
+                    <input class="textbox" id="TerNoSel" type="text" style="width:150px;">
+                </td>
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input id="TerDeptSel" class="easyui-combobox" style="width:150px; height:30px;" />
+                    @*<input class="easyui-textbox" id="TerDeptSel" style="width:150px;">*@
+                </td>
+                <td style="padding-left: 15px;">
+                    终端类型:
+                </td>
+                <td>
+                    <input id="TerTypeSel" type="text" class="easyui-combobox" style="width:160px; height:30px;" />
+                </td>
+                <td>
+                    &nbsp;&nbsp;<input type="checkbox" id="SendCMDDept" name="check2"> <label for="ChildrenDept">查询子企业</label>
+                </td>
+                <td style="padding-left: 15px;">
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetTerList()">查询</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="TerminalTable"></table>
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    //var loginname = $("#loginname").val();
+    //var UserName = $("#UserName").val();
+    //var DealerID = $("#AgentList").val();
+    var SendCMD = '@ViewBag.SendCMD';
+    var WaitSend = '@ViewBag.WaitSend';
+
+    var toolvalue = [];
+    if (SendCMD == "true") {
+        var SendCMDBtn = {
+            text: '发送命令',
+            iconCls: 'icon-add',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else {
+                    var ss = rows[0].ProName;
+     
+                    var TerNo = rows[0].TerNo;
+  
+                    if (ss == "一代无线GPS") {
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "二代无线GPS") {
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD_New?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "Homer3M") {
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "Homer3B-2") {
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=true', { title: TerNo, width: 860, height: 500 });
+                    }
+                    if (ss == "五代无线GPS") {
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD_Wudai?str=' + TerNo, { title: TerNo, width: 860, height: 500 });
+                    }
+                    if(ss=="五代有线GPS"){
+                        window.parent.$.DialogOpen('/SendCMD/WiredDevCMD_New?str=' + TerNo + '&flag=false', { title: TerNo, width: 860, height: 500 });
+                    }
+                }
+            }
+        };
+        toolvalue.push(SendCMDBtn);
+    }
+    
+
+    var TerminalData;
+    $(function () {
+        $("input, textarea, select").uniform();
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 45,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            queryParams: { isTree: "false" },
+            editable: true
+            @*onLoadSuccess: function () {
+            $('#parentid').combotree('setValue', '@ViewBag.FatherID');
+            }*@
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#TerDeptSel').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#TerDeptSel').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+
+        $('#TerTypeSel').combobox({
+            //url: '@Url.Action("GetTerTypeList", "TerType")',
+            url: '/TerType/GetTerTypeList?TypeMode=true',
+            valueField: 'ProId',
+            textField: 'ProName'
+        });
+        //终端用户表格高度
+        $("#TerminalTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+        loadTerminalTable();
+    });
+
+    function loadTerminalTable() {
+        TerminalData = $('#TerminalTable').datagrid({
+            url: '@Url.Action("GetTerListData", "SendCMD")',
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center' },
+                { field: 'Businessdivisionname', title: '所属企业', width: 150, align: 'center' },
+                { field: 'ProName', title: '终端类型', width: 100, align: 'center' },
+                { field: 'Worktime', title: '工作时间', width: 90, align: 'center' },
+                {
+                    field: 'Rtime', title: '回传时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'TerInnettime', title: '入网时间', width: 150, align: 'center' },
+                { field: 'Position', title: '终端位置 ', width: 350, align: 'center' }
+            ]],
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            //sortName: '',
+            //sortOrder: 'desc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [15, 30, 45],
+            singleSelect: true,
+            //queryParams: { "LOGINNAME": loginname, "USERNAME": UserName, "DEALERID": DealerID },//查询参数
+            pagination: true,
+            toolbar: toolvalue
+        });
+    }
+
+    //为表格增加参数重载数据
+    function GetTerList() {
+        var DeptId = $('#TerDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#SendCMDDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var param = { TerNo: $("#TerNoSel").val(), ProId: $("#TerTypeSel").combobox('getValue'), Businessdivisionid: DeptId, ChildrenSel: Children };
+        $("#TerminalTable").datagrid("load", param);
+        //window.parent.$("#TerminalTable").datagrid("load", param);
+    }
+
+</script>

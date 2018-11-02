@@ -1,0 +1,269 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    终端编号：
+                </td>
+                <td>
+                    <input class="textbox" id="TerNoSel" type="text" style="width:120px;">
+                </td>
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input id="TerDeptSel" class="easyui-combobox" style="width:150px; height:30px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    终端类型：
+                </td>
+                <td>
+                    <input id="TerTypeSel" type="text" class="easyui-combobox" style="width:120px; height:30px;" />
+                </td>
+                <td style="padding-left: 15px;">
+                    终端状态：
+                </td>
+                <td>
+                    <input id="TerStateSel" type="text" class="easyui-combobox" style="width:120px; height:30px;" />
+                </td>
+                <td>
+                    &nbsp;&nbsp;<input type="checkbox" id="ChildrenDept" name="check2"> <label for="ChildrenDept">查询子企业 </label>
+                </td>
+                <td style="padding-left: 15px;">
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetTerList()">查询</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="TerminalTable"></table>
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    var TerminalData;
+
+    var MutilSendManager = [];
+    var MutilSendCMDVal = '@ViewBag.MutilSendCMD';
+    var MutilWaitSendVal = '@ViewBag.MutilWaitSend';
+    var MutilWaitExeVal = '@ViewBag.MutilWaitExe';
+    var MutilHisSendVal = '@ViewBag.MutilHisSend';
+    if (MutilSendCMDVal == "true") {
+        var MutilSendCMD = {
+            text: '批量发送命令',
+            iconCls: 'icon-add',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+      
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else {
+                    var ss = rows[0].ProName;
+                    var TerNo = "";
+                    for (var i = 0; i < rows.length; i++) {
+                        TerNo += rows[i].TerNo + ",";
+                    }
+
+                    if (ss == "二代无线GPS") {
+                        window.parent.$.DialogOpen('/SendCMD/DevSendCMD_MultiNew?str=' + TerNo, { title: "批量发送命令2", width: 860, height: 500 });
+                    }
+                    else {
+                        window.parent.$.messager.alert('警告', '请选择类型为二代无线GPS的设备', 'error');
+                    }
+                }
+            }
+        };
+        MutilSendManager.push(MutilSendCMD);
+    }
+
+    if (MutilWaitSendVal == "true") {
+        var MutilWaitSend = {
+            text: '待发送命令',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else {
+                    var TerNo = "";
+                    for (var i = 0; i < rows.length; i++) {
+                        TerNo += rows[i].TerNo + ",";
+                    }
+                    window.parent.$.DialogOpen('/SendCMD/CMDList?TerGuid=' + TerNo+'&state=000', { title: "待发送命令", width: 800, height: 500 });
+                }
+            }
+        };
+        MutilSendManager.push(MutilWaitSend);
+    }
+    if (MutilWaitExeVal == "true") {
+        var MutilWaitExe = {
+            text: '发送未执行',
+            iconCls: 'icon-edit',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else {
+                    var TerNo = "";
+                    for (var i = 0; i < rows.length; i++) {
+                        TerNo += rows[i].TerNo + ",";
+                    }
+                    window.parent.$.DialogOpen('/SendCMD/CMDList?TerGuid=' + TerNo + '&state=001', { title: "发送未执行命令", width: 800, height: 500 });
+                }
+            }
+        };
+        MutilSendManager.push(MutilWaitExe);
+    }
+    if (MutilHisSendVal == "true") {
+        var MutilHisSend = {
+            text: '历史命令',
+            iconCls: 'icon-remove',
+            handler: function () {
+                var rows = TerminalData.datagrid('getSelections');
+                if (rows.length <= 0) {
+                    window.parent.$.messager.alert('警告', '您没有选择', 'error');
+                } else {
+                    var TerNo = "";
+                    for (var i = 0; i < rows.length; i++) {
+                        TerNo += rows[i].TerNo + ",";
+                    }
+                    window.parent.$.DialogOpen('/SendCMD/CMDHistoryList?TerNos=' + TerNo, { title: "历史命令", width: 800, height: 500 });
+                }
+            }
+        };
+        MutilSendManager.push(MutilHisSend);
+    }
+    $(function () {
+        loadTerminalTable();
+        $("input, textarea, select").uniform();
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 45,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+        $("#TerDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            queryParams: { isTree: "false" },
+            editable: true
+            @*onLoadSuccess: function () {
+                $('#parentid').combotree('setValue', '@ViewBag.FatherID');
+            }*@
+        });
+
+        BindSearchEvent($(" .textbox-text"), $('#TerDeptSel'));
+
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#TerDeptSel').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#TerDeptSel').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+
+        $('#TerTypeSel').combobox({
+            //url: '@Url.Action("GetTerTypeList", "TerType")',
+            url: '/TerType/GetTerTypeList?TypeMode=false',
+            valueField: 'ProId',
+            textField: 'ProName',
+            onLoadSuccess: function (e) {
+                var data1 = $('#TerTypeSel').combobox('getData');  //赋默认值
+                if (data1.length > 2) {
+                    $("#TerTypeSel ").combobox('select', data1[2].ProId);
+                }
+                $("#search").trigger("click");
+            }
+        });
+
+        $('#TerStateSel').combobox({
+            data: [{ id: 0, text: "--选择终端状态--" }, { id: 1, text: "测试" }, { id: 2, text: "待激活" }, { id: 3, text: "已激活" }, { id: 4, text: "已拆除" }, { id: 5, text: "到期" }, { id: 6, text: "其他" }],
+            valueField: 'id',
+            textField: 'text',
+            onLoadSuccess: function (e) {
+                $("#TerStateSel ").combobox('setValue', 0);
+            }
+        });
+
+        //终端用户表格高度
+        $("#TerminalTable").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+        
+    });
+
+    function loadTerminalTable() {
+        TerminalData = $('#TerminalTable').datagrid({
+            //url: '@Url.Action("GetTerListData", "SendCMD")',
+            url: '',
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center' },
+                { field: 'Businessdivisionname', title: '所属企业', width: 150, align: 'center' },
+                { field: 'ProName', title: '终端类型', width: 100, align: 'center' },
+                { field: 'Worktime', title: '工作时间', width: 90, align: 'center' },
+                {
+                    field: 'TerStatus', title: '设备状态', width: 120, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "测试";
+                            case "2":
+                                return "待激活";
+                            case "3":
+                                return "已激活";
+                            case "4":
+                                return "已拆除";
+                            case "5":
+                                return "到期";
+                            default:
+                                return "其他";
+                        }
+                    }
+                },
+                {
+                    field: 'Rtime', title: '回传时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'TerInnettime', title: '入网时间', width: 150, align: 'center' },
+                { field: 'Position', title: '终端位置 ', width: 350, align: 'center' }
+            ]],
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            sortName: 'USERNAME',
+            sortOrder: 'asc',//desc,asc
+            //分页中下拉选项的数值
+            pageList: [50, 100, 150],
+            //singleSelect: true,
+            //queryParams: { "LOGINNAME": loginname, "USERNAME": UserName, "DEALERID": DealerID },//查询参数
+            pagination: true,
+            toolbar: MutilSendManager
+        });
+    }
+
+    //为表格增加参数重载数据
+    function GetTerList() {
+        var DeptId = $('#TerDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#ChildrenDept").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var StateId = $('#TerStateSel').combotree('getValue');
+        var param = { TerNo: $("#TerNoSel").val(), Businessdivisionid: DeptId, ProId: $("#TerTypeSel").combobox('getValue'), ChildrenSel: Children, TerStatus: StateId };
+        //$("#TerminalTable").datagrid("load", param);
+        $("#TerminalTable").datagrid({
+            url:'/SendCMD/GetTerListData',  
+            queryParams:param
+        });
+    }
+
+</script>

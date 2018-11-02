@@ -1,0 +1,183 @@
+﻿<div class="tabcontant">
+    <div id="SearchTerBar" style=" background: #fafafa;padding:5px;">
+        <table>
+            <tr>
+                <td style="padding-left: 15px;">
+                    终端编号：
+                </td>
+                <td>
+                    <input id="TerNoSel" type="text" style="width: 100px;height:20px">
+                </td>
+                <td style="padding-left: 15px;">
+                    所属企业：
+                </td>
+                <td>
+                    <input id="AllDataDeptSel" class="easyui-combobox" style="width:200px; height:30px;" />
+                </td>
+                <td>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="checkbox" id="ChildrenDeptSel" name="ChildrenDeptSel"> <label for="ChildrenDeptSel">查询子企业 </label>
+                </td>
+
+                <td colspan="2">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="easyui-linkbutton" icon="icon-search" id="search" onclick="GetTerListData()">查询</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="easyui-linkbutton" icon="icon-search" id="DownLoadData" onclick="ExportData()">导出</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table id="TercensusData"></table>
+</div>
+<script src="~/assets/javascripts/Common.js"></script>
+<script type="text/javascript">
+    var TercensusData;
+
+    $(function () {
+        //检索框面板
+        $("#SearchTerBar").panel({
+            height: 50,
+            noheader: true,
+            style: { marginBottom: 5 }
+        });
+        $("input, textarea, select").uniform();
+        //终端用户表格高度
+        $("#TercensusData").height($(document.body).height() - $("#SearchTerBar").height() - 37);
+
+        loadTercensusData();
+
+        $("#AllDataDeptSel").combotree({
+            url: '/Dept/GetOrgNode',
+            editable: true,
+            queryParams: { isTree: "false" }
+        });
+        
+        BindSearchEvent($(" .textbox-text"), $('#AllDataDeptSel'));
+        /*
+        $(" .textbox-text")
+        .attr("title", "输入关键字，点击回车键，进行检索。")
+        .bind("input keydown", function (e) {
+            if (e.keyCode == "13") {
+                $('#AllDataDeptSel').combotree('tree').tree("search", $(this).val());
+                if ($(this).val() == "" || $(this).val() == null) {
+                    $('#AllDataDeptSel').combotree('tree').tree("collapseAll");
+                }
+            }
+        });
+        */
+
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                GetTerListData();
+            }
+        });
+    });
+
+    function loadTercensusData() {
+        TercensusData = $('#TercensusData').datagrid({
+            url: '@Url.Action("GetTercensusData", "Terminal")',
+            columns: [[
+                { field: 'TerNo', title: '终端编号', width: 90, align: 'center' },
+                { field: 'DeptId', title: '', width: 0, hidden: true },
+                { field: 'DeptName', title: '所属企业', width: 120, align: 'center' },
+                { field: 'TerTypeid', title: '设备类型', width: 110, align: 'center' },
+                { field: 'Programverson', title: '设备软件版本', width: 90, align: 'center' },
+                {
+                    field: 'TerStatus', title: '设备状态', width: 120, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "1":
+                                return "测试";
+                            case "2":
+                                return "待激活";
+                            case "3":
+                                return "已激活";
+                            case "4":
+                                return "已拆除";
+                            default:
+                                return "其他";
+                        }
+                    }
+                },
+                 {
+                     field: 'NewRtime', title: '最新回传时间', width: 150, align: 'center',formatter: function (value, row) {
+                         switch (value) {
+                             case "0001-01-01 00:00:00":
+                                 return "";
+                             default:
+                                 return value;
+                         }
+                     }
+                 },
+                {
+                    field: 'NotrtimeDay', title: '未回传天数', width: 90, align: 'center'
+                },
+                { field: 'TerVbatt', title: '设备电池电压', width: 90, align: 'center' },
+                { field: 'TerStatrtimes', title: '设备启动次数', width: 90, align: 'center' },
+                { field: 'PostbackTimes', title: '回传次数', width: 90, align: 'center' },
+                { field: 'Ntervalltime', title: '设备间隔时间', width: 90, align: 'center' },
+                { field: 'TotalworkTime', title: '累计工时', width: 90, align: 'center' },
+                { field: 'CuralarmState', title: '当前报警状态', width: 120, align: 'center' },
+                { field: 'StandardScale', title: '标准比例(%)', width: 120, align: 'center' },
+                { field: 'PreciseScale', title: '精准比例(%)', width: 120, align: 'center' },
+                { field: 'ChasecarScale', title: '追车比例(%)', width: 120, align: 'center' },
+                {
+                    field: 'CensusTime', title: '统计时间', width: 150, align: 'center', formatter: function (value, row) {
+                        switch (value) {
+                            case "0001-01-01 00:00:00":
+                                return "";
+                            default:
+                                return value;
+                        }
+                    }
+                },
+                { field: 'AnalysisResult', title: '分析结果', width: 90, align: 'center' }
+            ]],
+            striped: true,
+            rownumbers: true, //是否加行号
+            pagination: true, //是否显式分页
+            pageSize: 15, //页容量，必须和pageList对应起来，否则会报错
+            pageNumber: 1, //默认显示第几页
+            sortName: 'USERNAME',
+            sortOrder: 'asc',//desc,asc
+            pageList: [50, 100, 150],
+            queryParams: {  },//查询参数
+            detailFormatter: function (index, row) {
+                return '<div id="ddv-' + index + '" style="padding:5px 0"></div>';
+                $('#ddv-' + index).append(nav);
+                $('#dg').datagrid('fixDetailRowHeight', index);
+            },
+            pagination: true,
+            singleSelect: true
+        });
+    }
+
+    //为表格增加参数重载数据
+    function GetTerListData() {
+        var DeptId = $('#AllDataDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#ChildrenDeptSel").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var param = { TerNo: $("#TerNoSel").val(), DeptId: DeptId,ChildrenSel:Children };
+        $("#TercensusData").datagrid("load", param);
+    }
+
+    //导出
+    function ExportData()
+    {
+        var DeptId = $('#AllDataDeptSel').combotree('getValue');
+        var Children = "";
+        if ($("#ChildrenDeptSel").attr("checked") == "checked") {
+            Children = "true";
+        }
+        var param = { TerNo: $("#TerNoSel").val(), DeptId: DeptId, ChildrenSel: Children };
+        $.post("/Terminal/GetloadTercensusData", param, function (e) {
+            if (e.indexOf("Files") > 0) {
+                window.location.href = e;
+            } else {
+                alert("导出失败，请重新导出！");
+            }
+        })
+    }
+</script>
